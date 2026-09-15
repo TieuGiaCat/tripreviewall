@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   renderTitleBlock(tour);
+  renderGallery(tour);
   renderQuickFacts(tour);
   renderOverview(tour);
   renderVerdict(tour);
@@ -155,13 +156,81 @@ function renderLocation(tour) {
   document.getElementById("meeting-address").textContent = tour.city ? `${tour.city}, ${tour.island}, Hawaii` : `${tour.island}, Hawaii`;
 }
 
+function renderGallery(tour) {
+  const gallery = (tour.gallery || []).filter(Boolean);
+  const main = document.getElementById("gallery-main");
+  const thumbs = document.getElementById("gallery-thumbs");
+  const caption = document.getElementById("gallery-caption");
+
+  if (gallery.length === 0) {
+    // No uploaded photos yet — keep the brand-color placeholder already in the HTML.
+    thumbs.innerHTML = "";
+    caption.textContent = "Photo: Operator — awaiting upload";
+    return;
+  }
+
+  const setMain = (url) => {
+    main.style.backgroundImage = `url('${url}')`;
+    main.style.backgroundColor = "";
+  };
+  setMain(gallery[0]);
+  caption.textContent = "Photo: Operator";
+
+  if (gallery.length > 1) {
+    thumbs.innerHTML = gallery.map((url, i) => `
+      <div class="gallery-thumb tour-photo${i === 0 ? " active" : ""}" data-url="${url}" style="background-image:url('${url}')"></div>
+    `).join("");
+    thumbs.querySelectorAll(".gallery-thumb").forEach((thumb) => {
+      thumb.addEventListener("click", () => {
+        thumbs.querySelectorAll(".gallery-thumb").forEach((t) => t.classList.remove("active"));
+        thumb.classList.add("active");
+        setMain(thumb.dataset.url);
+      });
+    });
+  } else {
+    thumbs.innerHTML = "";
+  }
+}
+
 function renderBookingSidebar(tour) {
   document.getElementById("sidebar-price").textContent = `$${tour.priceFrom}`;
   document.getElementById("mobile-price").textContent = `$${tour.priceFrom}`;
-  const link = tour.fareharborShortname
+
+  const bl = tour.bookingLinks || {};
+  const showFareharbor = !bl.fareharbor || bl.fareharbor.show !== false; // default true if not set
+  const fareharborLink = tour.fareharborShortname
     ? `https://fareharbor.com/embeds/book/${tour.fareharborShortname}/`
     : "#";
-  document.getElementById("fareharbor-cta").setAttribute("href", link);
+
+  const primaryCta = document.getElementById("fareharbor-cta");
+  const mobileCta = document.getElementById("mobile-fareharbor-cta");
+  const mobileBar = document.getElementById("mobile-booking-bar");
+
+  if (showFareharbor && tour.fareharborShortname) {
+    primaryCta.setAttribute("href", fareharborLink);
+    primaryCta.style.display = "";
+    if (mobileCta) mobileCta.setAttribute("href", fareharborLink);
+    if (mobileBar) mobileBar.style.display = "";
+  } else {
+    primaryCta.style.display = "none";
+    if (mobileBar) mobileBar.style.display = "none";
+  }
+
+  // Secondary CTAs — only show platforms the admin has enabled AND given a URL.
+  const platforms = [
+    { key: "tripadvisor", label: "TripAdvisor" },
+    { key: "getyourguide", label: "GetYourGuide" },
+    { key: "viator", label: "Viator" },
+  ];
+  const enabled = platforms.filter((p) => bl[p.key] && bl[p.key].show && bl[p.key].url);
+  const block = document.getElementById("booking-secondary-block");
+  const list = document.getElementById("booking-secondary-list");
+  if (enabled.length > 0) {
+    block.style.display = "block";
+    list.innerHTML = enabled.map((p) => `<a href="${bl[p.key].url}" class="btn btn-secondary btn-full" target="_blank" rel="noopener sponsored">${p.label}</a>`).join("");
+  } else {
+    block.style.display = "none";
+  }
 }
 
 function initTabScrollSpy() {

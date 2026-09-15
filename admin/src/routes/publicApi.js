@@ -23,6 +23,8 @@ function toPublicShape(row) {
     googleSnapshot: d.googleSnapshot || {},
     variants: d.variants || [],
     fareharborShortname: d.fareharborShortname || "",
+    gallery: d.gallery || [],
+    bookingLinks: d.bookingLinks || {},
     priceFrom: row.price_from != null ? Number(row.price_from) : null,
     aggregatedRating: d.aggregatedRating != null ? Number(d.aggregatedRating) : null,
     reviewCountTotal: d.reviewCountTotal != null ? Number(d.reviewCountTotal) : null,

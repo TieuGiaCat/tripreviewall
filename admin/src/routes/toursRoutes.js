@@ -98,10 +98,25 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
   const v = d.verdict || {};
   const gs = d.googleSnapshot || {};
   const rd = d.ratingDistribution || {};
+  const bl = d.bookingLinks || {};
+  const gallery = d.gallery || [];
 
   const islandOptions = ISLANDS.map(
     (isl) => `<option value="${isl}" ${tour.island === isl ? "selected" : ""}>${isl}</option>`
   ).join("");
+
+  const galleryThumbs = gallery
+    .map(
+      (url) => `
+      <div style="position:relative;">
+        <img src="${esc(url)}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);">
+        <form method="POST" action="/admin/tours/${tour.id}/remove-image" style="position:absolute;top:4px;right:4px;">
+          <input type="hidden" name="imageUrl" value="${esc(url)}">
+          <button type="submit" class="btn btn-danger btn-sm" style="padding:2px 8px;" onclick="return confirm('Remove this image?');">✕</button>
+        </form>
+      </div>`
+    )
+    .join("");
 
   return `
     <h1 class="page-title">${isEdit ? "Edit Tour" : "New Tour"}</h1>
@@ -126,16 +141,45 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         </div>
         <div class="form-row">
           <div class="form-field"><label>Duration</label><input type="text" name="durationLabel" value="${esc(d.durationLabel || "")}" placeholder="e.g. Half Day"></div>
-          <div class="form-field"><label>FareHarbor Shortname</label><input type="text" name="fareharborShortname" value="${esc(d.fareharborShortname || "")}"></div>
-        </div>
-        <div class="form-row">
           <div class="form-field"><label>Status</label>
             <select name="status">
               <option value="draft" ${tour.status !== "published" ? "selected" : ""}>Draft</option>
               <option value="published" ${tour.status === "published" ? "selected" : ""}>Published</option>
             </select>
           </div>
+        </div>
+        <div class="form-row">
           <div class="form-field"><label>Price From (USD)</label><input type="number" step="1" min="0" name="priceFrom" value="${esc(tour.price_from != null ? tour.price_from : "")}"></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Booking Links</h2>
+        <p class="hint" style="margin:-8px 0 16px;">Each toggle controls whether that button shows on the live Tour Detail page. FareHarbor uses the shortname below to build its link; the other three need a full affiliate URL from that platform's partner dashboard.</p>
+
+        <div class="form-row">
+          <div class="form-field"><label>FareHarbor Shortname</label><input type="text" name="fareharborShortname" value="${esc(d.fareharborShortname || "")}"></div>
+          <div class="form-field">
+            <label><input type="checkbox" name="showFareharbor" value="1" ${bl.fareharbor && bl.fareharbor.show === false ? "" : "checked"}> Show FareHarbor button</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>TripAdvisor Affiliate URL</label><input type="text" name="tripadvisorUrl" value="${esc((bl.tripadvisor && bl.tripadvisor.url) || "")}" placeholder="https://..."></div>
+          <div class="form-field">
+            <label><input type="checkbox" name="showTripadvisor" value="1" ${bl.tripadvisor && bl.tripadvisor.show ? "checked" : ""}> Show TripAdvisor button</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>GetYourGuide Affiliate URL</label><input type="text" name="getyourguideUrl" value="${esc((bl.getyourguide && bl.getyourguide.url) || "")}" placeholder="https://..."></div>
+          <div class="form-field">
+            <label><input type="checkbox" name="showGetyourguide" value="1" ${bl.getyourguide && bl.getyourguide.show ? "checked" : ""}> Show GetYourGuide button</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Viator Affiliate URL</label><input type="text" name="viatorUrl" value="${esc((bl.viator && bl.viator.url) || "")}" placeholder="https://..."></div>
+          <div class="form-field">
+            <label><input type="checkbox" name="showViator" value="1" ${bl.viator && bl.viator.show ? "checked" : ""}> Show Viator button</label>
+          </div>
         </div>
       </div>
 
@@ -198,10 +242,28 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         <a href="/admin/tours" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
+
+    <div class="form-card">
+      <h2>Gallery</h2>
+      ${
+        !isEdit
+          ? `<p class="hint">Save the tour first — image upload becomes available once it has an id.</p>`
+          : `
+        ${gallery.length ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px;">${galleryThumbs}</div>` : `<p class="hint" style="margin-bottom:16px;">No images yet.</p>`}
+        <form method="POST" action="/admin/tours/${tour.id}/upload-image" enctype="multipart/form-data">
+          <div class="form-field">
+            <label>Upload image(s) — jpg, png or webp, max 8MB each</label>
+            <input type="file" name="images" accept=".jpg,.jpeg,.png,.webp" multiple>
+          </div>
+          <button type="submit" class="btn btn-secondary" style="margin-top:10px;">Upload</button>
+        </form>
+      `
+      }
+    </div>
   `;
 }
 
-function bodyToTourData(body) {
+function bodyToTourData(body, existingData = {}) {
   return {
     name: (body.name || "").trim(),
     company: (body.company || "").trim(),
@@ -231,6 +293,16 @@ function bodyToTourData(body) {
       star2: Number(body.star2) || 0,
       star1: Number(body.star1) || 0,
     },
+    bookingLinks: {
+      fareharbor: { show: body.showFareharbor === "1" },
+      tripadvisor: { url: (body.tripadvisorUrl || "").trim(), show: body.showTripadvisor === "1" },
+      getyourguide: { url: (body.getyourguideUrl || "").trim(), show: body.showGetyourguide === "1" },
+      viator: { url: (body.viatorUrl || "").trim(), show: body.showViator === "1" },
+    },
+    // Not edited by this form — preserved from whatever the tour already had,
+    // so saving the main form never wipes out uploaded images or variants.
+    variants: existingData.variants || [],
+    gallery: existingData.gallery || [],
   };
 }
 
@@ -345,12 +417,29 @@ async function updateTour(req, res, user, id) {
     return;
   }
 
+  // Fetch the current row first so gallery/variants (not edited by this form)
+  // survive the save instead of being wiped out.
+  let existing;
+  try {
+    const existingResult = await query("SELECT data FROM tours WHERE id = $1", [id]);
+    existing = existingResult.rows[0];
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Error", activeNav: "tours", user, body: `<div class="alert alert-error">Database error: ${esc(err.message)}</div>` }));
+    return;
+  }
+  if (!existing) {
+    res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Not found", activeNav: "tours", user, body: `<div class="alert alert-error">Tour not found.</div><a href="/admin/tours" class="btn btn-secondary">Back to Tours</a>` }));
+    return;
+  }
+
   const errors = [];
   if (!body.name || !body.name.trim()) errors.push("Tour name is required.");
   const slug = slugify(body.slug || body.name);
   if (!slug) errors.push("Could not generate a valid slug.");
 
-  const data = bodyToTourData(body);
+  const data = bodyToTourData(body, existing.data || {});
   const status = body.status === "published" ? "published" : "draft";
   const island = ISLANDS.includes(body.island) ? body.island : null;
   const priceFrom = body.priceFrom !== "" ? Number(body.priceFrom) : null;
@@ -405,4 +494,86 @@ async function deleteTour(req, res, user, id) {
   res.end();
 }
 
-module.exports = { listTours, newTourForm, createTour, editTourForm, updateTour, deleteTour };
+/* ============================================================
+   Gallery — upload / remove images
+   ============================================================ */
+async function uploadTourImage(req, res, user, id) {
+  const { parseImageUpload } = require("../upload");
+
+  let existing;
+  try {
+    const result = await query("SELECT slug, data FROM tours WHERE id = $1", [id]);
+    existing = result.rows[0];
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`Database error: ${esc(err.message)}`);
+    return;
+  }
+  if (!existing) {
+    res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+    res.end("Tour not found.");
+    return;
+  }
+
+  let uploadResult;
+  try {
+    uploadResult = await parseImageUpload(req, existing.slug);
+  } catch (err) {
+    console.error("[tours] image upload parse failed:", err.message);
+    res.writeHead(302, { Location: `/admin/tours/${id}/edit` });
+    res.end();
+    return;
+  }
+
+  const data = existing.data || {};
+  data.gallery = [...(data.gallery || []), ...uploadResult.urls];
+
+  try {
+    await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+  } catch (err) {
+    console.error("[tours] saving uploaded image urls failed:", err.message);
+  }
+
+  res.writeHead(302, { Location: `/admin/tours/${id}/edit` });
+  res.end();
+}
+
+async function removeTourImage(req, res, user, id) {
+  let body;
+  try {
+    body = await readFormBody(req);
+  } catch (err) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end("Malformed request.");
+    return;
+  }
+
+  let existing;
+  try {
+    const result = await query("SELECT data FROM tours WHERE id = $1", [id]);
+    existing = result.rows[0];
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`Database error: ${esc(err.message)}`);
+    return;
+  }
+  if (!existing) {
+    res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+    res.end("Tour not found.");
+    return;
+  }
+
+  const data = existing.data || {};
+  data.gallery = (data.gallery || []).filter((url) => url !== body.imageUrl);
+
+  try {
+    await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+  } catch (err) {
+    console.error("[tours] removing image failed:", err.message);
+  }
+
+  res.writeHead(302, { Location: `/admin/tours/${id}/edit` });
+  res.end();
+}
+
+module.exports = { listTours, newTourForm, createTour, editTourForm, updateTour, deleteTour, uploadTourImage, removeTourImage };

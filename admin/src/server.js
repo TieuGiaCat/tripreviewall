@@ -18,8 +18,38 @@ const MIME_TYPES = {
   ".js": "application/javascript; charset=utf-8",
   ".png": "image/png",
   ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
   ".svg": "image/svg+xml",
 };
+
+const UPLOADS_DIR = path.join(__dirname, "..", "public", "uploads");
+
+function serveUpload(req, res, urlPath) {
+  // urlPath is like "/uploads/tours/xyz.jpg" — strip the "/uploads" prefix
+  const rel = urlPath.replace(/^\/uploads\//, "");
+  const filePath = path.join(UPLOADS_DIR, rel);
+
+  if (!filePath.startsWith(UPLOADS_DIR)) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
+
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("Not found");
+      return;
+    }
+    const ext = path.extname(filePath);
+    res.writeHead(200, {
+      "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
+      "Cache-Control": "public, max-age=86400",
+    });
+    res.end(content);
+  });
+}
 
 function serveStatic(req, res, urlPath) {
   // urlPath is like "/admin/public/admin.css" — strip the "/admin/public" prefix
@@ -54,6 +84,9 @@ const server = http.createServer(async (req, res) => {
     // ---- Static assets ----
     if (method === "GET" && pathname.startsWith("/admin/public/")) {
       return serveStatic(req, res, pathname);
+    }
+    if (method === "GET" && pathname.startsWith("/uploads/")) {
+      return serveUpload(req, res, pathname);
     }
 
     // ---- Root ----
@@ -106,6 +139,15 @@ const server = http.createServer(async (req, res) => {
     const deleteMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/delete$/);
     if (deleteMatch && method === "POST") {
       return toursRoutes.deleteTour(req, res, session, deleteMatch[1]);
+    }
+
+    const uploadMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/upload-image$/);
+    if (uploadMatch && method === "POST") {
+      return toursRoutes.uploadTourImage(req, res, session, uploadMatch[1]);
+    }
+    const removeImageMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/remove-image$/);
+    if (removeImageMatch && method === "POST") {
+      return toursRoutes.removeTourImage(req, res, session, removeImageMatch[1]);
     }
 
     // ---- 404 ----

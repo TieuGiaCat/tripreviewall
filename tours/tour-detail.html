@@ -90,11 +90,12 @@
       </div>
     </div>
 
-    <!-- ================= GALLERY (placeholder — real photos not yet mapped, see note) ================= -->
+    <!-- ================= GALLERY ================= -->
     <div class="gallery">
       <div class="gallery-main tour-photo" id="gallery-main" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
     </div>
-    <p class="gallery-caption">Photo: Operator — awaiting image mapping</p>
+    <div class="gallery-thumbs" id="gallery-thumbs"></div>
+    <p class="gallery-caption" id="gallery-caption">Photo: Operator</p>
 
     <!-- ================= QUICK FACTS ================= -->
     <div class="quickfacts" id="quickfacts-strip"></div>
@@ -176,10 +177,9 @@
             <div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>
           </div>
 
-          <div class="booking-secondary-label">Also available on</div>
-          <div class="booking-secondary-list">
-            <a href="#" class="btn btn-secondary btn-full">TripAdvisor</a>
-            <a href="#" class="btn btn-secondary btn-full">GetYourGuide</a>
+          <div id="booking-secondary-block" style="display:none;">
+            <div class="booking-secondary-label">Also available on</div>
+            <div class="booking-secondary-list" id="booking-secondary-list"></div>
           </div>
 
           <p class="booking-disclosure">Tripreviewall may earn a commission if you book through the links above, at no extra cost to you.</p>
@@ -198,7 +198,7 @@
 <!-- Mobile sticky booking bar -->
 <div class="mobile-booking-bar" id="mobile-booking-bar">
   <div><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular" id="mobile-price">$100</div></div>
-  <a href="#" class="btn btn-primary">Check Availability</a>
+  <a href="#" class="btn btn-primary" id="mobile-fareharbor-cta">Check Availability</a>
 </div>
 
 <!-- ================= FOOTER (identical to Home) ================= -->
