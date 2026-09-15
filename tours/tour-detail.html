@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Tour — Tripreviewall</title>
+<meta name="description" id="page-desc" content="Honest Hawaii tour review — ratings aggregated from TripAdvisor, GetYourGuide, FareHarbor and Google.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/tour-detail.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<!-- ================= HEADER (identical to Home) ================= -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="../index.html" class="logo" aria-label="Tripreviewall home">
+      <span class="part-1">Tripreview</span><span class="part-2">all</span>
+    </a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="../tours.html">Tours</a>
+      <a href="../destinations.html">Destinations</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../about.html">About</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-drawer">
+  <div class="mobile-drawer-backdrop" data-drawer-backdrop></div>
+  <div class="mobile-drawer-panel" role="dialog" aria-label="Site menu">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span class="logo"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
+      <button class="close-btn" data-drawer-close aria-label="Close menu">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <nav>
+      <a href="../tours.html" class="mobile-nav-link">Tours</a>
+      <a href="../destinations.html" class="mobile-nav-link">Destinations</a>
+      <a href="../blog.html" class="mobile-nav-link">Blog</a>
+      <a href="../about.html" class="mobile-nav-link">About</a>
+      <a href="../contact.html" class="mobile-nav-link">Contact</a>
+    </nav>
+  </div>
+</div>
+
+<main id="main">
+  <div class="container" id="tour-not-found" style="display:none; padding:96px 0; text-align:center;">
+    <h1 class="page-h1" style="font-family:var(--font-serif);">Tour not found</h1>
+    <p style="color:var(--color-text-muted);margin-bottom:24px;">This tour may have been removed or the link is incorrect.</p>
+    <a href="../tours.html" class="btn btn-secondary">Browse All Tours</a>
+  </div>
+
+  <div class="container" id="tour-content">
+    <!-- ================= BREADCRUMB ================= -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html">Home</a><span class="sep">/</span>
+      <a href="../tours.html">Hawaii Tours</a><span class="sep">/</span>
+      <span class="current" id="bc-current">…</span>
+    </nav>
+
+    <!-- ================= TITLE BLOCK ================= -->
+    <div class="detail-title-block">
+      <div class="detail-location">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span id="detail-location-text">…</span>
+      </div>
+      <h1 class="detail-h1" id="detail-h1">…</h1>
+      <div class="detail-rating-row">
+        <a href="#ratings" class="detail-rating-link">
+          <span id="detail-rating-stars"></span>
+          <span class="score tabular" id="detail-rating-score"></span>
+          <span class="count" id="detail-rating-count"></span>
+        </a>
+        <span class="badge editors-pick" id="editors-pick-badge" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          Editor's Pick
+        </span>
+      </div>
+    </div>
+
+    <!-- ================= GALLERY (placeholder — real photos not yet mapped, see note) ================= -->
+    <div class="gallery">
+      <div class="gallery-main tour-photo" id="gallery-main" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
+    </div>
+    <p class="gallery-caption">Photo: Operator — awaiting image mapping</p>
+
+    <!-- ================= QUICK FACTS ================= -->
+    <div class="quickfacts" id="quickfacts-strip"></div>
+
+    <!-- ================= CONTENT TABS ================= -->
+    <div class="content-tabs">
+      <button class="content-tab active" data-target="tab-overview">Overview</button>
+      <button class="content-tab" data-target="tab-location">Location</button>
+    </div>
+
+    <!-- ================= TWO-COLUMN BODY ================= -->
+    <div class="detail-layout">
+      <div class="detail-main">
+
+        <!-- Overview -->
+        <section class="detail-section" id="tab-overview">
+          <h2 class="detail-section-title">Overview</h2>
+          <ul class="highlight-list" id="highlight-list"></ul>
+          <p class="detail-body-text" id="full-description"></p>
+
+          <div class="variant-selector" id="variant-block" style="display:none;">
+            <span class="variant-label">Options</span>
+            <div class="variant-options" id="variant-options"></div>
+          </div>
+        </section>
+
+        <!-- Our Verdict -->
+        <section class="detail-section">
+          <div class="verdict-box">
+            <div class="verdict-eyebrow">Tripreviewall's Take</div>
+            <h3 class="verdict-headline" id="verdict-headline">…</h3>
+            <div class="verdict-cols">
+              <div>
+                <div class="verdict-col-title">Good for</div>
+                <ul class="verdict-list good" id="verdict-good"></ul>
+              </div>
+              <div>
+                <div class="verdict-col-title">Worth knowing</div>
+                <ul class="verdict-list knowing" id="verdict-knowing"></ul>
+              </div>
+            </div>
+            <p class="verdict-byline" id="verdict-byline"></p>
+          </div>
+        </section>
+
+        <!-- Rating Breakdown by Source -->
+        <section class="detail-section" id="ratings">
+          <h2 class="detail-section-title">Ratings from every source we could find</h2>
+          <div id="main-histogram" style="margin-bottom:20px;"></div>
+          <div class="source-cards" id="source-cards"></div>
+          <div class="google-panel" id="google-panel"></div>
+          <p class="freshness-note">Ratings and review counts are checked periodically and may not reflect same-day changes on each platform. Individual review text is being added tour by tour — check back soon.</p>
+        </section>
+
+        <!-- Location -->
+        <section class="detail-section" id="tab-location">
+          <h2 class="detail-section-title">Location</h2>
+          <div class="map-embed">Map embed placeholder</div>
+          <p class="detail-body-text" style="font-size:var(--text-body);" id="meeting-address"></p>
+          <p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>
+        </section>
+
+      </div>
+
+      <!-- ================= BOOKING SIDEBAR ================= -->
+      <aside class="detail-sidebar-col">
+        <div class="booking-card">
+          <div class="booking-price-label">From</div>
+          <div class="booking-price tabular" id="sidebar-price">$100</div>
+          <div class="booking-trust-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Real-time availability via FareHarbor
+          </div>
+          <a href="#" class="btn btn-primary btn-full" id="fareharbor-cta">Check Availability</a>
+          <p style="font-size:var(--text-meta);color:var(--color-text-muted);margin:10px 0 0;">This is the tour operator's own booking system — no third-party markup.</p>
+
+          <div class="booking-widget-frame">
+            <h4>Select a date</h4>
+            <div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>
+          </div>
+
+          <div class="booking-secondary-label">Also available on</div>
+          <div class="booking-secondary-list">
+            <a href="#" class="btn btn-secondary btn-full">TripAdvisor</a>
+            <a href="#" class="btn btn-secondary btn-full">GetYourGuide</a>
+          </div>
+
+          <p class="booking-disclosure">Tripreviewall may earn a commission if you book through the links above, at no extra cost to you.</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ================= SIMILAR TOURS ================= -->
+    <section class="section" style="padding-top:0;">
+      <h2 class="detail-section-title" id="similar-title">Similar Tours</h2>
+      <div class="similar-tours-scroll" id="similar-tours-grid"></div>
+    </section>
+  </div>
+</main>
+
+<!-- Mobile sticky booking bar -->
+<div class="mobile-booking-bar" id="mobile-booking-bar">
+  <div><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular" id="mobile-price">$100</div></div>
+  <a href="#" class="btn btn-primary">Check Availability</a>
+</div>
+
+<!-- ================= FOOTER (identical to Home) ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
+        <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="../tours.html">Tours</a>
+        <a href="../destinations.html">Destinations</a>
+        <a href="../blog.html">Blog</a>
+        <a href="../transportation.html">Transportation</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="../about.html">About</a>
+        <a href="../contact.html">Contact</a>
+        <a href="../affiliate-disclosure.html">Affiliate Disclosure</a>
+        <a href="../privacy-policy.html">Privacy Policy</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
+        <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
+      </div>
+    </div>
+    <div class="footer-disclosure">
+      Tripreviewall earns a commission when you book through links on this site (FareHarbor, TripAdvisor, GetYourGuide). This never affects which reviews we show or how we rate a tour.
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../data/tours-full.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/tour-detail.js"></script>
+</body>
+</html>

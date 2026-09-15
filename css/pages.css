@@ -1,0 +1,40 @@
+/* ============================================================
+   tripreviewall.com — Static pages, Destinations, Contact form
+   ============================================================ */
+
+/* ---- Simple prose page (About, Privacy, Affiliate Disclosure) ---- */
+.prose-page { max-width: 760px; margin: 0 auto; padding: 40px 0 96px; }
+.prose-page h1 { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h1); margin: 8px 0 24px; }
+.prose-page h2 { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h3); margin: 40px 0 12px; }
+.prose-page p { font-size: var(--text-body-lg); line-height: 1.6; margin: 0 0 18px; color: var(--color-text); }
+.prose-page ul { margin: 0 0 18px; padding-left: 20px; }
+.prose-page li { font-size: var(--text-body); margin-bottom: 8px; }
+.prose-updated { font-size: var(--text-meta); color: var(--color-text-muted); margin-bottom: 32px; }
+
+/* ---- Destination pillar page ---- */
+.dest-hero { position: relative; aspect-ratio: 21/9; border-radius: var(--radius-lg); overflow: hidden; margin: 24px 0 32px; display: flex; align-items: flex-end; }
+.dest-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(11,59,79,0.75), rgba(11,59,79,0.05) 60%); }
+.dest-hero-content { position: relative; z-index: 2; padding: 32px; color: var(--color-bg); }
+.dest-hero-content h1 { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-display); margin: 0 0 8px; }
+.dest-hero-content p { font-size: var(--text-body); opacity: 0.9; margin: 0; }
+.dest-intro { font-size: var(--text-body-lg); color: var(--color-text); max-width: 800px; margin-bottom: 48px; line-height: 1.6; }
+.dest-island-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: 24px 0 40px; }
+.dest-island-tab { padding: 8px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: var(--text-meta); font-weight: 500; background: var(--color-bg-alt); color: var(--color-text); }
+.dest-island-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+
+/* ---- Contact form ---- */
+.contact-layout { display: grid; grid-template-columns: 1fr; gap: 40px; padding: 40px 0 96px; }
+@media (min-width: 900px) { .contact-layout { grid-template-columns: 1fr 1fr; } }
+.contact-info h1 { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h1); margin: 8px 0 16px; }
+.contact-info p { color: var(--color-text-muted); font-size: var(--text-body-lg); margin-bottom: 24px; }
+.contact-detail-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-size: var(--text-body); }
+.contact-detail-row svg { width: 18px; height: 18px; color: var(--color-primary); }
+.contact-form-card { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 32px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: var(--text-meta); font-weight: 600; margin-bottom: 6px; }
+.form-group input, .form-group textarea {
+  width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  padding: 10px 14px; font-family: var(--font-sans); font-size: var(--text-body); color: var(--color-text);
+}
+.form-group textarea { min-height: 120px; resize: vertical; }
+.form-success { display: none; background: rgba(92,138,114,0.1); border: 1px solid var(--color-positive); border-radius: var(--radius-sm); padding: 16px; font-size: var(--text-body); color: var(--color-positive-text); }

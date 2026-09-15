@@ -1,0 +1,115 @@
+require("dotenv").config();
+
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+
+const { requireAuth } = require("./middleware");
+const authRoutes = require("./routes/authRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const toursRoutes = require("./routes/toursRoutes");
+
+const PORT = process.env.PORT || 4000;
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
+
+const MIME_TYPES = {
+  ".css": "text/css; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".svg": "image/svg+xml",
+};
+
+function serveStatic(req, res, urlPath) {
+  // urlPath is like "/admin/public/admin.css" — strip the "/admin/public" prefix
+  const rel = urlPath.replace(/^\/admin\/public\//, "");
+  const filePath = path.join(PUBLIC_DIR, rel);
+
+  // Prevent path traversal outside PUBLIC_DIR
+  if (!filePath.startsWith(PUBLIC_DIR)) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
+
+  fs.readFile(filePath, (err, content) => {
+    if (err) {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("Not found");
+      return;
+    }
+    const ext = path.extname(filePath);
+    res.writeHead(200, { "Content-Type": MIME_TYPES[ext] || "application/octet-stream" });
+    res.end(content);
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  try {
+    const urlObj = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    const pathname = urlObj.pathname;
+    const method = req.method;
+
+    // ---- Static assets ----
+    if (method === "GET" && pathname.startsWith("/admin/public/")) {
+      return serveStatic(req, res, pathname);
+    }
+
+    // ---- Root ----
+    if (method === "GET" && (pathname === "/" || pathname === "/admin")) {
+      res.writeHead(302, { Location: "/admin/dashboard" });
+      return res.end();
+    }
+
+    // ---- Auth (no session required) ----
+    if (method === "GET" && pathname === "/admin/login") return authRoutes.handleLoginGet(req, res);
+    if (method === "POST" && pathname === "/admin/login") return authRoutes.handleLoginPost(req, res);
+    if (method === "GET" && pathname === "/admin/logout") return authRoutes.handleLogout(req, res);
+
+    // ---- Everything below requires a session ----
+    const session = requireAuth(req, res);
+    if (!session) return; // requireAuth already sent the redirect response
+
+    if (method === "GET" && pathname === "/admin/dashboard") {
+      return dashboardRoutes.showDashboard(req, res, session);
+    }
+
+    if (method === "GET" && pathname === "/admin/tours") {
+      return toursRoutes.listTours(req, res, session, urlObj);
+    }
+    if (method === "GET" && pathname === "/admin/tours/new") {
+      return toursRoutes.newTourForm(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/tours/new") {
+      return toursRoutes.createTour(req, res, session);
+    }
+
+    // Dynamic routes: /admin/tours/:id/edit , /admin/tours/:id/delete
+    const editMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/edit$/);
+    if (editMatch) {
+      const id = editMatch[1];
+      if (method === "GET") return toursRoutes.editTourForm(req, res, session, id);
+      if (method === "POST") return toursRoutes.updateTour(req, res, session, id);
+    }
+
+    const deleteMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/delete$/);
+    if (deleteMatch && method === "POST") {
+      return toursRoutes.deleteTour(req, res, session, deleteMatch[1]);
+    }
+
+    // ---- 404 ----
+    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end("404 Not Found");
+  } catch (err) {
+    console.error("[server] Unhandled error:", err);
+    if (!res.headersSent) {
+      res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("500 Internal Server Error");
+    }
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Tripreviewall admin panel running at http://localhost:${PORT}`);
+  console.log(`Log in at http://localhost:${PORT}/admin/login`);
+});

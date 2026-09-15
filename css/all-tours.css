@@ -1,0 +1,40 @@
+/* ============================================================
+   tripreviewall.com — All Tours (listing) page styles
+   Simplified per master-technical-architecture.md §11:
+   NO filter sidebar in v1 — search + sort + pagination only.
+   ============================================================ */
+
+.page-header-block { padding: 32px 0 24px; }
+.page-h1 { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h1); margin: 8px 0 8px; }
+.page-subline { color: var(--color-text-muted); font-size: var(--text-body); margin: 0 0 24px; }
+
+.at-search { display: flex; align-items: center; gap: 10px; background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 12px 16px; max-width: 520px; }
+.at-search svg { width: 18px; height: 18px; color: var(--color-text-muted); flex-shrink: 0; }
+.at-search input { border: none; outline: none; background: transparent; font-family: var(--font-sans); font-size: var(--text-body); width: 100%; }
+
+.sort-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 0; border-bottom: 1px solid var(--color-border); margin-bottom: 32px; }
+.result-count { font-size: var(--text-meta); color: var(--color-text-muted); }
+.result-count .n { font-weight: 600; color: var(--color-text); }
+.sort-select-wrap { display: flex; align-items: center; gap: 8px; }
+.sort-select-wrap label { font-size: var(--text-meta); color: var(--color-text-muted); }
+.sort-select {
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 8px 12px;
+  font-family: var(--font-sans); font-size: var(--text-meta); background: var(--color-bg-alt); color: var(--color-text);
+}
+
+.pagination { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 48px 0; flex-wrap: wrap; }
+.page-btn {
+  min-width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-bg-alt);
+  font-size: var(--text-meta); font-weight: 500; color: var(--color-text);
+}
+.page-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-btn svg { width: 16px; height: 16px; }
+
+.empty-state { text-align: center; padding: 80px 24px; }
+.empty-state svg { width: 48px; height: 48px; color: var(--color-border-strong); margin-bottom: 16px; }
+.empty-state h3 { font-size: var(--text-h4); margin: 0 0 8px; }
+.empty-state p { color: var(--color-text-muted); margin: 0 0 20px; }
+
+.seo-block { max-width: 720px; margin: 64px auto 0; font-size: var(--text-body); color: var(--color-text); line-height: 1.6; }

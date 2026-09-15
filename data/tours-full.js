@@ -1,0 +1,11523 @@
+/* ============================================================
+   ALL_TOURS — SINGLE SOURCE OF TRUTH for the whole site
+   265 real Hawaii tours, merged from client's 10 batch JSON files
+   (batch-01, 02a/b/c, 03a/b/c, 04a x2, 04b)
+   Excluded: batch-04c Maine (11), all lodging entries, 5 Aruba tours
+   ------------------------------------------------------------
+   REAL fields: slug, title, company, island, city, tourType,
+   duration, highlights, fullDescription, verdict.*, googleSnapshot.*,
+   variants, fareharborShortname
+
+   MOCK fields (flat placeholders, per client instruction —
+   to be entered manually per tour before launch):
+   priceFrom ($100), aggregatedRating (4.5), reviewCountTotal (250),
+   ratingDistribution
+   ============================================================ */
+
+const ALL_TOURS = [
+  {
+    "slug": "chinamans-hat-mokolii-kayak-kaneohe",
+    "title": "Chinaman's Hat (Mokoli'i) Kayak Experience",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kaneohe",
+    "tourType": "Self-Guided Kayak Tour",
+    "duration": "1.5 - 2.5 Hours (guide-dependent, often runs long)",
+    "highlights": [
+      "Paddle across Kaneohe Bay to the basalt islet of Mokoli'i (Chinaman's Hat)",
+      "Optional guided hike to the summit for panoramic Windward Coast views",
+      "Life vests, dry bags and safety briefing included on the tour package",
+      "Frequent sea turtle sightings in the bay",
+      "Small-group, near-private pacing - most trips are just one or two kayaks"
+    ],
+    "fullDescription": "This is the tour most people picture when they think of kayaking on Oahu's Windward side: a short paddle across Kaneohe Bay to Mokoli'i, the small basalt island known as Chinaman's Hat. Active Oahu Tours briefs guests on paddling technique and safety at Kualoa Regional Park, then sends you out either with a guide alongside or, for the rental-only option, on your own once you're comfortable on the water.\n\nOnce ashore, most guides offer a choice: an easy walk around the island's sandy inlet, or a steeper scramble to the summit that involves some light rock-climbing near the top. Neither is technical, but the summit route isn't for anyone uneasy with heights or exposed scrambling.\n\nConditions on this stretch of bay can shift quickly - several travelers have described calm glassy water on one visit and choppy, kayak-flipping conditions on another, sometimes on the same route a week apart. Reef is close to shore in places, which is the most common source of minor injuries (cut feet), so water shoes are worth the extra step.",
+    "verdict": {
+      "headline": "A reliable, low-key paddle for first-timers - just bring water shoes and check the wind.",
+      "goodFor": [
+        "First-time kayakers wanting a short, guided introduction",
+        "Travelers who want a summit view without a full hiking trip",
+        "Small groups or couples wanting a near-private pace",
+        "Anyone comfortable getting their feet wet and a little muddy on the hike"
+      ],
+      "worthKnowing": [
+        "Reef near the shoreline has caused cut feet for multiple guests - water shoes are strongly recommended",
+        "Bay conditions vary day to day; some trips report rough, choppy water that can tip a kayak",
+        "The self-guided tour includes a briefing but the guide may not paddle the whole route with you",
+        "Parking at Kualoa Regional Park is limited on weekends"
+      ],
+      "closingNote": "Guides are consistently the strongest part of the experience according to past guests, several of whom rebooked other activities with the same company after this tour.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Reviewers on TripAdvisor consistently single out individual guides by name for going out of their way - staying past the scheduled end time, offering the optional summit hike, and giving clear safety briefings. The most repeated caveat is ocean conditions: several guests describe glassy, easy water, while others describe a rough crossing with a kayak tipping close to shore. Cut feet from nearshore reef are the most common minor complaint, and water shoes are frequently recommended by past guests themselves.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Self-Guided Kayak Tour",
+      "Kayak Rental Only"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaneohe-bay-coral-reef-kayak",
+    "title": "Kaneohe Bay Coral Reef Self-Guided Kayaking Adventure",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kaneohe",
+    "tourType": "Self-Guided Kayak + Snorkel",
+    "duration": "Half Day (self-guided window)",
+    "highlights": [
+      "Paddle out to Kaneohe Bay's coral reef flats",
+      "Bring your own mask/snorkel to explore reef life in shallow water",
+      "Self-guided pacing - go at your own speed"
+    ],
+    "fullDescription": "A self-guided kayak route out into Kaneohe Bay's reef flats, aimed at travelers who want to combine paddling with some light snorkeling over coral in shallow, relatively protected water. Because it's self-guided, there's no naturalist narration - this is best for guests who are comfortable reading tide/wind conditions themselves or who've already done the guided version of a nearby route.",
+    "verdict": {
+      "headline": "A solid self-guided option if you already know the bay - pair it with a tide check.",
+      "goodFor": [
+        "Confident paddlers wanting reef access without a guide",
+        "Snorkelers who want flexible timing",
+        "Repeat Kaneohe Bay visitors"
+      ],
+      "worthKnowing": [
+        "No guide narration - self-guided means self-navigated",
+        "Reef visibility depends heavily on tide and recent weather",
+        "Bring your own snorkel gear unless a rental add-on is confirmed at booking"
+      ],
+      "closingNote": "Best treated as a paddle-and-snorkel combo rather than a structured tour.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Fewer independent reviews specifically for this route versus the Chinaman's Hat tour from the same operator; general sentiment for the company centers on reliable equipment drop-off/pickup and friendly staff.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaneohe-bay-sandbar-kayak",
+    "title": "Kaneohe Bay Sandbar Kayak Experience",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kaneohe",
+    "tourType": "Self-Guided Kayak Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Paddle out to the sandbar in the middle of Kaneohe Bay",
+      "Stand in waist-deep turquoise water far from shore",
+      "Popular spot for photos with mountain backdrop"
+    ],
+    "fullDescription": "Kaneohe Bay's sandbar - a shallow, mid-bay stretch that's dry or ankle-deep at low tide - is one of Oahu's most photographed spots, and this route paddles you straight out to it. The self-guided experience includes a safety briefing; the rental-only option is bare equipment for guests who know the route.",
+    "verdict": {
+      "headline": "Great for the sandbar photo, but time it around tide and boat traffic.",
+      "goodFor": [
+        "Photo-focused travelers",
+        "Groups wanting an easy, flat-water paddle",
+        "Anyone who wants the classic 'standing in the ocean' shot"
+      ],
+      "worthKnowing": [
+        "Kaneohe Bay sandbar can get crowded with boat tours around midday",
+        "Sandbar exposure depends on tide - check timing",
+        "This is a shared public sandbar, not an exclusive access point"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "TripAdvisor listing for this operator, cross-referenced under the 'Half-Day Kaneohe Bay Sandbar Self-Guided Kayaking Experience' name, shows a strong average rating with guests citing smooth equipment pickup/drop-off logistics as a repeat theme.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Self-Guided Kayak Experience",
+      "Kayak Rental Only"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "sharks-cove-self-guided-snorkel-haleiwa",
+    "title": "Sharks Cove Self-Guided Snorkel",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Self-Guided Snorkel Rental",
+    "duration": "Half Day rental window",
+    "highlights": [
+      "Snorkel gear rental for North Shore's famous Sharks Cove",
+      "Home to some of Oahu's best shallow-reef marine life viewing (summer conditions)",
+      "Self-guided - explore at your own pace"
+    ],
+    "fullDescription": "Sharks Cove on Oahu's North Shore is a rocky, reef-protected cove that turns into one of the best snorkel spots on the island during summer's calm surf season. This listing is gear rental/logistics for guests snorkeling the cove independently, not a guided in-water tour.",
+    "verdict": {
+      "headline": "Excellent snorkeling if you go in summer - skip it during North Shore's winter surf season.",
+      "goodFor": [
+        "Confident swimmers wanting a self-paced snorkel",
+        "Summer (May-Sept) North Shore visitors"
+      ],
+      "worthKnowing": [
+        "Winter surf (roughly Oct-Mar) makes Sharks Cove dangerous even for experienced swimmers - conditions change seasonally, not just daily",
+        "Entry is over rocks in places - water shoes recommended",
+        "This is equipment/logistics only; no guide accompanies you into the water"
+      ],
+      "closingNote": "Always check same-day ocean/surf conditions before entering - this is a location where conditions matter more than operator quality.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Sharks Cove itself (independent of this specific operator) is widely regarded as one of Oahu's top snorkel spots in summer conditions, with numerous reviewers noting the seasonal danger during winter high-surf months.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kahana-kaaawa-rainforest-river-kayak",
+    "title": "Kahana / Kaaawa Rainforest River Kayak",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kaaawa",
+    "tourType": "Self-Guided River Kayak",
+    "duration": "Half Day",
+    "highlights": [
+      "Paddle a calm, jungle-lined river instead of open ocean",
+      "Good beginner option - flat water, no surf or currents",
+      "Lush rainforest scenery on Oahu's Windward side"
+    ],
+    "fullDescription": "A change of pace from the ocean kayak routes nearby: this trip paddles Kahana's river through dense rainforest, which means flat, current-free water that's especially forgiving for nervous first-time paddlers or families with younger kids.",
+    "verdict": {
+      "headline": "The easiest paddle in this operator's lineup - a good pick for nervous beginners or families.",
+      "goodFor": [
+        "Families with young kids",
+        "First-time kayakers who want to skip ocean swell entirely",
+        "Anyone wanting jungle scenery over beach scenery"
+      ],
+      "worthKnowing": [
+        "Less 'iconic Hawaii' scenery than the ocean routes - no summit hike or sandbar payoff",
+        "River can have mosquitoes - bring repellent"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Limited independent review volume specifically for the river route versus the operator's ocean kayak tours; general company sentiment (equipment condition, punctual delivery) applies here as well.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Self-Guided Kayak Tour",
+      "Kayak Rental Only"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kailua-kayak-rentals-general",
+    "title": "Kailua Kayak Rentals",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Bare Kayak Rental",
+    "duration": "Flexible rental window",
+    "highlights": [
+      "Flexible, unguided kayak rental for exploring Kailua Bay on your own schedule"
+    ],
+    "fullDescription": "A straightforward equipment rental for travelers who already know where they want to paddle in Kailua Bay - whether that's toward the Mokulua Islands, Popoia (Flat) Island, or just along the shoreline - and don't need a guided route.",
+    "verdict": {
+      "headline": "Best for repeat visitors or confident paddlers who don't need a route plan.",
+      "goodFor": [
+        "Experienced kayakers",
+        "Travelers who already have a route in mind",
+        "Longer or multi-hour flexible outings"
+      ],
+      "worthKnowing": [
+        "No route guidance or safety briefing included - this is equipment only",
+        "If you're unsure where to paddle, the Mokulua Islands or Popoia Island guided tours from the same operator are a better first-timer fit"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General operator reviews reference dependable delivery/pickup timing for Kailua-area rentals.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard Rental"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mokulua-islands-twin-islands-kayak-kailua",
+    "title": "Mokulua Islands (Twin Islands) Kayak Tour",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Kayak Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Paddle to the twin Mokulua Islands off Kailua Beach",
+      "Land on Na Mokulua's protected beach (seasonal access rules apply)",
+      "One of Oahu's most scenic ocean kayak routes"
+    ],
+    "fullDescription": "The Mokulua Islands - two dramatic islets just off Kailua Beach - are one of the signature paddling destinations on Oahu. This route covers open-water crossing to the islands, with a guided option for travelers who want route narration and safety support, or a self-guided version for confident paddlers.",
+    "verdict": {
+      "headline": "One of Oahu's best ocean kayak routes - go guided if it's your first open-water crossing.",
+      "goodFor": [
+        "Intermediate paddlers comfortable with open water",
+        "Travelers wanting a bucket-list Kailua photo spot",
+        "Guided option: nervous first-timers wanting support on the crossing"
+      ],
+      "worthKnowing": [
+        "This is an open-water crossing, not a protected bay - wind and swell affect difficulty more than the Kaneohe Bay routes",
+        "Landing on Moku Nui (the larger island) is seasonally restricted during seabird nesting season - confirm current access with the operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Reviews for Mokulua kayak trips generally highlight the scenery as a highlight of an Oahu trip, with occasional notes about wind picking up on the return crossing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Self-Guided Kayak Adventure",
+      "Guided Kayak Tour"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "popoia-island-kailua-bay-kayak-tour",
+    "title": "Popoia Island (Flat Island) & Kailua Bay Kayak Tour",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Kayak Tour",
+    "duration": "Half Day or Full Day",
+    "highlights": [
+      "Shorter, calmer paddle than the Mokulua route - good for beginners",
+      "Explore Popoia (Flat) Island just offshore from Kailua Beach Park",
+      "Full-day option adds extended beach and snorkel time"
+    ],
+    "fullDescription": "Popoia Island sits much closer to shore than the Mokulua Islands, making this the gentler of Kailua's two kayak-to-an-island options. The guided tours add narration and pacing support; the full-day version builds in extra time on the water and at the island itself rather than covering more distance.",
+    "verdict": {
+      "headline": "The beginner-friendly alternative to the Mokulua Islands crossing.",
+      "goodFor": [
+        "First-time ocean kayakers",
+        "Families",
+        "Anyone wanting island time without a long crossing"
+      ],
+      "worthKnowing": [
+        "Shorter crossing than Mokulua means less open-water scenery on the way",
+        "Full-day option is mostly extra leisure time, not extra distance - confirm what's included before upgrading"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Reviews commonly compare this favorably to the Mokulua route for families and nervous paddlers, citing calmer water and a shorter crossing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Self-Guided Kayaking",
+      "Guided Tour - Half Day",
+      "Guided Tour - Full Day"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kailua-bay-popoia-paddleboard-lesson",
+    "title": "Kailua Bay & Popoia Island Paddle Board Lesson",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "SUP Lesson",
+    "duration": "Half Day",
+    "highlights": [
+      "Stand-up paddleboard instruction in Kailua Bay's calm, protected water",
+      "Beginner-friendly flat-water conditions",
+      "Optional paddle out toward Popoia Island"
+    ],
+    "fullDescription": "A SUP-specific lesson in Kailua Bay, distinct from this operator's kayak tours. Kailua's calm, shallow bay is one of the more forgiving spots on Oahu to learn to stand-up paddle.",
+    "verdict": {
+      "headline": "A solid, low-stress spot to try SUP for the first time.",
+      "goodFor": [
+        "First-time paddleboarders",
+        "Anyone wanting a gentler water activity than kayaking or surfing"
+      ],
+      "worthKnowing": [
+        "Morning sessions tend to have calmer water and less wind than afternoon"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General operator sentiment (friendly, patient instructors) applies; limited SUP-specific review volume independent of the kayak tours.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mokulua-islands-kayak-ebike-combo",
+    "title": "Guided Mokulua Islands Kayak Tour & E-Bike Adventure",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Multi-Activity Combo",
+    "duration": "Full Day (combo)",
+    "highlights": [
+      "Combines the guided Mokulua Islands kayak crossing with an e-bike ride around Kailua",
+      "Covers two activities and more ground than a single-activity booking",
+      "Good option for travelers with limited days on Oahu"
+    ],
+    "fullDescription": "A packaged combo for travelers who want to fit more into one booking: the guided Mokulua Islands kayak tour paired with an e-bike leg exploring Kailua town and coastline.",
+    "verdict": {
+      "headline": "Efficient if you only have one day for Kailua - otherwise, book the two activities separately for more flexibility.",
+      "goodFor": [
+        "Time-limited travelers wanting to combine activities in one day",
+        "Moderately fit guests comfortable with both paddling and e-biking"
+      ],
+      "worthKnowing": [
+        "It's a longer, more physically demanding day than either activity alone",
+        "Combo pricing should be compared against booking the kayak tour and an e-bike rental separately"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Lower review volume as a newer combo product; general operator reliability comments apply.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "popoia-island-kayak-ebike-combo",
+    "title": "Popoia Island Kayak & E-Bike Guided Adventure Tour",
+    "company": "",
+    "fareharborShortname": "",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Multi-Activity Combo",
+    "duration": "Half or Full Day",
+    "highlights": [
+      "Combines the beginner-friendly Popoia Island kayak tour with an e-bike leg around Kailua",
+      "Full-day version adds more leisure/exploration time",
+      "Gentler pairing than the Mokulua combo - suits beginners"
+    ],
+    "fullDescription": "The beginner-friendly counterpart to the Mokulua kayak + e-bike combo, pairing the shorter Popoia Island paddle with e-biking around Kailua. A reasonable full-day option for travelers who want variety without the longer open-water crossing to the Mokulua Islands.",
+    "verdict": {
+      "headline": "A gentler full-day combo option than the Mokulua version.",
+      "goodFor": [
+        "Families or beginners wanting a full day of light activity",
+        "Travelers who want variety without high physical demand"
+      ],
+      "worthKnowing": [
+        "Confirm what's included in the 'full day' upgrade versus the half-day version before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Similar to the Mokulua combo, review volume is lower given this appears to be a newer packaged product.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Half Day",
+      "Full Day"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pearl-harbor-city-tour-uss-arizona-aloha-hawaii-tours",
+    "title": "Pearl Harbor City Tour / USS Arizona Memorial",
+    "company": "Aloha Hawaii Tours",
+    "fareharborShortname": "alohahawaiitours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Historical / Bus Tour",
+    "duration": "~5 Hours",
+    "highlights": [
+      "Round-trip hotel pickup from Waikiki",
+      "Entry to USS Arizona Memorial and Pearl Harbor Visitor Center",
+      "Drive-by tour of historic downtown Honolulu"
+    ],
+    "fullDescription": "A standard shuttle-bus Pearl Harbor tour: hotel pickup, transport to Pearl Harbor, entry to the visitor center and USS Arizona Memorial (booked in advance since Navy-run ferry slots are limited), then a drive-by loop through downtown Honolulu landmarks on the way back.",
+    "verdict": {
+      "headline": "A convenient no-car-needed way to see Pearl Harbor - just know the USS Arizona portion is free to book yourself if you don't need the bus.",
+      "goodFor": [
+        "Travelers without a rental car",
+        "Anyone who wants the downtown Honolulu drive-by included"
+      ],
+      "worthKnowing": [
+        "USS Arizona Memorial tickets are free and bookable directly through the National Park Service/recreation.gov - tour companies charge for transport and logistics, not for 'access'",
+        "Battleship Missouri tours are typically given by museum docents free to all visitors, not an exclusive perk of any one operator"
+      ],
+      "closingNote": "Worth comparing against booking free NPS Arizona Memorial tickets directly and paying only for transport if that's what you actually need.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Pearl Harbor shuttle tours in this category generally get positive marks for convenience and guide narration; the most common critical feedback across similar Oahu operators concerns tight scheduling around Navy ferry availability, which is outside any operator's control.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "private-oahu-grand-circle-island-tour",
+    "title": "Private Oahu Grand Circle Island Tour",
+    "company": "Aloha Sunshine Tours",
+    "fareharborShortname": "alohasunshinetours",
+    "island": "Oahu",
+    "city": "Honolulu (Waikiki pickup)",
+    "tourType": "Private Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Private vehicle, not a shared shuttle",
+      "Circle-island route covering North Shore, Windward Coast, and scenic lookouts",
+      "Flexible stops set by your group rather than a fixed bus schedule"
+    ],
+    "fullDescription": "A private full-day circle-island tour departing Waikiki, covering Oahu's major scenic points - North Shore beaches, Windward Coast lookouts, and local food stops - with the flexibility of a private vehicle rather than a fixed-route shuttle.",
+    "verdict": {
+      "headline": "Good value split across a group of 4+ - pricier per person if traveling solo or as a couple.",
+      "goodFor": [
+        "Families or groups of 4-8 wanting a private, flexible itinerary",
+        "Travelers wanting to skip large shared-shuttle tours"
+      ],
+      "worthKnowing": [
+        "Private tours cost more per person than shared shuttles for solo/couple travelers",
+        "Confirm exact stops in advance - 'grand circle island' routes vary by operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Limited independent review volume found for this specific listing; general private-tour sentiment in this category favors flexibility over the fixed stops of shared shuttles.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dolphins-and-you",
+    "title": "Dolphins and You",
+    "company": "And You Creations",
+    "fareharborShortname": "andyoucreations",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Boat Tour / Dolphin Watch",
+    "duration": "Half Day",
+    "highlights": [
+      "Boat excursion focused on spotting wild spinner dolphins off Oahu's coast",
+      "Small-group boat setting"
+    ],
+    "fullDescription": "A dolphin-watching boat trip off Oahu for travelers wanting an ocean wildlife encounter. Confirm with the operator directly whether this is a watch-only trip or includes swim time, since Hawaii's rules on approaching resting spinner dolphins are strict.",
+    "verdict": {
+      "headline": "Check current swim-with-dolphins regulations before booking - Hawaii's rules on approaching spinner dolphins have tightened in recent years.",
+      "goodFor": [
+        "Wildlife watchers",
+        "Travelers prioritizing an ocean-based dolphin encounter"
+      ],
+      "worthKnowing": [
+        "NOAA regulations restrict close approach to Hawaiian spinner dolphins in their resting bays; confirm exactly what interaction is included before booking",
+        "Sightings are never guaranteed with wild animals"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Independent review volume for this specific listing was limited; general sentiment for Oahu dolphin-watch boats centers on sighting variability and crew knowledge of marine regulations.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "island-and-you",
+    "title": "Island and You",
+    "company": "And You Creations",
+    "fareharborShortname": "andyoucreations",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private/Custom Island Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Custom, flexible island exploration experience",
+      "Personalized itinerary rather than a fixed route"
+    ],
+    "fullDescription": "A custom, personalized island tour from the same operator as Dolphins and You - positioned as a flexible full-island experience rather than a fixed-stop bus route.",
+    "verdict": {
+      "headline": "Confirm the exact itinerary at booking - 'custom' tours vary widely by guide and day.",
+      "goodFor": [
+        "Travelers wanting a flexible, non-scripted day"
+      ],
+      "worthKnowing": [
+        "Because it's custom, ask the operator directly what stops are typically included before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Limited independent review data specific to this listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "blue-planet-adventure-paddle-rentals",
+    "title": "Paddle Rentals",
+    "company": "Blue Planet Adventure Company",
+    "fareharborShortname": "blueplanetadventure",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "SUP/Kayak Rental",
+    "duration": "Flexible rental window",
+    "highlights": [
+      "North Shore paddle equipment rental (SUP and/or kayak)",
+      "Explore Haleiwa's harbor and coastline independently"
+    ],
+    "fullDescription": "Equipment rental out of Haleiwa on Oahu's North Shore, for travelers who want to paddle the harbor or nearby coastline on their own schedule rather than a guided tour.",
+    "verdict": {
+      "headline": "A flexible option for confident paddlers already familiar with North Shore water conditions.",
+      "goodFor": [
+        "Self-sufficient paddlers",
+        "Travelers based on the North Shore for multiple days"
+      ],
+      "worthKnowing": [
+        "No guide or route briefing included - check surf/wind conditions yourself before heading out, especially in winter"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General reviews for North Shore paddle rental shops emphasize equipment condition and local knowledge of where it's safe to launch that day.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "rage-room-splatter-art-studio-honolulu",
+    "title": "Rage Room & Splatter Art Studio",
+    "company": "Break'N Anger",
+    "fareharborShortname": "breaknanger",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Indoor Experience (non-outdoor)",
+    "duration": "45-90 Minutes",
+    "highlights": [
+      "Smash breakable items in a padded room with protective gear provided",
+      "Splatter-paint studio as a calmer alternative or add-on",
+      "Good rainy-day or non-beach activity option"
+    ],
+    "fullDescription": "Not an outdoor tour - this is an indoor stress-relief/entertainment activity in Honolulu. The Rage Room lets guests smash bottles, electronics, and other breakables in protective gear; the Splatter Art Studio is a paint-throwing creative alternative. The combo package includes both.",
+    "verdict": {
+      "headline": "A fun rainy-day or group-activity option, distinct from anything else in this operator's Hawaii lineup.",
+      "goodFor": [
+        "Groups looking for a non-beach activity",
+        "Rainy day backup plan",
+        "Bachelor/bachelorette or birthday groups"
+      ],
+      "worthKnowing": [
+        "Protective gear is provided but wear clothes you don't mind getting dirty for the Splatter option",
+        "Not suitable for anyone with certain mobility or hearing sensitivities - check with the operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Rage room concepts as a category tend to get strong satisfaction scores for stress relief and novelty; typical operator-level feedback focuses on staff safety briefings and gear quality.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Rage Room Only",
+      "Splatter Art Studio Only",
+      "Rage & Splatter Combo"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "captain-max-turtle-canyon-snorkel",
+    "title": "Turtle Canyon Snorkel (Semi-Private Boat Tour)",
+    "company": "Captain Max Boat Tours",
+    "fareharborShortname": "captainmaxboattours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Semi-Private Snorkel Boat",
+    "duration": "Half Day",
+    "highlights": [
+      "Semi-private boat (smaller group than large commercial catamarans)",
+      "Turtle Canyon off Waikiki is one of Oahu's most reliable sea turtle snorkel spots",
+      "33 photos on file - among the most photo-documented listings in this dataset"
+    ],
+    "fullDescription": "A semi-private snorkel boat trip to Turtle Canyon, a shallow reef area off Waikiki known for consistent green sea turtle sightings. The 'semi-private' format means a smaller passenger count than the large commercial catamarans that also run this route.",
+    "verdict": {
+      "headline": "A strong pick if you want turtle snorkeling without a 100-person catamaran crowd.",
+      "goodFor": [
+        "Snorkelers prioritizing a smaller boat and group size",
+        "Turtle sightings (high-probability spot)"
+      ],
+      "worthKnowing": [
+        "Turtle Canyon is a shared public snorkel area - multiple operators run the same spot, so it won't feel exclusive even on a semi-private boat",
+        "Confirm exact passenger cap when booking if group size matters to you"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Turtle Canyon as a destination is consistently cited across Oahu snorkel operators for reliable sea turtle sightings; smaller-boat operators in this category tend to score well on crew attentiveness versus large commercial catamarans.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "captain-max-private-waikiki-sunset-cruise",
+    "title": "Private Waikiki Sunset Cruise",
+    "company": "Captain Max Boat Tours",
+    "fareharborShortname": "captainmaxboattours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Charter",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Fully private boat charter for your group only",
+      "Sunset timing off Waikiki's coastline"
+    ],
+    "fullDescription": "A private (exclusive-use) sunset boat charter off Waikiki - the whole boat is booked for one group rather than shared with strangers.",
+    "verdict": {
+      "headline": "Worth it for special occasions or groups wanting full privacy - a premium over shared sunset sails.",
+      "goodFor": [
+        "Proposals, anniversaries, small private celebrations",
+        "Groups who don't want to share a boat with strangers"
+      ],
+      "worthKnowing": [
+        "Private charters cost significantly more per person than shared sunset sail tickets - compare against a shared option if budget matters more than privacy"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Private charter operators in this category generally score well on flexibility (custom timing, playlist, occasion add-ons); common feedback across the category is to confirm exact boat size/passenger comfort before booking for larger groups.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "captain-max-private-waikiki-boat-tour",
+    "title": "Private Waikiki Boat Tour",
+    "company": "Captain Max Boat Tours",
+    "fareharborShortname": "captainmaxboattours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Charter",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Private daytime charter along the Waikiki coastline",
+      "Flexible itinerary since the boat is exclusive to your group"
+    ],
+    "fullDescription": "A daytime counterpart to the Private Waikiki Sunset Cruise from the same operator - same private-charter format, different time of day.",
+    "verdict": {
+      "headline": "Same private-charter value proposition as the sunset version, for groups who prefer daylight.",
+      "goodFor": [
+        "Groups wanting daytime photos and warmer swim conditions",
+        "Families with kids who may not want a late sunset return"
+      ],
+      "worthKnowing": [
+        "Confirm with the operator what's actually different between this and the Sunset Cruise beyond timing - some private charter operators let you customize either into a snorkel stop"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See Private Waikiki Sunset Cruise - same operator, similar general sentiment pattern.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "aloha-scuba-wreck-reef-2-tank",
+    "title": "Wreck & Reef - 2 Tank Dive Charter",
+    "company": "Aloha Scuba Diving Co.",
+    "fareharborShortname": "divealohascuba",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Two-tank dive covering a wreck site and a reef site off Oahu",
+      "For certified divers only"
+    ],
+    "fullDescription": "A two-tank certified dive charter visiting one of Oahu's wreck sites plus a reef dive - popular for divers wanting variety across a single charter rather than two reef dives back to back.",
+    "verdict": {
+      "headline": "A good pick for certified divers wanting wreck variety without a separate wreck-specialty trip.",
+      "goodFor": [
+        "Certified open-water divers",
+        "Divers who enjoy wreck exploration"
+      ],
+      "worthKnowing": [
+        "Certification card required - confirm exact requirements and minimum logged dives if the wreck site has depth restrictions"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Oahu wreck-and-reef combo dives are a popular charter category; general sentiment favors operators with smaller boats and dive guides who know current wreck conditions.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "aloha-scuba-reef-explorer-2-tank",
+    "title": "Reef Explorer - 2 Tank Dive Charter",
+    "company": "Aloha Scuba Diving Co.",
+    "fareharborShortname": "divealohascuba",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Two reef-focused dive sites off Oahu",
+      "For certified divers"
+    ],
+    "fullDescription": "The reef-focused counterpart to the Wreck & Reef charter from the same operator - two dive sites, both reef rather than wreck.",
+    "verdict": {
+      "headline": "The pick for divers who'd rather maximize reef/marine-life time over wreck exploration.",
+      "goodFor": [
+        "Certified divers prioritizing coral and fish life over wrecks"
+      ],
+      "worthKnowing": [
+        "If you want both wreck and reef, book the Wreck & Reef charter instead of this one"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Similar general sentiment pattern to the operator's wreck charter; reef site selection depends on conditions that day.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "aloha-scuba-divemaster",
+    "title": "Divemaster (Professional Course)",
+    "company": "Aloha Scuba Diving Co.",
+    "fareharborShortname": "divealohascuba",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Professional Certification Course",
+    "duration": "Multi-Day Course",
+    "highlights": [
+      "Divemaster-level professional certification training",
+      "Not a tourist activity - a multi-day training program"
+    ],
+    "fullDescription": "This listing is a professional dive certification course (Divemaster level), not a one-off tourist excursion. It's aimed at experienced divers pursuing dive industry credentials, typically requiring prior Advanced Open Water and Rescue Diver certifications.",
+    "verdict": {
+      "headline": "Not a vacation activity - this is a serious multi-day certification commitment for aspiring dive professionals.",
+      "goodFor": [
+        "Certified divers pursuing professional-level credentials"
+      ],
+      "worthKnowing": [
+        "Prerequisite certifications required before enrollment - confirm with the shop directly",
+        "This is a program measured in days/weeks, not a single booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not applicable - this is a training program rather than a reviewed tourist experience; general shop reputation applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "aloha-scuba-night-dive",
+    "title": "Night Dive - Tuesday & Friday",
+    "company": "Aloha Scuba Diving Co.",
+    "fareharborShortname": "divealohascuba",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Certified Diver - Night Dive",
+    "duration": "Evening / ~2-3 Hours",
+    "highlights": [
+      "Scheduled night dives on Tuesdays and Fridays only",
+      "Nocturnal marine life viewing with dive lights"
+    ],
+    "fullDescription": "A fixed-schedule night dive (only offered Tuesday and Friday evenings) for certified divers wanting to see Oahu's reef life after dark, when many species become active that are hidden during the day.",
+    "verdict": {
+      "headline": "A worthwhile add-on for divers already comfortable with day diving - book early since it only runs twice a week.",
+      "goodFor": [
+        "Certified divers wanting a different marine-life experience",
+        "Repeat visitors who've already done Oahu's daytime dive sites"
+      ],
+      "worthKnowing": [
+        "Fixed schedule (Tue/Fri only) - plan your trip dates around it if this is a priority",
+        "Night diving requires more comfort/experience than daytime diving - confirm any prerequisites"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Night diving as a category typically draws smaller, more experienced-diver groups; general operator sentiment for this shop applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dive-oahu-waikiki-coast-cruise-byob",
+    "title": "Waikiki Coast Cruise - BYOB",
+    "company": "Dive Oahu",
+    "fareharborShortname": "diveoahu",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Boat Cruise (bring your own alcohol)",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Casual boat cruise along the Waikiki coastline",
+      "Bring-your-own-beverage format keeps pricing lower than catered cruises"
+    ],
+    "fullDescription": "A casual, no-frills coastal cruise off Waikiki, run by a company otherwise known for scuba diving. The BYOB format means you bring your own drinks rather than paying for an onboard bar package.",
+    "verdict": {
+      "headline": "A budget-friendly, casual cruise option - check BYOB rules (glass containers, quantity limits) before you bring drinks aboard.",
+      "goodFor": [
+        "Budget-conscious groups wanting a simple coastal cruise",
+        "Anyone who prefers bringing their own drinks over paying cruise bar prices"
+      ],
+      "worthKnowing": [
+        "BYOB policies typically restrict glass bottles and have quantity guidelines - confirm with the operator",
+        "This is a general cruise, not a snorkel or dive trip despite the operator's diving focus"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "BYOB sunset/coastal cruises are a popular lower-cost Waikiki category; general sentiment favors operators who are upfront about exact BYOB rules ahead of time.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dolphin-excursion-waianae",
+    "title": "Dolphin Excursion",
+    "company": "Dolphin Excursions",
+    "fareharborShortname": "dolphinexcursions",
+    "island": "Oahu",
+    "city": "Waianae",
+    "tourType": "Boat Tour / Dolphin & Snorkel",
+    "duration": "Half Day",
+    "highlights": [
+      "Departs from Waianae Harbor on Oahu's less-touristed Leeward Coast",
+      "Wild dolphin viewing with typically calmer, clearer water than Waikiki-departure boats"
+    ],
+    "fullDescription": "A Leeward Coast (Waianae) departure point puts this trip on a different stretch of ocean than most Waikiki-based dolphin tours - generally calmer and clearer, and a longer drive from most hotels.",
+    "verdict": {
+      "headline": "Worth the longer drive from Waikiki for typically better water conditions and fewer boats.",
+      "goodFor": [
+        "Travelers with a rental car willing to drive to the Leeward Coast",
+        "Anyone wanting to avoid Waikiki's boat traffic"
+      ],
+      "worthKnowing": [
+        "Waianae Harbor is roughly 45-60 minutes from Waikiki depending on traffic - factor this into your day",
+        "As with all wild-dolphin tours, sightings and close encounters aren't guaranteed"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Leeward Coast dolphin tours are frequently recommended over Waikiki-departure options specifically for calmer water and less crowded conditions, based on general regional travel commentary.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "waikiki-parasail",
+    "title": "Parasail",
+    "company": "Waikiki Parasail",
+    "fareharborShortname": "gohawaii-waikikiparasail",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Parasailing",
+    "duration": "~1.5-2 Hours (short flight time)",
+    "highlights": [
+      "Aerial views of Waikiki and Diamond Head from up to several hundred feet",
+      "One of the highest-volume listings in this dataset by availability count"
+    ],
+    "fullDescription": "Standard Waikiki parasailing - a boat tows you aloft on a parachute-style canopy for an aerial view of the coastline. High booking volume in this dataset suggests this is a well-established, frequently-run operation.",
+    "verdict": {
+      "headline": "A reliable, high-volume operator for a classic Waikiki bucket-list activity.",
+      "goodFor": [
+        "First-time parasailers",
+        "Anyone wanting quick aerial photos of Waikiki/Diamond Head"
+      ],
+      "worthKnowing": [
+        "Actual airtime is short (a few minutes per flight) relative to total trip time - most of the booking is boat transit and waiting",
+        "Weight and health restrictions typically apply - check before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "High-volume Waikiki parasail operators typically get consistent marks for safety briefings and smooth boat operations; typical feedback across the category notes short actual flight duration versus total time commitment.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-hawaii-watersports-parasailing",
+    "title": "Parasailing",
+    "company": "Go Hawaii Watersports",
+    "fareharborShortname": "gohawaii-watersports",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Parasailing",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Another high-volume Waikiki-area parasail operator",
+      "Similar format to Waikiki Parasail (separate company)"
+    ],
+    "fullDescription": "A second, separately-operated parasailing company in the same Waikiki/Honolulu harbor area - similar format and experience to other parasail listings in this dataset.",
+    "verdict": {
+      "headline": "Comparable experience to other Waikiki parasail operators - compare current pricing and departure time options.",
+      "goodFor": [
+        "First-time parasailers"
+      ],
+      "worthKnowing": [
+        "With multiple parasail operators running from the same general harbor, price and exact departure time are often the deciding factors between them"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki parasail category sentiment applies; high booking volume suggests an established operation.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-hawaii-watersports-deep-sea-fishing",
+    "title": "Private Charter Deep Sea Fishing Tour",
+    "company": "Go Hawaii Watersports",
+    "fareharborShortname": "gohawaii-watersports",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Fishing Charter",
+    "duration": "Half or Full Day",
+    "highlights": [
+      "Exclusive-use fishing charter for your group",
+      "Oahu deep sea fishing for species like mahi-mahi, ono, and tuna depending on season"
+    ],
+    "fullDescription": "A private deep sea fishing charter out of Honolulu. As a private booking, the whole boat and crew are dedicated to your group rather than shared with other anglers.",
+    "verdict": {
+      "headline": "A strong choice for serious anglers or groups wanting the whole boat to themselves.",
+      "goodFor": [
+        "Experienced anglers",
+        "Groups wanting a private, non-shared charter"
+      ],
+      "worthKnowing": [
+        "Catch is never guaranteed and varies heavily by season - ask what's been running recently before booking",
+        "Confirm catch-and-release vs. keep policies in advance"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Private deep sea fishing charters in Hawaii generally get strong marks when reviewers land fish, with typical caveats about seasonal variability affecting results.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-hawaii-watersports-waikiki-snorkel-playground",
+    "title": "2-Hour Waikiki Snorkel & Ocean Playground Adventure",
+    "company": "Go Hawaii Watersports",
+    "fareharborShortname": "gohawaii-watersports",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel + Water Activities",
+    "duration": "2 Hours",
+    "highlights": [
+      "Combines snorkeling with other water 'playground' elements (confirm exact inclusions - e.g. inflatables, paddleboards)",
+      "Short, accessible 2-hour format"
+    ],
+    "fullDescription": "A shorter-format snorkel trip off Waikiki that bundles in additional water activities beyond just snorkeling - good for groups with mixed interests or shorter attention spans (families with kids).",
+    "verdict": {
+      "headline": "A good fit for families wanting variety in a shorter time window rather than a single-focus, longer snorkel trip.",
+      "goodFor": [
+        "Families with kids",
+        "Travelers with limited time who still want an ocean activity"
+      ],
+      "worthKnowing": [
+        "Confirm exactly what 'ocean playground' includes at booking - offerings vary between operators using similar naming"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Shorter combo snorkel/water-play formats in Waikiki tend to score well with families specifically for keeping kids engaged across multiple activities in one booking.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "gone-surfing-hawaii-rentals",
+    "title": "Surfboard & Paddleboard Rentals",
+    "company": "Gone Surfing Hawaii",
+    "fareharborShortname": "gonesurfinghawaii",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Equipment Rental",
+    "duration": "Flexible rental window",
+    "highlights": [
+      "Surfboard and SUP rental near Waikiki",
+      "No lesson included - equipment only"
+    ],
+    "fullDescription": "A straightforward equipment rental for travelers who already know how to surf or paddleboard and just need gear near Waikiki's beaches.",
+    "verdict": {
+      "headline": "Fine for confident surfers/paddlers - complete beginners should book a lesson elsewhere first.",
+      "goodFor": [
+        "Experienced surfers/paddlers wanting flexible, unscheduled beach time"
+      ],
+      "worthKnowing": [
+        "No instruction included - absolute beginners are better served by a lesson package first"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki-area rental shop sentiment centers on board condition and convenient beachfront pickup/drop-off.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-nuts-hawaii-north-shore-surf-camp",
+    "title": "North Shore Surf Camp",
+    "company": "Go Nuts Hawaii",
+    "fareharborShortname": "gonuts-hawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Surf Instruction",
+    "duration": "Multi-Day / Camp Format",
+    "highlights": [
+      "Multi-session surf camp format on Oahu's famous North Shore",
+      "Structured progression rather than a single one-off lesson"
+    ],
+    "fullDescription": "A surf camp (multiple sessions over consecutive days) rather than a single lesson, based on the North Shore - a more serious commitment for travelers who want to actually improve, not just try surfing once.",
+    "verdict": {
+      "headline": "The right choice if you want real skill progression, not just a one-time photo-op surf lesson.",
+      "goodFor": [
+        "Travelers spending several days on the North Shore",
+        "Anyone wanting structured progression over a single try"
+      ],
+      "worthKnowing": [
+        "North Shore surf conditions vary dramatically by season - winter swells are for experienced surfers only, so confirm which season/break the camp uses for beginners"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Multi-day surf camps generally score well for visible skill improvement over single lessons; North Shore specifically requires operators to carefully pick beginner-appropriate breaks depending on season.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ultimate-circle-island-tour-oahu",
+    "title": "Oahu Ultimate Circle Island Tour - Visiting 21+ Locations",
+    "company": "Ultimate Circle Island Tours",
+    "fareharborShortname": "haleiwaturtletours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Van/Bus Circle Island Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Claims 21+ stops across the island in a single day",
+      "Broad overview tour for first-time Oahu visitors with limited time"
+    ],
+    "fullDescription": "A high-stop-count circle-island tour promising over 21 locations in one day - a broad, fast-paced overview rather than a leisurely deep dive into any single spot.",
+    "verdict": {
+      "headline": "Great for a whirlwind first impression of the island - not for anyone wanting to actually linger anywhere.",
+      "goodFor": [
+        "First-time visitors with only one day to see 'everything'",
+        "Travelers who prioritize breadth over depth"
+      ],
+      "worthKnowing": [
+        "With 21+ stops in a single day, time at each location will be brief - this is a highlight-reel tour, not a leisurely exploration",
+        "Confirm whether stops are drive-by/photo-only versus actual walk-around time"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "High-stop-count circle island tours are popular with first-time visitors but reviewers across this category commonly note limited time per stop as the trade-off for breadth.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "aquatic-life-divers-explorers-dive",
+    "title": "The Explorer's Dive: Advanced Long Range Two Tank Charter",
+    "company": "Aquatic Life Divers",
+    "fareharborShortname": "aquaticlifedivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - Advanced 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Long-range boat trip to sites further from the harbor than standard charters",
+      "For advanced/experienced divers - not a beginner trip"
+    ],
+    "fullDescription": "A long-range advanced charter that runs further offshore than Kona's standard two-tank dives, reaching sites less frequently visited by beginner-focused operators. Best suited to divers with logged open-water experience.",
+    "verdict": {
+      "headline": "Worth it for experienced divers wanting less-crowded Kona sites - not the right pick for newer divers.",
+      "goodFor": [
+        "Advanced Open Water certified divers",
+        "Divers who've already done Kona's standard sites and want something new"
+      ],
+      "worthKnowing": [
+        "Longer boat ride to site than standard charters - factor in seasickness risk if that affects you",
+        "Confirm minimum certification level and logged dive count required"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Advanced/long-range Kona dive charters as a category are generally reviewed favorably for reaching quieter sites; the common trade-off noted is longer transit time on the boat.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "aquatic-life-divers-signature-morning-dive",
+    "title": "Signature Morning Dive: Two Tank Morning Charter",
+    "company": "Aquatic Life Divers",
+    "fareharborShortname": "aquaticlifedivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day (Morning)",
+    "highlights": [
+      "Standard morning two-tank charter - the shop's core, everyday dive offering",
+      "Morning timing generally means calmer water and better visibility"
+    ],
+    "fullDescription": "The standard two-tank morning dive charter from this operator, covering closer Kona sites than the Explorer's Dive. Morning charters typically benefit from calmer conditions before afternoon wind picks up.",
+    "verdict": {
+      "headline": "The default choice for most certified divers - book the Explorer's Dive instead only if you specifically want longer-range sites.",
+      "goodFor": [
+        "Certified divers wanting a standard, reliable Kona dive",
+        "Morning-person travelers wanting calmer water"
+      ],
+      "worthKnowing": [
+        "Sites are closer/shorter transit than the Explorer's Dive option from the same shop"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Standard morning charters in Kona are consistently the most-booked dive product in the region, generally reviewed well for calm conditions and manageable group sizes.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "big-island-abalone-farm-tours",
+    "title": "Farm Tours",
+    "company": "Big Island Abalone",
+    "fareharborShortname": "bigislandabalone",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Farm/Aquaculture Tour",
+    "duration": "~1-1.5 Hours",
+    "highlights": [
+      "Tour of a working abalone aquaculture farm on the Kona Coast",
+      "Learn how abalone (a shellfish delicacy) is farmed using deep-sea water",
+      "Tasting typically included"
+    ],
+    "fullDescription": "A behind-the-scenes tour of one of Kona's abalone farms, which use the region's unique deep, cold seawater pumping infrastructure (originally built for ocean thermal energy research) to raise abalone. An educational, low-physical-effort activity.",
+    "verdict": {
+      "headline": "An interesting, easy-going alternative to Kona's ocean activities - good for a hot midday slot or a non-swimming day.",
+      "goodFor": [
+        "Foodies and aquaculture-curious travelers",
+        "Families wanting a low-intensity activity",
+        "Rainy or non-beach days"
+      ],
+      "worthKnowing": [
+        "This is an educational farm tour, not a hands-on harvesting experience - confirm exactly what's included"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona-area aquaculture farm tours are a niche but well-regarded category, typically praised for guide knowledge and the novelty of tasting fresh abalone on site.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "big-island-bees-beekeeping-tour",
+    "title": "Beekeeping Tour",
+    "company": "Big Island Bees",
+    "fareharborShortname": "bigislandbees",
+    "island": "Big Island",
+    "city": "Captain Cook",
+    "tourType": "Farm/Apiary Tour",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Tour a working apiary and honey-processing facility in South Kona",
+      "Honey tasting typically included",
+      "Learn about Hawaii's unique single-varietal honeys (macadamia, lehua, wilelaiki)"
+    ],
+    "fullDescription": "A tour through a Big Island apiary and honey house, with tastings of Hawaii's distinctive single-source honeys - a low-key, educational stop that pairs well with South Kona coffee farm visits nearby.",
+    "verdict": {
+      "headline": "A pleasant, easy add-on if you're already exploring South Kona's coffee belt.",
+      "goodFor": [
+        "Food and agriculture-curious travelers",
+        "Anyone combining this with a South Kona coffee farm day"
+      ],
+      "worthKnowing": [
+        "Short duration - best paired with another South Kona stop to fill out a half day"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Apiary tours in South Kona are frequently mentioned as an under-the-radar addition to a coffee-farm day, with tasting quality as the most-cited highlight.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "body-glove-deluxe-snorkel-dolphin-watch",
+    "title": "Deluxe Snorkel & Dolphin Watch",
+    "company": "Body Glove Hawaii",
+    "fareharborShortname": "bodyglove",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Large Boat Snorkel Cruise",
+    "duration": "~4-5 Hours",
+    "highlights": [
+      "Established, large-boat commercial snorkel cruise off Kona",
+      "Dolphin watching en route, typically with a snorkel stop at Pawai Bay or similar reef",
+      "Water slide on the boat - a well-known feature of Body Glove's Kona vessel"
+    ],
+    "fullDescription": "Body Glove is one of the longest-running commercial operators in Kona, running a larger vessel with amenities (including a signature water slide) for a full-morning snorkel and dolphin-watching cruise.",
+    "verdict": {
+      "headline": "A reliable, amenity-rich choice for families - just know it's a bigger boat with a bigger crowd than boutique operators.",
+      "goodFor": [
+        "Families with kids (the water slide is a genuine draw)",
+        "Travelers who prefer an established, larger operator over a small boutique boat"
+      ],
+      "worthKnowing": [
+        "Larger group size than small-boat competitors in this dataset - if an intimate experience matters more to you than amenities, compare against smaller Kona operators"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Body Glove's Kona snorkel cruise is a long-established, high-volume operation; general sentiment favors the onboard amenities (water slide, lunch/refreshments) with the trade-off of a larger group size than boutique boats.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "body-glove-historical-lunch-cruise",
+    "title": "Historical Lunch Cruise",
+    "company": "Body Glove Hawaii",
+    "fareharborShortname": "bodyglove",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Sightseeing Cruise with Narration",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Coastal cruise along Kona's historic shoreline with narrated history",
+      "Lunch included, non-snorkel format"
+    ],
+    "fullDescription": "A history-and-scenery focused cruise along the Kona Coast, aimed at travelers who want the coastal views and cultural context without a swim component.",
+    "verdict": {
+      "headline": "A good pick for non-swimmers or anyone wanting Kona's history over its reef.",
+      "goodFor": [
+        "Non-swimmers",
+        "History-focused travelers",
+        "Older travelers or anyone wanting a lower-activity ocean outing"
+      ],
+      "worthKnowing": [
+        "No snorkeling on this cruise - book the Deluxe Snorkel & Dolphin Watch instead if water time is the priority"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Narrated history cruises in this category tend to score well with older travelers and history buffs specifically for the guide narration quality.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "body-glove-super-raft-sunset-tour",
+    "title": "Super-Raft Sunset Tour",
+    "company": "Body Glove Hawaii",
+    "fareharborShortname": "bodyglove",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Rigid Inflatable (RIB) Sunset Tour",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Smaller, faster rigid inflatable boat rather than the large Body Glove vessel",
+      "Sunset timing along the Kona Coast",
+      "Highest quality score (96) among this operator's listings in this dataset"
+    ],
+    "fullDescription": "A different vessel style from Body Glove's main snorkel cruise - a smaller, faster raft-style boat for a more intimate sunset experience along the coastline.",
+    "verdict": {
+      "headline": "The best-rated option in this operator's lineup - worth prioritizing if sunset timing works for your schedule.",
+      "goodFor": [
+        "Travelers wanting a smaller-boat feel from an established operator",
+        "Sunset/romantic outings"
+      ],
+      "worthKnowing": [
+        "Rigid inflatable boats ride rougher than the large catamaran-style vessel - not ideal for anyone prone to motion sickness on choppy water"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Smaller raft-style sunset tours in Kona are frequently highlighted for feeling more personal than large commercial cruise vessels.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "botanical-world-zipline",
+    "title": "Zip Line at Botanical World Adventures",
+    "company": "Botanical World Adventures",
+    "fareharborShortname": "bwa",
+    "island": "Big Island",
+    "city": "Hakalau",
+    "tourType": "Zipline Course",
+    "duration": "~2.5 Hours",
+    "highlights": [
+      "Zipline course through Hamakua Coast rainforest/garden setting",
+      "Combines adventure activity with lush tropical scenery",
+      "Can be paired with the garden day pass from the same property"
+    ],
+    "fullDescription": "A zipline canopy tour on the Hamakua Coast's lush windward side, set within a larger botanical garden property, offering a jungle-canopy perspective rather than a coastal/lava landscape.",
+    "verdict": {
+      "headline": "A good half-day activity if you're touring the Hamakua Coast waterfall drive - pair it with the garden pass.",
+      "goodFor": [
+        "Families and groups wanting an active adventure stop",
+        "Travelers driving the Hamakua Coast scenic route"
+      ],
+      "worthKnowing": [
+        "Weight and health restrictions typical of ziplines apply - confirm before booking",
+        "Consider adding the Self-Guided Garden Tour Day Pass to make a fuller day of the visit"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hamakua Coast zipline/garden combo attractions are commonly recommended as a stop on the Hilo-to-Waipio scenic drive; general sentiment favors the scenery over adrenaline intensity compared to steeper zipline courses elsewhere on the island.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard (~2.5 Hours)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "botanical-world-garden-day-pass",
+    "title": "Self-Guided Garden Tour Day Pass",
+    "company": "Botanical World Adventures",
+    "fareharborShortname": "bwa",
+    "island": "Big Island",
+    "city": "Hakalau",
+    "tourType": "Self-Guided Botanical Garden",
+    "duration": "Full Day Access",
+    "highlights": [
+      "Self-guided walk through tropical gardens and a waterfall viewpoint",
+      "20 photos on file - the most photo-documented listing from this operator",
+      "Flexible, all-day access pass"
+    ],
+    "fullDescription": "An all-day, self-paced pass to walk the property's botanical gardens and waterfall overlook independently, at your own speed, without a scheduled tour time.",
+    "verdict": {
+      "headline": "A relaxed, low-cost stop on the Hamakua Coast drive - good for photographers wanting to linger.",
+      "goodFor": [
+        "Photographers and garden enthusiasts wanting unhurried time",
+        "Travelers on a budget compared to the zipline package"
+      ],
+      "worthKnowing": [
+        "Self-guided means no narration - bring a guidebook or the garden's own signage for plant identification"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Self-guided garden passes in this category are typically valued for flexibility and photography time rather than educational depth.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "coral-reef-kealakekua-bay-snorkel",
+    "title": "Kealakekua Bay / Captain Cook Monument Snorkel",
+    "company": "Coral Reef Snorkel Adventures",
+    "fareharborShortname": "coralreef",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Kealakekua Bay is a Marine Life Conservation District with some of Kona's clearest water and richest reef life",
+      "Passes the Captain Cook Monument, accessible only by boat or a steep trail",
+      "Among the highest quality scores (97) in this dataset"
+    ],
+    "fullDescription": "Kealakekua Bay is widely regarded as one of the best snorkeling spots on the Big Island - protected status means healthier coral and more fish than open-access bays, and the boat-only access to the Captain Cook Monument area keeps crowds lower than shore-accessible spots.",
+    "verdict": {
+      "headline": "One of the strongest snorkel destinations in this entire dataset - a near-must for reef-focused travelers on the Big Island.",
+      "goodFor": [
+        "Snorkelers prioritizing reef health and marine life density",
+        "Anyone interested in the Captain Cook historical site"
+      ],
+      "worthKnowing": [
+        "Kealakekua Bay has protected status - stay off the coral and follow all posted marine sanctuary rules",
+        "Morning departures typically have calmer water and better visibility"
+      ],
+      "closingNote": "This consistently ranks among the top-scoring listings in our full dataset, which lines up with Kealakekua Bay's reputation as one of Hawaii's premier protected snorkel sites.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kealakekua Bay is consistently cited across Kona snorkel operators as offering the clearest water and richest marine life on this coast, owing to its Marine Life Conservation District protection.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "coral-reef-manta-ray-night-snorkel",
+    "title": "Manta Ray Night Snorkel",
+    "company": "Coral Reef Snorkel Adventures",
+    "fareharborShortname": "coralreef",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening / ~2.5 Hours",
+    "highlights": [
+      "Kona is one of the few places in the world with reliable nightly manta ray encounters",
+      "Underwater lights attract plankton, which draws feeding mantas close to snorkelers",
+      "Highest quality score in this operator's lineup (98)"
+    ],
+    "fullDescription": "Kona's manta ray night snorkel is one of the Big Island's signature experiences - boats anchor over a known feeding area, lights are lowered into the water to attract plankton, and manta rays (sometimes several at once) feed just below the surface, often within feet of snorkelers.",
+    "verdict": {
+      "headline": "One of the best wildlife encounters on the Big Island - book this even if you only do one night activity.",
+      "goodFor": [
+        "Anyone who can swim comfortably in open water at night",
+        "Wildlife and photography enthusiasts"
+      ],
+      "worthKnowing": [
+        "Manta sightings are very likely but never 100% guaranteed - ask about the operator's track record/rebooking policy",
+        "Night ocean swimming can be disorienting for first-timers - confirm comfort level before booking if you're a nervous swimmer"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Manta ray night snorkeling off Kailua-Kona is widely regarded across operators as one of the top wildlife experiences in Hawaii, with high, consistent sighting rates due to a stable resident manta population in the area.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dolphin-discoveries-manta-ray-night-snorkel",
+    "title": "Manta Ray Night Snorkel",
+    "company": "Dolphin Discoveries",
+    "fareharborShortname": "dolphindiscoveries",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening",
+    "highlights": [
+      "Another Kona operator running the manta ray night snorkel experience",
+      "Smaller-boat alternative to larger commercial operators"
+    ],
+    "fullDescription": "A second manta ray night snorkel operator in Kona - the experience itself (feeding mantas under boat lights) is largely consistent across operators since it depends on the same resident manta population and feeding site conventions.",
+    "verdict": {
+      "headline": "Comparable manta experience to other Kona operators - crew size and boat comfort are the main differentiators.",
+      "goodFor": [
+        "Wildlife enthusiasts",
+        "Travelers comparing smaller operators for this experience"
+      ],
+      "worthKnowing": [
+        "See Coral Reef Snorkel Adventures' manta listing for general category notes - sighting rates depend more on the manta population than the specific operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Kona manta night snorkel sentiment applies; smaller operators in this category are often praised for closer, more personal guide attention in the water.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dolphin-discoveries-captain-cook-snorkel",
+    "title": "Captain Cook Snorkel Adventure",
+    "company": "Dolphin Discoveries",
+    "fareharborShortname": "dolphindiscoveries",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Boat snorkel trip to the Captain Cook Monument / Kealakekua Bay area",
+      "Highest quality score (98) in this operator's lineup"
+    ],
+    "fullDescription": "Another operator running trips to the Kealakekua Bay/Captain Cook Monument area - see the note on Coral Reef Snorkel Adventures' listing for general context on why this destination consistently scores well.",
+    "verdict": {
+      "headline": "A strong choice for the same reasons Kealakekua Bay ranks highly across every operator that visits it.",
+      "goodFor": [
+        "Snorkelers prioritizing reef health and marine life"
+      ],
+      "worthKnowing": [
+        "Compare departure time and boat size against other Kealakekua Bay operators in this dataset - the destination quality is consistent, but boat experience varies"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See Kealakekua Bay category notes; this operator's high internal quality score suggests strong equipment/photo documentation.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dolphin-discoveries-deluxe-kona-snorkel",
+    "title": "Deluxe Kona Snorkel Adventure (2 Snorkel Spots)",
+    "company": "Dolphin Discoveries",
+    "fareharborShortname": "dolphindiscoveries",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Two separate snorkel stops in one trip for site variety",
+      "Good option if you want more than one reef environment in a single booking"
+    ],
+    "fullDescription": "A two-stop snorkel itinerary from the same operator, aimed at travelers wanting variety (different reef structure, different likely marine life) rather than a single-site deep dive.",
+    "verdict": {
+      "headline": "Good value if you want to sample more than one reef in a single trip.",
+      "goodFor": [
+        "Travelers who can't decide between two snorkel spots",
+        "First-time Kona snorkelers wanting a broader sample"
+      ],
+      "worthKnowing": [
+        "Two stops means less total time at each versus a single-site trip - trade-off of breadth for depth"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Two-stop snorkel trips in Kona are generally well received for variety, with the main trade-off being shorter time per site.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-forest-trail-hidden-craters-hike",
+    "title": "Hidden Craters Hike",
+    "company": "Hawaii Forest & Trail",
+    "fareharborShortname": "hawaiiforestandtrail",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Guided Hike",
+    "duration": "~5 Hours",
+    "highlights": [
+      "Private-land access to Hualalai Volcano's upper slopes and hidden craters/fissures",
+      "3-4 miles through native cloud forest with a lava tube walk-through",
+      "National Park-certified guides with strong reputation for naturalist knowledge"
+    ],
+    "fullDescription": "Hawaii Forest & Trail is one of the Big Island's most established eco-tour operators, and this hike is one of their signature products: private land access onto Hualalai Volcano's upper slopes, taking guests through native cloud forest, past volcanic fissures and craters, and through a lava tube, all within a relatively short drive of Kailua-Kona (roughly 30 minutes to the trailhead).\n\nGuides are consistently the standout feature according to past visitors - multiple accounts describe naturalist-level knowledge of Hawaiian flora, birds, geology, and cultural history, delivered in an engaging, unhurried way. The terrain itself is moderately demanding: 3-4 miles with steep sections, tree roots, and loose rock, and it's explicitly not well-suited to anyone with mobility limitations.",
+    "verdict": {
+      "headline": "One of the Big Island's best guided hikes - book it if you're reasonably fit and want substance over a quick photo stop.",
+      "goodFor": [
+        "Fit hikers and nature enthusiasts",
+        "Birders (multiple guests report 20+ species spotted)",
+        "Travelers wanting Volcanoes National Park-style scenery without the long drive to Hilo"
+      ],
+      "worthKnowing": [
+        "Terrain includes steep, root-covered, and loose-rock sections - not appropriate for anyone with mobility issues",
+        "Weather can force rebooking to a different tour time (sunrise/sunset) - build flexibility into your schedule if possible",
+        "Walking sticks are recommended and typically provided; rain gear may also be available"
+      ],
+      "closingNote": "Guide quality is the single most repeated praise point across independent reviews - if your guide happens to change, expect the experience to vary more than most tours in this dataset.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Independent reviews for this hike consistently single out individual guides for deep naturalist knowledge across geology, Hawaiian culture, and local bird species, describing the experience as closer to a private lesson than a standard group tour. The most repeated caveat is the physically demanding terrain - steep grades and root-covered trail sections that reviewers explicitly note are unsuitable for anyone with mobility concerns.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-geo-tours-volcano-national-park-adventure",
+    "title": "Volcano National Park Adventure",
+    "company": "Hawaii Geo Tours",
+    "fareharborShortname": "hawaiigeotours",
+    "island": "Big Island",
+    "city": "Kailua-Kona / Waikoloa Village",
+    "tourType": "Guided Van Tour to Hawaii Volcanoes National Park",
+    "duration": "Full Day",
+    "highlights": [
+      "Full-day guided trip to Hawaii Volcanoes National Park from the Kona side of the island",
+      "Geology-focused narration (the operator's name signals a science/education angle)",
+      "Private VIP option for smaller, exclusive-group touring"
+    ],
+    "fullDescription": "Hawaii Volcanoes National Park sits on the opposite (Hilo) side of the island from Kona, making this a genuinely long day - this tour handles the transportation and narration so guests don't have to self-drive the roughly 2-hour each-way trip. The 'Geo Tours' branding suggests an emphasis on volcanic geology explanation alongside the standard park sightseeing stops.",
+    "verdict": {
+      "headline": "A convenient way to see the volcano without a very long self-drive day - choose the private VIP option if a smaller group matters to you.",
+      "goodFor": [
+        "Kona/Waikoloa-based travelers without a rental car, or who don't want to self-drive ~4 hours round trip",
+        "Geology-curious travelers wanting deeper scientific context"
+      ],
+      "worthKnowing": [
+        "This is genuinely a long day (park entry, standard viewing points, and roughly 4 hours of driving round trip) - pace expectations accordingly",
+        "Confirm current lava viewing status directly, since active eruption/glow visibility changes over time and isn't guaranteed on any given day"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona-to-Volcanoes-National-Park day tours are a well-established category on the Big Island; general sentiment favors guides with strong volcanic geology knowledge, with the most common caveat being the long total drive time inherent to the route regardless of operator.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Pickup from Kona",
+      "Pickup from Waikoloa",
+      "Private VIP (Kona or Waikoloa)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "common-ground-kauai-farm-food-experience",
+    "title": "Farm and Food Experience",
+    "company": "Common Ground Kauai",
+    "fareharborShortname": "commongroundkauai",
+    "island": "Kauai",
+    "city": "Kilauea",
+    "tourType": "Farm Tour + Tasting",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Working regenerative farm tour on Kauai's North Shore near Kilauea",
+      "Farm-to-table tasting typically included",
+      "Educational focus on regenerative/sustainable agriculture practices"
+    ],
+    "fullDescription": "A North Shore Kauai farm tour with a strong sustainability/regenerative-agriculture angle, pairing a walking tour with tastings of what's grown on site.",
+    "verdict": {
+      "headline": "A worthwhile, low-key stop for anyone interested in food systems or exploring Kauai's North Shore beyond the beaches.",
+      "goodFor": [
+        "Foodies and sustainable-agriculture enthusiasts",
+        "Travelers wanting a non-beach North Shore stop"
+      ],
+      "worthKnowing": [
+        "What's tasted/harvested varies seasonally - confirm current offerings if you have specific expectations"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "North Shore Kauai farm tours in this category are generally praised for genuine sustainability practices over 'tourist farm' staging.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dive-kauai-discover-scuba",
+    "title": "Discover Scuba Dive - OCEAN EXPERIENCE",
+    "company": "Dive Kauai",
+    "fareharborShortname": "divekauai",
+    "island": "Kauai",
+    "city": "Poipu",
+    "tourType": "Beginner Scuba (No Certification Required)",
+    "duration": "~3-4 Hours",
+    "highlights": [
+      "No certification required - includes basic instruction plus a real ocean dive",
+      "South Shore Poipu location, generally calmer water than the North Shore",
+      "Good way to 'try' scuba before committing to a full certification course"
+    ],
+    "fullDescription": "A Discover Scuba program lets first-timers try scuba diving in open water under close instructor supervision, without needing a certification card. Poipu's South Shore location tends to have calmer conditions than Kauai's North Shore, which matters for absolute beginners.",
+    "verdict": {
+      "headline": "A solid low-commitment way to see if scuba is for you before investing in full certification.",
+      "goodFor": [
+        "First-time divers",
+        "Snorkelers curious about trying scuba"
+      ],
+      "worthKnowing": [
+        "This is not a certification - if you enjoy it, you'll need a separate multi-day course (like Open Water) to dive independently elsewhere",
+        "Basic swimming ability and comfort in open water are still required"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Discover Scuba programs in Poipu are commonly recommended as a lower-pressure entry point to diving, with South Shore conditions cited as more forgiving for nervous first-timers than North Shore sites.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dive-kauai-twilight-night-dive",
+    "title": "Twilight & Night Dive",
+    "company": "Dive Kauai",
+    "fareharborShortname": "divekauai",
+    "island": "Kauai",
+    "city": "Poipu",
+    "tourType": "Certified Diver - Night Dive",
+    "duration": "Evening",
+    "highlights": [
+      "Twilight-to-night dive off Kauai's South Shore",
+      "See nocturnal reef species not visible during the day"
+    ],
+    "fullDescription": "A certified-diver night dive off Poipu, transitioning from twilight into full darkness - a different, often more intimate experience of the same reef sites dived during the day.",
+    "verdict": {
+      "headline": "A good add-on for certified divers who've already done Kauai's daytime sites.",
+      "goodFor": [
+        "Certified divers comfortable with night conditions"
+      ],
+      "worthKnowing": [
+        "Requires prior night-diving comfort or a brief in-water orientation - confirm with the shop if this is your first night dive"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Night diving off Kauai's South Shore is a smaller, more experienced-diver category with generally positive sentiment around calmer evening conditions in Poipu.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "fathom-five-koloa-landing-shore-dive",
+    "title": "Koloa Landing Shore Dive",
+    "company": "Fathom Five Divers",
+    "fareharborShortname": "fathomfive",
+    "island": "Kauai",
+    "city": "Koloa",
+    "tourType": "Certified Diver - Shore Dive",
+    "duration": "Varies by option (1.5-4 hours)",
+    "highlights": [
+      "Koloa Landing is one of Hawaii's best-known and most accessible shore dive sites",
+      "No boat required - walk in directly from shore, which keeps costs lower than boat charters",
+      "Multiple tank-count and time-of-day combinations available"
+    ],
+    "fullDescription": "Koloa Landing is a well-known, easy-entry shore dive site on Kauai's South Shore, popular specifically because it doesn't require a boat - divers walk in from a protected cove. This operator offers the full range of ways to dive it: single or double tank, standard daytime, twilight, or full night.",
+    "verdict": {
+      "headline": "One of Hawaii's most accessible shore dives - a good value pick since there's no boat fee built into the price.",
+      "goodFor": [
+        "Certified divers wanting a lower-cost alternative to boat charters",
+        "Divers who prefer the flexibility/control of a shore entry"
+      ],
+      "worthKnowing": [
+        "Shore entry means a bit more gear-carrying than a boat dive, and conditions can be choppier at the entry point during high surf/swell",
+        "Night and twilight options require prior night-diving comfort"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Koloa Landing is widely cited across dive travel resources as one of the best and most convenient shore dives in the Hawaiian Islands, valued for its protected cove entry and consistently good visibility relative to other shore-access sites.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "1-Tank Shore Dive",
+      "2-Tank Shore Dive",
+      "Twilight 2-Tank Shore Dive",
+      "Night 1-Tank Shore Dive"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "fathom-five-2-tank-boat-dive",
+    "title": "2-Tank Boat Dive",
+    "company": "Fathom Five Divers",
+    "fareharborShortname": "fathomfive",
+    "island": "Kauai",
+    "city": "Koloa",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Boat access to Kauai South Shore sites not reachable from shore",
+      "Two tanks at two distinct sites in one trip"
+    ],
+    "fullDescription": "The boat-access counterpart to this operator's Koloa Landing shore dives - reaches sites further offshore than a shore entry allows, generally with better visibility and more varied topography.",
+    "verdict": {
+      "headline": "Choose this over the shore dive if reaching farther offshore sites matters more to you than saving on boat fees.",
+      "goodFor": [
+        "Certified divers wanting site variety beyond Koloa Landing",
+        "Divers prioritizing visibility/topography over cost"
+      ],
+      "worthKnowing": [
+        "Costs more than the shore dive option due to boat operation - compare both before booking if budget is a factor"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Boat dive charters on Kauai's South Shore are generally reviewed favorably for reaching sites with better visibility than shore-access points.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "fathom-five-discover-scuba-koloa",
+    "title": "1-Tank Discover SCUBA - Koloa Landing",
+    "company": "Fathom Five Divers",
+    "fareharborShortname": "fathomfive",
+    "island": "Kauai",
+    "city": "Koloa",
+    "tourType": "Beginner Scuba (No Certification Required)",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "No certification required - a real ocean dive at Koloa Landing with close instructor supervision",
+      "Uses the same well-regarded, easy-entry site as the operator's certified shore dives"
+    ],
+    "fullDescription": "This operator's beginner-friendly Discover Scuba option, using the same protected Koloa Landing site as their certified diver trips - a good indicator that conditions here are genuinely beginner-appropriate rather than just marketed that way.",
+    "verdict": {
+      "headline": "A strong first-timer pick specifically because it uses one of Hawaii's most forgiving, protected dive sites.",
+      "goodFor": [
+        "First-time divers",
+        "Anyone nervous about open-water conditions elsewhere"
+      ],
+      "worthKnowing": [
+        "Not a certification - a separate course is needed to dive independently afterward"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Beginner scuba programs at Koloa Landing benefit from the site's protected-cove conditions, which is frequently cited as a reason to choose this location over open-coast beginner dive sites.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "emountain-bike-experience-tour-kihei",
+    "title": "The Experience Tour",
+    "company": "Emountain Bike Tour Maui",
+    "fareharborShortname": "emountainbiketourmauillc",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Guided E-Mountain Bike Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Guided electric mountain bike route in the Kihei/Upcountry area",
+      "E-bike assist makes climbs accessible to a wider fitness range",
+      "21 photos on file - well-documented listing"
+    ],
+    "fullDescription": "A guided e-mountain-bike tour that uses electric pedal assist to open Maui's trails up to riders who might not tackle them on a standard bike. This appears to be the operator's standard/shorter route.",
+    "verdict": {
+      "headline": "A good introduction to Maui's e-mountain-bike scene without committing to the longer Grand Tour.",
+      "goodFor": [
+        "Riders wanting a moderate, guided introduction to e-mountain biking",
+        "Groups with mixed fitness levels (e-assist levels the playing field)"
+      ],
+      "worthKnowing": [
+        "Confirm terrain difficulty and trail surface type before booking if you have no mountain biking experience at all"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "E-mountain-bike touring is a growing category on Maui; general sentiment favors guided operators for route knowledge and bike maintenance support over self-guided rentals.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "emountain-bike-grand-tour-kihei",
+    "title": "The Grand Tour",
+    "company": "Emountain Bike Tour Maui",
+    "fareharborShortname": "emountainbiketourmauillc",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Guided E-Mountain Bike Tour",
+    "duration": "Full Day (longer than Experience Tour)",
+    "highlights": [
+      "Longer, more extensive route than the operator's Experience Tour",
+      "More varied terrain and greater distance covered"
+    ],
+    "fullDescription": "The extended version of this operator's e-mountain-bike offering, covering more distance and likely more varied terrain than the shorter Experience Tour.",
+    "verdict": {
+      "headline": "Choose this over the Experience Tour if you want a full day and more distance - confirm fitness expectations first.",
+      "goodFor": [
+        "Confident riders wanting a longer, more immersive day",
+        "Repeat Maui visitors who've done shorter bike tours before"
+      ],
+      "worthKnowing": [
+        "Longer duration means more physical demand even with e-assist - ask the operator for a realistic difficulty comparison against the Experience Tour"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General e-mountain-bike category sentiment applies; longer tours in this category are typically recommended for riders who've already tried a shorter session.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-hawaii-vip-road-to-hana-haleakala-sunset",
+    "title": "VIP Road to Hana Tour + Haleakala Sunset",
+    "company": "Experience Hawaii",
+    "fareharborShortname": "experiencemauitours",
+    "island": "Maui",
+    "city": "Kahului",
+    "tourType": "Private/VIP Van Tour",
+    "duration": "Full Day (very long)",
+    "highlights": [
+      "Combines the Road to Hana drive with a Haleakala sunset finish in one very long day",
+      "Private/VIP format - smaller group than large shuttle-bus Hana tours"
+    ],
+    "fullDescription": "An ambitious combo that stacks Maui's two signature road trips - Road to Hana and Haleakala - into a single day, capped with sunset at the summit. This is a long, demanding itinerary by design.",
+    "verdict": {
+      "headline": "An efficient way to check off Maui's two biggest drives in one day - but it's a genuinely exhausting itinerary, not a relaxed one.",
+      "goodFor": [
+        "Time-limited travelers wanting to combine both bucket-list drives",
+        "Early risers comfortable with a very long day"
+      ],
+      "worthKnowing": [
+        "Combining Hana and Haleakala in one day means less time at any single stop than dedicating a full day to each separately",
+        "Haleakala summit gets cold at sunset - bring warm layers even though you started the day at sea level in tropical heat"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Combined Hana + Haleakala day tours are a known Maui category, generally praised for efficiency by time-limited travelers, with recurring feedback that it's a long, tiring day rather than a leisurely one.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-hawaii-half-day-vip-road-to-hana",
+    "title": "1/2 Day VIP Private Road to Hana Tour with Pick Up",
+    "company": "Experience Hawaii",
+    "fareharborShortname": "experiencemauitours",
+    "island": "Maui",
+    "city": "Kahului",
+    "tourType": "Private/VIP Van Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Shorter, half-day version of the Road to Hana drive",
+      "Private/VIP format with hotel pickup included"
+    ],
+    "fullDescription": "A condensed, half-day take on the famously long Road to Hana route - good for travelers who want a taste of the drive's waterfalls and coastal views without a full-day commitment.",
+    "verdict": {
+      "headline": "A reasonable compromise if a full-day Hana drive doesn't fit your schedule - just know you'll see fewer stops.",
+      "goodFor": [
+        "Travelers with only half a day free",
+        "Anyone unsure if the full Road to Hana experience is worth a whole day for them"
+      ],
+      "worthKnowing": [
+        "The full Road to Hana route has 600+ curves and dozens of potential stops - a half-day version necessarily skips most of them, so set expectations accordingly"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Half-day Road to Hana tours are a smaller category than full-day versions; general sentiment is positive for convenience but notes the trade-off of seeing a fraction of the full route's stops.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-hawaii-vip-kona-coast-tour",
+    "title": "VIP Kona Coast Private Tour with Pickup",
+    "company": "Experience Hawaii",
+    "fareharborShortname": "experiencemauitours",
+    "island": "Big Island",
+    "city": "Kona area (booked through a Maui-based operator)",
+    "tourType": "Private/VIP Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Private/VIP touring format on the Big Island's Kona Coast"
+    ],
+    "fullDescription": "Listed under the same operator as this company's Maui Road to Hana tours, but this specific product covers the Kona Coast on the Big Island. Given the cross-island listing, confirm exact logistics (departure island, any flight coordination) directly before booking.",
+    "verdict": {
+      "headline": "Verify logistics before booking - this product's location data crosses islands from its parent company.",
+      "goodFor": [
+        "Travelers already confirmed to be on the Big Island wanting a private VIP tour"
+      ],
+      "worthKnowing": [
+        "Double-check departure location and whether any inter-island travel is required - this is the one listing in our dataset where the operator's home island and the tour's actual island don't match"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this listing to summarize; recommend direct operator confirmation before publishing final page copy.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dive-maui-lanai-cathedral-2-tank",
+    "title": "2 Tank Lanai Cathedral Dive by Boat",
+    "company": "Dive Maui",
+    "fareharborShortname": "goscubadivemaui",
+    "island": "Maui",
+    "city": "Lahaina",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Boat trip to Lanai's famous 'Cathedrals' dive sites - large underwater lava tube caverns with dramatic light beams",
+      "One of Maui-area diving's most distinctive, photogenic sites"
+    ],
+    "fullDescription": "The Cathedrals off Lanai are among the most visually striking dive sites in Hawaii - collapsed lava tube caverns with openings that let sunlight stream through in dramatic beams, a favorite for underwater photographers.",
+    "verdict": {
+      "headline": "One of the most visually dramatic dive sites accessible from Maui - a strong pick for photography-minded certified divers.",
+      "goodFor": [
+        "Certified divers interested in cavern/swim-through diving",
+        "Underwater photographers"
+      ],
+      "worthKnowing": [
+        "Crossing to Lanai means more boat time than a Maui-only dive - factor this into your day and any seasickness concerns",
+        "Cavern diving, even in open-topped formations like this, benefits from prior buoyancy control confidence"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "The Lanai Cathedrals are consistently ranked among Hawaii's top dive sites across independent dive-travel resources, specifically for the unique lava tube light formations.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "dive-maui-shark-turtle-shore-dive",
+    "title": "Shark and Turtle Dive for Certified Divers from Shore",
+    "company": "Dive Maui",
+    "fareharborShortname": "goscubadivemaui",
+    "island": "Maui",
+    "city": "Lahaina",
+    "tourType": "Certified Diver - Shore Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Shore-access dive (no boat fee) with regular shark and turtle sightings",
+      "Lower cost alternative to boat charters for certified divers"
+    ],
+    "fullDescription": "A shore-entry dive near Lahaina offering a lower-cost alternative to boat dives, with reasonably reliable sightings of reef sharks and green sea turtles.",
+    "verdict": {
+      "headline": "Good value for certified divers not wanting to pay boat-dive prices.",
+      "goodFor": [
+        "Budget-conscious certified divers",
+        "Shark and turtle enthusiasts"
+      ],
+      "worthKnowing": [
+        "Shore entries can involve more surface swimming/less convenience than boat drop-offs - ask about entry conditions"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Shore dives near Lahaina are generally valued by certified divers for cost savings versus boat charters, with sighting reliability for sharks/turtles cited as a strong point.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hana-and-beyond-tour",
+    "title": "Hana & Beyond Tour",
+    "company": "Hana and Beyond",
+    "fareharborShortname": "hanaandbeyond",
+    "island": "Maui",
+    "city": "Paia",
+    "tourType": "Guided Road to Hana Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Full Road to Hana route departing from Paia, the traditional gateway town",
+      "Shared or fully private group options",
+      "'Beyond' in the name suggests stops past Hana town itself (e.g., the Pools of Oheo/Kipahulu area)"
+    ],
+    "fullDescription": "A guided Road to Hana tour departing from Paia - the small North Shore town that traditionally marks the start of the Hana Highway. Available as either a shared-group booking or a fully private tour for your party only.",
+    "verdict": {
+      "headline": "A solid, traditional Road to Hana option - choose private if group privacy matters more to you than cost.",
+      "goodFor": [
+        "First-time Road to Hana travelers wanting a guided (not self-drive) experience",
+        "Groups wanting the private option to set their own pace"
+      ],
+      "worthKnowing": [
+        "Shared tours run on a fixed schedule set by the group's slowest members; private tours cost more but offer full flexibility on stops and pacing"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Guided Road to Hana tours departing from Paia are a well-established category; general sentiment favors guided options over self-driving specifically for narration and not having to focus on the notoriously narrow, curvy road while trying to enjoy the scenery.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Shared Group Tour",
+      "Private Group Tour"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hana-tours-of-maui-private-deluxe",
+    "title": "Private Deluxe Hana Tour",
+    "company": "Hana Tours of Maui",
+    "fareharborShortname": "hanatoursofmaui",
+    "island": "Maui",
+    "city": "Kula",
+    "tourType": "Private Deluxe Road to Hana Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Private, deluxe-tier Road to Hana experience",
+      "Departing from Upcountry Maui (Kula)"
+    ],
+    "fullDescription": "Another private Road to Hana operator, positioned at the 'deluxe' tier - likely meaning a higher-end vehicle and/or more inclusions than standard shared shuttle tours. Compare inclusions directly against Hana and Beyond's private option if choosing between the two.",
+    "verdict": {
+      "headline": "Compare vehicle type, inclusions, and price directly against other private Hana operators before choosing.",
+      "goodFor": [
+        "Travelers wanting a premium private Hana experience"
+      ],
+      "worthKnowing": [
+        "'Deluxe' branding varies by operator - confirm specifics (vehicle type, food/drink inclusions, stop count) rather than assuming"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Private, higher-end Road to Hana tours are a competitive category on Maui; general sentiment favors operators transparent about exact vehicle and inclusion details upfront.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-by-storm-hana-back-luxury",
+    "title": "Hana & Back Adventure Tour: Luxury Expedition",
+    "company": "Hawaii By Storm Tours, LLC",
+    "fareharborShortname": "hawaiibystorm",
+    "island": "Maui",
+    "city": "Kahului",
+    "tourType": "Guided Road to Hana Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Full round-trip Road to Hana route ('Hana & Back' - implies the full loop or return drive is included)",
+      "'Luxury Expedition' branding suggests upgraded vehicle/amenities"
+    ],
+    "fullDescription": "This operator's flagship Road to Hana product, branded as a 'Luxury Expedition' - one of four distinct Maui hiking/driving itineraries this company offers (see the related Pipiwai Trail and Haleakala listings from the same operator).",
+    "verdict": {
+      "headline": "A premium-branded Hana tour - verify what specifically makes it 'luxury' (vehicle, food, guide ratio) before paying a premium.",
+      "goodFor": [
+        "Travelers wanting an upgraded Road to Hana experience"
+      ],
+      "worthKnowing": [
+        "Compare directly against this operator's other Maui itineraries (Pipiwai Trail, Haleakala) if you're deciding between a Hana day and a hiking-focused day"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Premium-branded Road to Hana tours are common on Maui; general sentiment across the category rewards operators who clearly itemize what the upgrade includes.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-by-storm-waimoku-falls-pipiwai",
+    "title": "Waimoku Falls at Pipiwai Trail Hiking Adventure",
+    "company": "Hawaii By Storm Tours, LLC",
+    "fareharborShortname": "hawaiibystorm",
+    "island": "Maui",
+    "city": "Kahului",
+    "tourType": "Guided Hike (Pipiwai Trail, Kipahulu)",
+    "duration": "Full Day",
+    "highlights": [
+      "Guided hike through the Pipiwai Trail's bamboo forest to 400-foot Waimoku Falls",
+      "Located in the Kipahulu District, past Hana town - one of Maui's most rewarding trails"
+    ],
+    "fullDescription": "The Pipiwai Trail is widely regarded as one of Maui's best hikes - a path through a dense bamboo forest and past the Seven Sacred Pools area, ending at the dramatic 400-foot Waimoku Falls. This guided version handles the long drive from Kahului so guests don't have to self-navigate.",
+    "verdict": {
+      "headline": "One of Maui's genuinely best hikes - worth prioritizing this over a generic Road to Hana drive if you have to choose.",
+      "goodFor": [
+        "Hikers wanting real trail time rather than a mostly-driving day",
+        "Waterfall and bamboo forest enthusiasts"
+      ],
+      "worthKnowing": [
+        "The trail is roughly 4 miles round trip with some elevation and can be muddy - wear real hiking shoes, not sandals",
+        "This is a long day given the Kahului-to-Kipahulu drive time; confirm start time and total hours"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "The Pipiwai Trail to Waimoku Falls is consistently ranked among Maui's top hikes across independent travel resources, specifically praised for the bamboo forest section and the payoff waterfall.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-by-storm-pipiwai-haleakala-deluxe",
+    "title": "Pipiwai Trail & Haleakala Summit Deluxe Tour",
+    "company": "Hawaii By Storm Tours, LLC",
+    "fareharborShortname": "hawaiibystorm",
+    "island": "Maui",
+    "city": "Kahului",
+    "tourType": "Guided Hike + Summit Tour Combo",
+    "duration": "Full Day (very long)",
+    "highlights": [
+      "Combines the Pipiwai Trail hike with a Haleakala summit visit in one day",
+      "Covers two of Maui's most demanding, high-value destinations in a single booking"
+    ],
+    "fullDescription": "A combo itinerary stacking the Pipiwai Trail hike with a Haleakala summit visit - similar in spirit to Experience Hawaii's Hana+Haleakala combo, but pairing the hike specifically rather than the full Hana drive.",
+    "verdict": {
+      "headline": "An ambitious, rewarding combo for fit travelers - but a genuinely long, tiring day by design.",
+      "goodFor": [
+        "Fit travelers wanting to maximize a single day",
+        "Anyone who's already done a separate Hana drive and wants the hike-plus-summit combo instead"
+      ],
+      "worthKnowing": [
+        "This stacks a moderate hike with a high-elevation summit visit in one day - pace and altitude adjustment matter, especially for older travelers or anyone sensitive to elevation change"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Combo hike-and-summit Maui tours are a smaller but growing category; general sentiment favors them for efficiency with the caveat that they demand more physical stamina than either destination alone.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-by-storm-haleakala-summit-day-sunset",
+    "title": "Haleakala Summit Day/Sunset Hiking Adventure",
+    "company": "Hawaii By Storm Tours, LLC",
+    "fareharborShortname": "hawaiibystorm",
+    "island": "Maui",
+    "city": "Kahului",
+    "tourType": "Guided Summit Hike",
+    "duration": "Full Day or Evening",
+    "highlights": [
+      "Haleakala summit hiking, available in day or sunset timing",
+      "Above-the-clouds crater views at over 10,000 feet elevation"
+    ],
+    "fullDescription": "A dedicated Haleakala summit hiking tour, offered in either daytime or sunset timing, without the added Pipiwai Trail combo of this operator's other listing.",
+    "verdict": {
+      "headline": "The focused choice if you want real trail time at the summit rather than a quick lookout stop.",
+      "goodFor": [
+        "Hikers wanting to actually walk Haleakala's crater trails, not just view the sunrise/sunset from the parking area",
+        "Travelers who've already done Pipiwai Trail separately"
+      ],
+      "worthKnowing": [
+        "Summit elevation (over 10,000 ft) can cause altitude effects - shortness of breath, headache - even on a short hike; go easy on pace and stay hydrated",
+        "Temperatures at the summit can be near freezing at sunrise/sunset regardless of how hot it is at sea level - bring real warm layers"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Haleakala summit hiking tours are frequently recommended over drive-up-only sunrise/sunset visits for travelers wanting more than a parking-lot view; altitude adjustment and cold-weather prep are the most repeated practical tips across independent sources.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "enoa-pearl-harbor-tour",
+    "title": "Pearl Harbor Tour by E Noa",
+    "company": "E Noa Corporation",
+    "fareharborShortname": "enoatours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Historical Bus Tour",
+    "duration": "5-7 Hours depending on package",
+    "highlights": [
+      "Long-established, well-known Oahu Pearl Harbor tour operator (also runs the Waikiki Trolley)",
+      "USS Arizona Memorial entry included in every package",
+      "Optional add-ons: Battleship Missouri guided walk, downtown Honolulu drive-by (Iolani Palace, King Kamehameha Statue, Aloha Tower)"
+    ],
+    "fullDescription": "E Noa is one of Oahu's most established tour operators, also known for running the Waikiki Trolley. Their Pearl Harbor tours all include the same core: hotel pickup, a briefing at the Pearl Harbor Visitor Center, and entry to the USS Arizona Memorial. Where they differ is in the add-ons bundled in - whether the Battleship Missouri is included, and whether a downtown Honolulu drive-by (Iolani Palace, King Kamehameha Statue, Aloha Tower) is part of the package.",
+    "verdict": {
+      "headline": "A dependable, established operator - the honest thing to know is that USS Arizona Memorial access itself is free, so you're really paying for transport, logistics, and the add-on stops.",
+      "goodFor": [
+        "Travelers without a car who want Pearl Harbor handled logistically",
+        "Anyone wanting the downtown Honolulu add-on included rather than arranging it separately"
+      ],
+      "worthKnowing": [
+        "The USS Arizona Memorial itself is free and independently bookable through the National Park Service - operators are charging for transport, guided context, and add-ons, not for the memorial access",
+        "Battleship Missouri tours are conducted by ship docents that are included in Missouri admission regardless of which tour operator books you in",
+        "Compare which package includes Missouri versus downtown-only before booking, since the names ('Remembered A/B' vs 'City' vs 'Salute') don't make the difference obvious at a glance"
+      ],
+      "closingNote": "This is worth stating plainly because it doesn't reduce the value of a well-run logistics tour, but travelers deserve to know what they're actually paying for at Pearl Harbor.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "E Noa is a long-established Honolulu tour operator with generally positive sentiment for guide knowledge on its Pearl Harbor tours, per Waikiki Trolley company reviews covering the same operator. Independent travel commentary on Pearl Harbor tours broadly notes that several standard inclusions (Missouri docent tours, Arizona Memorial access) are free to all visitors regardless of which paid tour company is used.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Pearl Harbor Remembered A (USS Arizona + Missouri + Downtown)",
+      "Pearl Harbor Remembered B (USS Arizona + Missouri + Downtown, extended)",
+      "Pearl Harbor City (USS Arizona + Downtown, no Missouri)",
+      "Salute to Pearl Harbor"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "enoa-majestic-circle-island-tour",
+    "title": "Majestic Circle Island Tour",
+    "company": "E Noa Corporation",
+    "fareharborShortname": "enoatours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Van/Bus Circle Island Tour",
+    "duration": "~7-8 Hours",
+    "highlights": [
+      "Full-day circle-island route from an established, well-known Oahu operator",
+      "Departs Waikiki, covering North Shore and Windward Coast scenic points"
+    ],
+    "fullDescription": "E Noa's own circle-island tour, separate from their Pearl Harbor products - a full-day scenic loop of Oahu with narration from an established local operator.",
+    "verdict": {
+      "headline": "A reliable, established-operator option if you're comparing circle-island tours.",
+      "goodFor": [
+        "First-time Oahu visitors wanting a broad overview with a trusted, long-running operator"
+      ],
+      "worthKnowing": [
+        "Compare stop count and pacing against other circle-island listings in this dataset - naming conventions like 'majestic' or 'ultimate' don't reliably indicate more stops"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "As an established operator, E Noa generally scores well for reliable scheduling and guide professionalism across its tour lineup.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-aloha-luxury-beach-picnic",
+    "title": "Luxury Beach Picnic: Two Guests",
+    "company": "Experience Aloha Co",
+    "fareharborShortname": "experiencealoha",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Styled Beach Picnic Setup",
+    "duration": "~2 Hours setup/session",
+    "highlights": [
+      "Fully set-up, styled beach picnic for two - decor, seating, food arranged",
+      "Popular for anniversaries, proposals, or a special date on the beach"
+    ],
+    "fullDescription": "A styled, done-for-you beach picnic setup - low tables, cushions, decor, and typically food/drinks arranged at a beach location, aimed at couples wanting a special-occasion experience without planning the logistics themselves.",
+    "verdict": {
+      "headline": "A genuinely nice way to mark a special occasion - just confirm the exact beach location and any permit requirements.",
+      "goodFor": [
+        "Anniversaries, proposals, birthdays",
+        "Couples wanting a low-effort, high-polish beach experience"
+      ],
+      "worthKnowing": [
+        "Some Oahu beaches restrict commercial setups/permits - confirm the operator has proper authorization for their chosen location",
+        "Weather is out of anyone's control - ask about the rain/wind contingency plan"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Styled beach picnic companies are a growing Oahu category, generally praised for presentation quality and used frequently for proposals and anniversaries per general travel/wedding-planning commentary.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-aloha-wedding-photography",
+    "title": "Wedding Photography",
+    "company": "Experience Aloha Co",
+    "fareharborShortname": "experiencealoha",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Photography Service",
+    "duration": "Session-based",
+    "highlights": [
+      "Professional wedding photography service on Oahu"
+    ],
+    "fullDescription": "A photography service rather than an activity/tour - covers full wedding-day photography on Oahu.",
+    "verdict": {
+      "headline": "Request a portfolio and package details directly - photography quality varies significantly by individual photographer even within one company.",
+      "goodFor": [
+        "Couples getting married on Oahu needing a local photographer"
+      ],
+      "worthKnowing": [
+        "Ask specifically which photographer will shoot your date, and review their individual portfolio rather than the company's general marketing photos"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this listing; general wedding photography category advice is to always review the individual photographer's portfolio before booking.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-aloha-engagement-photography",
+    "title": "Engagement Photography Session",
+    "company": "Experience Aloha Co",
+    "fareharborShortname": "experiencealoha",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Photography Service",
+    "duration": "Session-based (~1-2 Hours)",
+    "highlights": [
+      "Engagement photo session at scenic Oahu locations"
+    ],
+    "fullDescription": "A shorter-format photography session for engagement photos, from the same operator as the wedding photography listing.",
+    "verdict": {
+      "headline": "Ask about location options and turnaround time for edited photos before booking.",
+      "goodFor": [
+        "Couples wanting professional engagement photos during an Oahu trip"
+      ],
+      "worthKnowing": [
+        "Golden hour (near sunrise/sunset) sessions are typically the most in-demand time slots - book early if timing matters"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "experience-aloha-custom-floral-proposal",
+    "title": "Custom Floral Proposal",
+    "company": "Experience Aloha Co",
+    "fareharborShortname": "experiencealoha",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Proposal Styling Service",
+    "duration": "Setup + session",
+    "highlights": [
+      "Custom floral arch/setup for a proposal moment, typically paired with photography"
+    ],
+    "fullDescription": "A proposal-styling service - floral decor setup at a scenic Oahu location, generally intended to be paired with a photography package to capture the moment.",
+    "verdict": {
+      "headline": "Confirm whether photography is included or needs to be booked as a separate add-on.",
+      "goodFor": [
+        "Anyone planning a proposal during an Oahu trip who wants a styled, photographed moment"
+      ],
+      "worthKnowing": [
+        "Check if this listing includes a photographer or if you need to also book their photography service separately",
+        "Confirm location permitting the same as the beach picnic listing"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this listing; proposal styling as a category is generally recommended to be booked well in advance of the trip.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-adventure-pelagic-cageless-shark-dive",
+    "title": "Pelagic (Cageless) Shark Dive",
+    "company": "Go Adventure Hawaii",
+    "fareharborShortname": "goadventurehawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Cageless Shark Snorkel",
+    "duration": "~3 Hours",
+    "highlights": [
+      "Departs from Haleiwa Small Boat Harbor - the North Shore's established shark-tour hub",
+      "Snorkel in open water alongside a safety diver, no cage",
+      "Species vary by trip: sandbar, Galapagos, and occasionally tiger sharks; also turtles, dolphins, and (in season) whales en route"
+    ],
+    "fullDescription": "Cageless shark snorkeling off Oahu's North Shore is a well-established category, with Haleiwa Harbor as the hub for several operators running very similar trips into deep pelagic water where sharks naturally congregate. A safety diver accompanies snorkelers at all times, and small group sizes (often 6-8 guests) are standard across the category.",
+    "verdict": {
+      "headline": "A genuinely well-regarded, safety-conscious adventure activity - not the reckless stunt it might sound like on paper.",
+      "goodFor": [
+        "Adventurous travelers, including nervous first-timers who want reassurance from a safety diver",
+        "Wildlife/photography enthusiasts",
+        "Families with older kids comfortable in open water"
+      ],
+      "worthKnowing": [
+        "Water at the dive site can be very deep (over 100 feet) - the operator recommends being a confident, experienced swimmer",
+        "Seasickness is a real consideration on the boat ride out; taking motion sickness medication in advance is commonly recommended across operators in this category",
+        "Sightings are generally very reliable in this category, but never 100% guaranteed with wild animals - ask about the specific operator's track record"
+      ],
+      "closingNote": "Across independently reviewed operators running this same type of trip out of Haleiwa, safety briefings and crew professionalism are consistently the most-praised elements - this appears to be a mature, well-run category rather than a fringe activity.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Cageless shark snorkeling out of Haleiwa Harbor is widely reviewed across multiple operators with strong, consistent praise for safety briefings, crew knowledge, and the quality of in-water guidance from safety divers. The most repeated practical tips from past guests are to take motion sickness medication ahead of time and to be a confident swimmer, since dive sites can be well over 100 feet deep.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-adventure-custom-day-trip",
+    "title": "Custom Day Trip",
+    "company": "Go Adventure Hawaii",
+    "fareharborShortname": "goadventurehawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Custom Private Charter",
+    "duration": "Full Day (flexible)",
+    "highlights": [
+      "Fully custom boat day - fishing, snorkeling, sightseeing, or a mix, set by your group",
+      "Private charter format"
+    ],
+    "fullDescription": "A flexible, build-your-own-day charter from the same North Shore operator that runs the shark dive - good for groups who want to combine activities (fishing plus snorkeling, for example) rather than book a fixed-format trip.",
+    "verdict": {
+      "headline": "Ideal for groups with mixed interests who don't want to choose just one activity type.",
+      "goodFor": [
+        "Groups wanting to mix fishing, snorkeling, and sightseeing in one private charter",
+        "Anyone wanting full control over the day's itinerary"
+      ],
+      "worthKnowing": [
+        "Because it's custom, get specifics in writing (activities, stops, duration) before booking rather than assuming"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Custom private charters as a category are generally reviewed well for flexibility; general operator sentiment (see the shark dive listing) applies to crew quality here as well.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "go-adventure-fishing-charter",
+    "title": "Fishing Charter",
+    "company": "Go Adventure Hawaii",
+    "fareharborShortname": "goadventurehawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Fishing Charter",
+    "duration": "Half or Full Day",
+    "highlights": [
+      "Standard fishing charter out of Haleiwa Harbor on Oahu's North Shore"
+    ],
+    "fullDescription": "A dedicated fishing charter from the same North Shore operator - straightforward offshore fishing rather than the custom mixed-activity or shark-dive products.",
+    "verdict": {
+      "headline": "A solid choice for anglers specifically wanting to fish rather than a mixed-activity day.",
+      "goodFor": [
+        "Anglers of any experience level"
+      ],
+      "worthKnowing": [
+        "Ask about typical current catch (species running that season) and keep-vs-release policy before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General North Shore fishing charter sentiment favors operators transparent about recent catch results and clear keep/release policies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ocean-outfitters-marine-life-tour",
+    "title": "Marine Life Tour",
+    "company": "Ocean Outfitters Hawaii",
+    "fareharborShortname": "hawaiiglassbottomboats-slt",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Glass-Bottom / Wildlife Viewing Boat",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "North Shore boat trip focused on general marine life viewing",
+      "Shorter, more affordable format than a full snorkel charter"
+    ],
+    "fullDescription": "A general wildlife-viewing boat trip off Oahu's North Shore - shorter and more accessible than a full snorkel excursion, aimed at travelers wanting to see marine life without getting in the water.",
+    "verdict": {
+      "headline": "A good low-commitment option for non-swimmers or anyone short on time.",
+      "goodFor": [
+        "Non-swimmers",
+        "Families with young kids",
+        "Short-time-window travelers"
+      ],
+      "worthKnowing": [
+        "This is viewing-focused, not a snorkel trip - book the Cage-free Shark Tour or another operator's snorkel product if getting in the water is the goal"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Shorter North Shore wildlife-viewing boats in this category are generally chosen by families and non-swimmers wanting an easier alternative to snorkel tours.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ocean-outfitters-cage-free-shark-tour",
+    "title": "Cage-free Shark Tour",
+    "company": "Ocean Outfitters Hawaii",
+    "fareharborShortname": "hawaiiglassbottomboats-slt",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Cageless Shark Snorkel",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Another North Shore cageless shark snorkel option (see Go Adventure Hawaii's Pelagic Shark Dive for detailed category context)",
+      "Departs from the North Shore harbor area"
+    ],
+    "fullDescription": "A cageless shark snorkel trip from a second North Shore operator - see this category's general safety and logistics notes on the Go Adventure Hawaii Pelagic Shark Dive page, since the fundamentals (safety diver, open water, small groups) are consistent across Haleiwa-based operators.",
+    "verdict": {
+      "headline": "Comparable experience to other North Shore cageless shark tours - compare current pricing and departure times.",
+      "goodFor": [
+        "Adventurous travelers and wildlife photographers"
+      ],
+      "worthKnowing": [
+        "Multiple operators run very similar trips from North Shore harbors - price, schedule, and boat size are the main differentiators between them"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General North Shore cageless shark tour sentiment is strongly positive across the category for safety-diver-led encounters; see the Go Adventure Hawaii listing for detailed independent review findings on this activity type.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-nautical-oahu-west-oahu-heritage-sail",
+    "title": "West Oahu Heritage Snorkel Sail",
+    "company": "Hawaii Nautical - Oahu",
+    "fareharborShortname": "hawaiinautical",
+    "island": "Oahu",
+    "city": "Waianae",
+    "tourType": "Sailing Snorkel Cruise",
+    "duration": "Half Day",
+    "highlights": [
+      "Sails the Leeward (West) Coast, generally calmer and less touristed than Waikiki",
+      "'Heritage' framing suggests some cultural/historical narration included"
+    ],
+    "fullDescription": "A sailing snorkel trip on Oahu's West Coast, an area with typically calmer water and fewer boats than Waikiki-departure trips, plus cultural context per the 'heritage' naming.",
+    "verdict": {
+      "headline": "A good pick for travelers with a rental car willing to head to the quieter Leeward Coast.",
+      "goodFor": [
+        "Travelers wanting calmer water and fewer crowds than Waikiki",
+        "Anyone interested in West Oahu's cultural history"
+      ],
+      "worthKnowing": [
+        "Waianae is roughly 45-60 minutes from Waikiki - factor the drive into your day"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Leeward Coast sailing trips are frequently recommended over Waikiki-departure options for calmer conditions; general sentiment for this operator's broader portfolio applies here.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-nautical-oahu-kaula-kai-sunset-ko-olina",
+    "title": "Kaula Kai Sunset Sail at Ko Olina",
+    "company": "Hawaii Nautical - Oahu",
+    "fareharborShortname": "hawaiinautical",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Sunset Sail",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Departs from Ko Olina's protected lagoons on the West Coast",
+      "Sunset timing over calm resort-area water"
+    ],
+    "fullDescription": "A sunset sail departing from Ko Olina, the resort area on Oahu's West Coast known for its calm, man-made lagoons - generally very protected water compared to open-coast departures.",
+    "verdict": {
+      "headline": "A relaxed, low-swell sunset option if you're staying in or near Ko Olina.",
+      "goodFor": [
+        "Ko Olina resort guests",
+        "Anyone wanting particularly calm sailing conditions"
+      ],
+      "worthKnowing": [
+        "Ko Olina is on the far West side of the island - a longer drive from Waikiki than most sunset sail departure points"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Ko Olina-departure sunset sails are generally praised for calm water conditions given the area's protected lagoon geography.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-ocean-charters-keanuenue",
+    "title": "Private Catamaran Cruise & Snorkeling \"Keanuenue\"",
+    "company": "Hawaii Ocean Charters",
+    "fareharborShortname": "hawaiioceancharters",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Catamaran Charter",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Fully private catamaran named 'Keanuenue' - exclusive to your group",
+      "Day option includes snorkeling; sunset option is swim-and-sail focused"
+    ],
+    "fullDescription": "A private catamaran charter on the named vessel Keanuenue, bookable as either a daytime snorkel cruise or a sunset cruise with swim time - same boat and operator, two time-of-day formats.",
+    "verdict": {
+      "headline": "Choose the day option for reef time, sunset for the classic golden-hour sail.",
+      "goodFor": [
+        "Groups wanting full boat privacy",
+        "Day: snorkelers; Sunset: couples and celebrations"
+      ],
+      "worthKnowing": [
+        "As a private charter, this costs more per person than a shared snorkel boat - worth it primarily if privacy is a priority"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Private catamaran charters in Honolulu are generally reviewed favorably for flexibility and exclusivity; general sentiment favors the sunset timing for atmosphere and the day option for snorkeling quality.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Day - Cruise & Snorkeling",
+      "Sunset - Cruise & Swim"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-oahu-circle-island-tour",
+    "title": "Oahu Circle Island Tour",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Shared Circle Island Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Full-day circle-island route covering North Shore beaches and scenic Oahu stops",
+      "Available in English and German-language guided formats",
+      "Operator name ('Hawaii Reisetipps' = German for 'Hawaii travel tips') signals this company specifically serves German-speaking travelers alongside English"
+    ],
+    "fullDescription": "A shared circle-island tour run by an operator that explicitly serves both English and German-speaking travelers (note the shortname 'hawaiireisetipps' - German for 'Hawaii travel tips'). The core route appears consistent across listings; naming and language vary by which market the listing targets.",
+    "verdict": {
+      "headline": "A solid choice if you want a German-language guided option - confirm exact stop count and language for your specific date.",
+      "goodFor": [
+        "German-speaking travelers wanting a guide in their language",
+        "English-speaking travelers wanting a standard circle-island overview"
+      ],
+      "worthKnowing": [
+        "Confirm which language your specific booking/date is guided in",
+        "Treat 'stops' claims as approximate rather than a fixed itinerary guarantee"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General circle-island tour sentiment applies; operators serving specific language markets (German, Japanese, Spanish) are common on Oahu and generally valued by travelers from those markets for guide language fluency.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "North Shore Circle Island Tour (EN)",
+      "Beste Orte Inselrundfahrt (DE)",
+      "Highlights - 30 Spots / 10 Stops (EN)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-private-custom-tour",
+    "title": "Private Custom Oahu Tour",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Custom Van Tour",
+    "duration": "Full Day (flexible)",
+    "highlights": [
+      "Fully private, flexible itinerary set by your group",
+      "Available in English or German"
+    ],
+    "fullDescription": "This operator's private, build-your-own itinerary option - separate from the shared circle-island tour, aimed at groups wanting full control over stops and pacing.",
+    "verdict": {
+      "headline": "Worth it for groups wanting full itinerary control - confirm specifics in writing before booking.",
+      "goodFor": [
+        "Families or groups of 4+ wanting a flexible, private day",
+        "German-speaking travelers"
+      ],
+      "worthKnowing": [
+        "Because it's custom, get a proposed stop list in writing at booking rather than assuming what's included"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General operator sentiment (see the shared Circle Island Tour listing) applies to guide quality across this company's product line.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Private Custom Group Tour (EN)",
+      "Individuelle Oahu Inselrundfahrt (DE)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-fully-customized-tour-event",
+    "title": "Fully Customized Tour or Event",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Custom Event/Transportation Booking",
+    "duration": "Varies",
+    "highlights": [
+      "Broader booking category than the private tour listing - appears to cover events (weddings, corporate, etc.) as well as custom sightseeing"
+    ],
+    "fullDescription": "A catch-all booking listing for fully customized transportation/touring needs beyond standard sightseeing - likely used for weddings, group events, or highly specific itineraries that don't fit the standard tour products.",
+    "verdict": {
+      "headline": "Contact the operator directly to scope your specific event or unusual itinerary need.",
+      "goodFor": [
+        "Weddings, corporate groups, or non-standard event transportation needs"
+      ],
+      "worthKnowing": [
+        "This is a flexible booking placeholder rather than a defined product - expect a conversation with the operator before a final quote"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not applicable - this is a custom booking category rather than a standard reviewed tour product.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-luau-transportation",
+    "title": "Luau Transportation Private Group Oahu",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Transportation Service",
+    "duration": "Round-trip transport",
+    "highlights": [
+      "Private round-trip transportation specifically for luau attendance",
+      "Useful if your hotel isn't on a standard luau shuttle route"
+    ],
+    "fullDescription": "A transport-only service getting your private group to and from a luau, distinct from actually booking the luau ticket itself (see this dataset's luau listings - Luau Kalamaku, Queens Waikiki Luau - for the events themselves).",
+    "verdict": {
+      "headline": "Useful if you want private transport rather than a shared shuttle bus to your luau.",
+      "goodFor": [
+        "Groups wanting private transport instead of a shared shuttle",
+        "Travelers whose hotel isn't on standard luau shuttle routes"
+      ],
+      "worthKnowing": [
+        "This is transportation only - book your actual luau ticket separately"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not applicable in isolation - a transportation logistics service rather than an experience to review independently.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-chauffeur-transportation",
+    "title": "Chauffeur & Transportation Service (Servicing all of Oahu)",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "General Private Chauffeur Service",
+    "duration": "As booked",
+    "highlights": [
+      "General private driver/chauffeur service covering all of Oahu",
+      "By far the highest availability count in this dataset - suggests this is a high-frequency, everyday service rather than a scheduled tour"
+    ],
+    "fullDescription": "A general private driver service rather than a fixed tour product - useful for airport transfers, point-to-point trips, or any transportation need that doesn't fit a packaged tour.",
+    "verdict": {
+      "headline": "A flexible transport option, not an 'experience' page in the traditional sense - list under transportation/logistics rather than tours.",
+      "goodFor": [
+        "Airport transfers",
+        "Point-to-point private transport",
+        "Groups needing flexible, on-demand driving"
+      ],
+      "worthKnowing": [
+        "This is a transportation service, not a sightseeing tour - consider whether it belongs in the site's tour listings at all, or as a separate 'services' category"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not applicable - a general transportation service rather than a reviewed tour experience.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-pearl-harbor-downtown-honolulu",
+    "title": "Pearl Harbor & USS Arizona with Downtown Honolulu",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Historical Bus Tour",
+    "duration": "~5-6 Hours",
+    "highlights": [
+      "Pearl Harbor and USS Arizona Memorial tour with downtown Honolulu drive-by included",
+      "Available in this operator's English/German-serving format"
+    ],
+    "fullDescription": "This company's Pearl Harbor tour product - see the E Noa Corporation Pearl Harbor listing for general category context (free NPS memorial access, docent-led Missouri tours) which applies across all operators running similar itineraries.",
+    "verdict": {
+      "headline": "Same general Pearl Harbor honesty note applies here as with other operators - you're paying for transport and narration, not for 'access.'",
+      "goodFor": [
+        "German-speaking travelers wanting Pearl Harbor covered in their language",
+        "Travelers without a car"
+      ],
+      "worthKnowing": [
+        "See the E Noa Corporation Pearl Harbor Tour page for the general transparency note about what's actually free vs. paid at Pearl Harbor"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Pearl Harbor tour category sentiment applies across operators; see the E Noa Corporation listing for detailed independent findings.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "danielshawaii-circle-island-helicopter-combo",
+    "title": "Private Oahu Circle Island Tour & Helicopter Flight",
+    "company": "DanielsHawaii",
+    "fareharborShortname": "hawaiireisetipps",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Combo: Private Van Tour + Helicopter",
+    "duration": "Full Day",
+    "highlights": [
+      "Combines a private circle-island ground tour with an aerial helicopter flight",
+      "A premium, high-budget combo product"
+    ],
+    "fullDescription": "A premium combo pairing this operator's private circle-island tour with a helicopter flight - for travelers wanting both a ground-level and aerial perspective of Oahu in one booking.",
+    "verdict": {
+      "headline": "A genuinely premium option for travelers wanting both perspectives on Oahu - expect a significant price jump over the ground tour alone.",
+      "goodFor": [
+        "Special-occasion travelers",
+        "Aerial photography enthusiasts wanting a ground tour paired in"
+      ],
+      "worthKnowing": [
+        "Compare pricing against booking a standalone helicopter tour plus a separate ground tour - combo pricing isn't always cheaper than booking separately"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Combo ground-and-air tour packages are a premium niche category on Oahu, generally chosen by travelers wanting to maximize a single significant-budget day.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-turtle-tours-northshore-circle-island",
+    "title": "Northshore Circle Island Adventure",
+    "company": "Hawaii Turtle Tours",
+    "fareharborShortname": "hawaiiturtletours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Shared Circle Island Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Standard North Shore/circle-island route",
+      "23 photos on file - well-documented listing"
+    ],
+    "fullDescription": "Another standard circle-island tour operator, with North Shore beaches and scenic Windward Coast stops as the core route.",
+    "verdict": {
+      "headline": "A solid, well-photographed standard circle-island option worth comparing against similar listings on price and stop count.",
+      "goodFor": [
+        "First-time Oahu visitors"
+      ],
+      "worthKnowing": [
+        "Compare against other circle-island tours in this dataset on price and exact stop list, since the general route type is common across operators"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General circle-island tour sentiment applies across this common Oahu tour category.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-turtle-tours-private-spanish-tour",
+    "title": "Full Day Isla Oahu Con Experiencia Personalizada - Tour Privado En Español",
+    "company": "Hawaii Turtle Tours",
+    "fareharborShortname": "hawaiiturtletours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Custom Tour (Spanish-Guided)",
+    "duration": "Full Day",
+    "highlights": [
+      "Fully private, Spanish-language guided Oahu tour",
+      "Personalized itinerary rather than a fixed route"
+    ],
+    "fullDescription": "A private, Spanish-language guided tour from the same operator as the standard Circle Island Adventure - aimed specifically at Spanish-speaking travelers wanting a guide in their own language plus a flexible, personalized itinerary.",
+    "verdict": {
+      "headline": "A strong option for Spanish-speaking travelers wanting both language comfort and full itinerary flexibility.",
+      "goodFor": [
+        "Spanish-speaking travelers",
+        "Groups wanting a private, personalized day"
+      ],
+      "worthKnowing": [
+        "Confirm proposed stops in writing since this is a custom/personalized product"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Spanish-language guided tours are a growing category on Oahu, generally valued by Spanish-speaking travelers for guide fluency and cultural rapport.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hans-hedemann-surf-lessons",
+    "title": "Surf Lessons",
+    "company": "Hans Hedemann South Shore (Queen Kapiolani)",
+    "fareharborShortname": "hhsurf",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Surf Instruction",
+    "duration": "~2 Hours",
+    "highlights": [
+      "South Shore (Waikiki-area) surf lessons, run by a named professional surf school",
+      "Beginner-friendly, gentle wave location"
+    ],
+    "fullDescription": "Hans Hedemann is a recognized name in Hawaii's professional surfing/surf instruction community, and this location runs beginner-friendly lessons on Waikiki's gentle South Shore waves - a classic, low-intimidation spot to learn.",
+    "verdict": {
+      "headline": "A trustworthy, name-recognized choice for first-time surf lessons in Waikiki.",
+      "goodFor": [
+        "Absolute beginners",
+        "Families wanting a well-known instructional brand"
+      ],
+      "worthKnowing": [
+        "South Shore/Waikiki conditions are among the gentlest and most forgiving in Hawaii for first-timers, which is part of why this is a popular first-lesson location generally"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hans Hedemann-affiliated surf schools are generally well regarded in the Hawaii surf instruction community for professional-level coaching credentials applied to beginner lessons.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-polo-trail-rides-oceanfront-horseback",
+    "title": "Oceanfront Horseback Ride",
+    "company": "Hawaii Polo Trail Rides",
+    "fareharborShortname": "hipolotrailrides",
+    "island": "Oahu",
+    "city": "Waialua",
+    "tourType": "Horseback Riding",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Oceanfront horseback riding on Oahu's North Shore near Waialua",
+      "Group or fully private options, daytime or sunset timing"
+    ],
+    "fullDescription": "Beachfront/oceanfront horseback riding near Waialua on Oahu's North Shore, available across a matrix of group vs. private and daytime vs. sunset options.",
+    "verdict": {
+      "headline": "A scenic, relatively rare Oahu activity - go private and sunset if you want the most photogenic, least crowded version.",
+      "goodFor": [
+        "Riders of any experience level (confirm skill requirements at booking)",
+        "Couples wanting a romantic, private sunset option"
+      ],
+      "worthKnowing": [
+        "Group rides move at the pace of the group's least experienced rider - private rides offer more pace flexibility",
+        "Weight limits typically apply to horseback tours - confirm before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Oceanfront horseback riding is a relatively uncommon Oahu activity, generally praised in the category for scenic value and the novelty of combining horses with beach/ocean views not commonly found together.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Group Ride - Daytime (\"Sunshine\")",
+      "Group Ride - Sunset",
+      "Private Ride - Sunset"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hi-private-tours-east-oahu-kailua",
+    "title": "East Oahu Lookouts & Kailua Day",
+    "company": "HI Private Tours",
+    "fareharborShortname": "hiprivatetours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Private tour covering East Oahu's scenic lookouts (Makapu'u, Lanikai, etc.) plus Kailua town/beach time"
+    ],
+    "fullDescription": "A private tour focused specifically on East Oahu's scenic lookout points and Kailua, rather than a full circle-island route - good for travelers wanting depth on one region rather than breadth across the whole island.",
+    "verdict": {
+      "headline": "A good regional-focus option if you'd rather spend real time in East Oahu than rush a full circle island route.",
+      "goodFor": [
+        "Travelers wanting Lanikai/Kailua beach time built into a tour",
+        "Photography-focused travelers (East Oahu's lookouts are among the island's most photogenic)"
+      ],
+      "worthKnowing": [
+        "This skips the North Shore and West side - it's a regional deep dive, not a full-island overview"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Regional-focus private tours (East Oahu specifically) are generally valued for allowing real time at fewer stops versus rushed full-island circuits.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hi-private-tours-north-shore-adventure",
+    "title": "North Shore Adventure Tour",
+    "company": "HI Private Tours",
+    "fareharborShortname": "hiprivatetours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Private tour focused on Oahu's North Shore - surf beaches, shrimp trucks, Haleiwa town"
+    ],
+    "fullDescription": "This operator's North Shore-focused counterpart to the East Oahu tour - same private format, different regional focus.",
+    "verdict": {
+      "headline": "A good regional-focus pick if North Shore beaches and Haleiwa town are your priority.",
+      "goodFor": [
+        "Surf culture and beach-focused travelers",
+        "Anyone wanting real time in Haleiwa rather than a drive-through"
+      ],
+      "worthKnowing": [
+        "Like the East Oahu version, this trades full-island breadth for depth in one region"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See East Oahu Lookouts & Kailua Day for general operator sentiment - same company, similar private-tour format.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hi-private-tours-full-day-circle-island",
+    "title": "Full Day Circle Island Tour - See it All",
+    "company": "HI Private Tours",
+    "fareharborShortname": "hiprivatetours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "This operator's full circle-island option, combining what the East Oahu and North Shore tours cover separately"
+    ],
+    "fullDescription": "The comprehensive version of this operator's regional tours - covers the full island loop rather than focusing on just East Oahu or just the North Shore.",
+    "verdict": {
+      "headline": "Choose this over the regional-focus tours if breadth matters more than depth for your trip.",
+      "goodFor": [
+        "First-time visitors wanting to see the whole island in one private day"
+      ],
+      "worthKnowing": [
+        "As with any full circle-island tour, expect less time per stop than the regional-focus alternatives from the same operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private circle-island tour sentiment applies; the trade-off between breadth (this tour) and depth (the regional options) is the main decision point across this operator's lineup.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hi-private-tours-tantalus-dinner-japanese",
+    "title": "Tantalus Lookout Dinner Plan (Japanese-Guided)",
+    "company": "HI Private Tours",
+    "fareharborShortname": "hiprivatetours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Evening Tour + Dinner",
+    "duration": "Evening",
+    "highlights": [
+      "Evening trip to Tantalus Lookout, one of Honolulu's best nighttime city-light viewpoints",
+      "Dinner included",
+      "Japanese-language guided format"
+    ],
+    "fullDescription": "An evening tour to Tantalus Lookout above Honolulu, paired with dinner, guided in Japanese - a distinct product from this operator's daytime sightseeing tours.",
+    "verdict": {
+      "headline": "A romantic, distinct evening option - confirm dinner venue and cuisine style at booking.",
+      "goodFor": [
+        "Japanese-speaking travelers",
+        "Couples wanting an evening city-lights view plus dinner"
+      ],
+      "worthKnowing": [
+        "Confirm exact dinner inclusions (venue, courses) since 'dinner included' can vary widely between a set menu and a simple meal stop"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Tantalus Lookout is well regarded independently as one of Oahu's best night-time city view spots; operators combining it with dinner target evening/date-night positioning.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kailua-beach-adventures-2hr-guided-kayak",
+    "title": "2-Hour Guided Kayak + Beach Time",
+    "company": "Kailua Beach Adventures",
+    "fareharborShortname": "kailuasailboards",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Guided Kayak Tour",
+    "duration": "2 Hours",
+    "highlights": [
+      "Shorter, guided kayak format with beach relaxation time built in",
+      "Good for travelers who want a taste of kayaking without a full half-day commitment"
+    ],
+    "fullDescription": "A compact, guided kayak experience in Kailua Bay that pairs paddling time with beach relaxation - a shorter format than this operator's other kayak tours.",
+    "verdict": {
+      "headline": "A good fit for a shorter time window or families with mixed energy levels.",
+      "goodFor": [
+        "Time-limited travelers",
+        "Families wanting both activity and downtime in one booking"
+      ],
+      "worthKnowing": [
+        "Shorter paddling distance than the Twin Islands or self-guided discovery options from the same operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Kailua kayak operator sentiment favors reliable equipment and logistics; this shorter format is generally chosen by families and time-limited travelers.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kailua-beach-adventures-self-guided-discovery",
+    "title": "Self-Guided Kayaking Discovery",
+    "company": "Kailua Beach Adventures",
+    "fareharborShortname": "kailuasailboards",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Self-Guided Kayak Rental",
+    "duration": "Flexible",
+    "highlights": [
+      "Flexible, self-guided kayak rental in Kailua Bay",
+      "Bookable in English or Japanese"
+    ],
+    "fullDescription": "A self-guided kayak rental option for confident paddlers wanting to explore Kailua Bay on their own schedule, available for booking in Japanese as well as English.",
+    "verdict": {
+      "headline": "A flexible option for experienced paddlers - book the guided option instead if you want route direction.",
+      "goodFor": [
+        "Confident, experienced kayakers",
+        "Japanese-speaking travelers (dedicated booking option available)"
+      ],
+      "worthKnowing": [
+        "No guide or route briefing included - confident paddling experience recommended"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General operator sentiment applies; self-guided options in this category are typically chosen by repeat Kailua visitors or experienced paddlers.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Self-Guided Kayaking Discovery",
+      "Rental (Japanese-language booking)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kailua-beach-adventures-twin-islands-guided",
+    "title": "Twin Islands Guided Kayak Tour",
+    "company": "Kailua Beach Adventures",
+    "fareharborShortname": "kailuasailboards",
+    "island": "Oahu",
+    "city": "Kailua",
+    "tourType": "Guided Kayak Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Guided crossing to the Mokulua ('Twin') Islands off Kailua Beach",
+      "Comparable destination to Active Oahu Tours' Mokulua Islands tour, run by a different operator"
+    ],
+    "fullDescription": "A guided kayak tour to the Mokulua Islands from a second Kailua-area operator - see the Active Oahu Tours Mokulua Islands page for general destination context (open-water crossing, seasonal landing restrictions).",
+    "verdict": {
+      "headline": "A comparable Mokulua Islands option to other operators in this dataset - compare price and group size.",
+      "goodFor": [
+        "Intermediate paddlers comfortable with open water"
+      ],
+      "worthKnowing": [
+        "See the Mokulua Islands (Active Oahu Tours) page for general notes on seasonal landing restrictions during seabird nesting season"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Mokulua Islands kayak category notes; multiple Kailua-based operators run comparable trips to this destination.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaimana-tours-hanauma-bay",
+    "title": "Hanauma Bay Snorkeling",
+    "company": "Kaimana Tours",
+    "fareharborShortname": "kaimanatours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel Tour + Transport",
+    "duration": "Half Day",
+    "highlights": [
+      "Transport and logistics support for Hanauma Bay, Oahu's most famous protected snorkel bay",
+      "Useful for travelers without a car, since Hanauma Bay requires advance reservation and has limited parking"
+    ],
+    "fullDescription": "Hanauma Bay is a Marine Life Conservation District and one of Oahu's most iconic snorkel spots, but it requires an advance online reservation (capped daily visitor numbers) and has notoriously limited parking. This listing provides transport and logistics support around those constraints.",
+    "verdict": {
+      "headline": "A genuinely useful convenience service, given Hanauma Bay's reservation and parking system can trip up independent visitors.",
+      "goodFor": [
+        "Travelers without a car",
+        "Anyone who wants Hanauma Bay's reservation logistics handled for them"
+      ],
+      "worthKnowing": [
+        "Hanauma Bay itself requires a separate timed-entry reservation through the City and County of Honolulu system - confirm whether this operator handles that booking or whether you need to arrange it yourself in advance",
+        "The bay is closed on Mondays and Tuesdays for reef recovery"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hanauma Bay is independently regarded as one of Oahu's best protected snorkel sites; commentary across travel resources consistently flags the advance-reservation requirement and limited parking as the main planning hurdles for independent visitors.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaimana-tours-makapuu-halona",
+    "title": "Makapu'u Point Lighthouse Trail Hike & Halona Blowhole",
+    "company": "Kaimana Tours",
+    "fareharborShortname": "kaimanatours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Guided Hike + Sightseeing",
+    "duration": "Half Day",
+    "highlights": [
+      "Paved, moderate lighthouse trail hike with strong whale-watching potential in season (roughly Dec-April)",
+      "Halona Blowhole stop included",
+      "Beginner-friendly - one of Oahu's most accessible scenic hikes"
+    ],
+    "fullDescription": "The Makapu'u Lighthouse Trail is a paved, gently graded coastal hike - one of Oahu's most accessible 'hike' experiences, with strong ocean views and seasonal humpback whale sightings. This tour pairs it with a stop at the nearby Halona Blowhole.",
+    "verdict": {
+      "headline": "One of the easiest, most rewarding hikes on Oahu - especially good in whale season.",
+      "goodFor": [
+        "Beginner hikers or families",
+        "Winter/spring travelers hoping to see humpback whales from shore"
+      ],
+      "worthKnowing": [
+        "The trail is paved and gently sloped - one of the more accessible options if mobility is a concern, though it's still an uphill walk",
+        "Whale sightings are seasonal (roughly December-April) and not guaranteed"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "The Makapu'u Lighthouse Trail is consistently ranked among Oahu's most accessible scenic hikes, with independent sources specifically noting it as one of the better shore-based whale watching spots during winter migration season.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaimana-tours-manoa-falls",
+    "title": "Manoa Falls Rainforest & Self-Guided Hike",
+    "company": "Kaimana Tours",
+    "fareharborShortname": "kaimanatours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Transport + Self-Guided Hike",
+    "duration": "Half Day",
+    "highlights": [
+      "Transport/logistics to Manoa Falls, a rainforest waterfall hike close to Honolulu",
+      "Self-guided once at the trailhead"
+    ],
+    "fullDescription": "Manoa Falls is a short, popular rainforest hike close to central Honolulu, ending at a waterfall - this listing covers transport, with the hike itself self-guided.",
+    "verdict": {
+      "headline": "A convenient, close-to-town rainforest hike option - trail can be muddy, so plan footwear accordingly.",
+      "goodFor": [
+        "Travelers without a car wanting an easy rainforest hike near Honolulu",
+        "Families with kids comfortable on a short, sometimes muddy trail"
+      ],
+      "worthKnowing": [
+        "The trail is frequently muddy and can be crowded given its proximity to Honolulu - wear appropriate shoes"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Manoa Falls is a well-known, easily accessible hike near Honolulu; independent commentary consistently notes muddy trail conditions and the value of good footwear.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaimana-tours-snorkel-gear-rental",
+    "title": "Snorkel Gear and Beach Rental",
+    "company": "Kaimana Tours",
+    "fareharborShortname": "kaimanatours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Equipment Rental",
+    "duration": "Flexible",
+    "highlights": [
+      "Basic snorkel and beach equipment rental",
+      "Flexible, no fixed schedule"
+    ],
+    "fullDescription": "A straightforward gear rental listing from this operator - snorkel equipment and beach gear for independent exploration.",
+    "verdict": {
+      "headline": "A simple, no-frills option if you just need gear rather than a guided trip.",
+      "goodFor": [
+        "Independent travelers who know where they want to snorkel"
+      ],
+      "worthKnowing": [
+        "No route or destination guidance included - pair with the Hanauma Bay logistics listing if you want that specific destination's reservation handled"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General equipment rental sentiment centers on gear condition and convenient pickup logistics.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "catamaran-kepoikai-day-sail",
+    "title": "Day Sail",
+    "company": "Catamaran Kepoikai II",
+    "fareharborShortname": "kepoikai",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Shared Catamaran Sail",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Shared (non-private) daytime catamaran sail off Waikiki - a more affordable format than private charters",
+      "Named vessel with an established local presence"
+    ],
+    "fullDescription": "A standard shared-boat daytime sail off Waikiki - a more budget-friendly alternative to the private catamaran charters elsewhere in this dataset, sharing the boat with other travelers rather than booking it exclusively.",
+    "verdict": {
+      "headline": "A good budget-friendly sailing option if you don't need boat privacy.",
+      "goodFor": [
+        "Solo travelers and couples on a budget",
+        "Anyone comfortable sharing a boat with other guests"
+      ],
+      "worthKnowing": [
+        "Shared format means less flexibility on timing/stops than a private charter, but at a meaningfully lower price point"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Shared daytime sails off Waikiki are a well-established, budget-friendly category; general sentiment favors them specifically for affordability relative to private charter alternatives.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ko-hana-rum-distillery-tour",
+    "title": "Ko Hana Hawaiian Agricole Rum Distillery Tour",
+    "company": "Ko Hana Distillers",
+    "fareharborShortname": "kohanarum",
+    "island": "Oahu",
+    "city": "Kunia Camp",
+    "tourType": "Distillery Tour + Tasting",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Tour of a working sugarcane farm and agricole-style rum distillery in Central Oahu",
+      "Tasting included - a distinctive Hawaii-grown spirit category",
+      "High availability count in this dataset, suggesting a well-established, frequently-run operation"
+    ],
+    "fullDescription": "Ko Hana is known for agricole-style rum, distilled directly from fresh-pressed sugarcane juice (rather than molasses, the more common rum base) grown on-site in Central Oahu. This tour covers the cane fields, distillation process, and a tasting.",
+    "verdict": {
+      "headline": "A genuinely distinctive Hawaii agriculture-and-spirits experience - a good non-beach activity for spirits enthusiasts.",
+      "goodFor": [
+        "Spirits/cocktail enthusiasts",
+        "Agriculture-curious travelers",
+        "Rainy day or non-beach activity seekers"
+      ],
+      "worthKnowing": [
+        "Tasting portions and any souvenir-bottle purchase options vary - confirm what's included versus available for purchase separately"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Ko Hana is a recognized name in the craft/agricole rum category, generally praised in independent food-and-drink travel coverage for its distinctive farm-to-bottle production model, which is uncommon compared to typical molasses-based rum tours.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-island-ocean-tours-whale-dolphin-kealakekua-speedboat",
+    "title": "Whale/Dolphin Watch, Sea Cave & Captain Cook Kealakekua Bay Reef Snorkel Speed Boat Adventure",
+    "company": "Hawaii Island & Ocean Tours",
+    "fareharborShortname": "hawaiiislandandoceantours",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Speedboat Multi-Activity Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Combines whale/dolphin watching, a sea cave stop, and Kealakekua Bay snorkeling in one faster-format speedboat trip",
+      "19 photos on file - well-documented listing",
+      "Speedboat format covers more ground/variety than a standard sail-and-snorkel boat"
+    ],
+    "fullDescription": "A multi-stop speedboat trip bundling several of Kona's signature ocean experiences - wildlife watching, a sea cave, and snorkeling at the protected Kealakekua Bay - into a single, faster-paced outing than a leisurely sail boat would allow.",
+    "verdict": {
+      "headline": "Good for travelers wanting variety and efficiency over a slow, single-focus boat day.",
+      "goodFor": [
+        "Travelers wanting to combine several 'must-do' Kona activities in one trip",
+        "Anyone short on days who wants breadth"
+      ],
+      "worthKnowing": [
+        "Speedboats ride rougher than larger catamarans - not ideal for anyone prone to motion sickness",
+        "See the Kealakekua Bay notes on the Coral Reef Snorkel Adventures listing for general destination context"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Multi-activity speedboat combos in Kona are generally reviewed favorably for variety, with the common trade-off being a rougher, faster ride than larger catamaran-style boats.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-island-ocean-tours-manta-moonlight-keauhou",
+    "title": "Manta Ray Moonlight Snorkel in Keauhou - Kona",
+    "company": "Hawaii Island & Ocean Tours",
+    "fareharborShortname": "hawaiiislandandoceantours",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening",
+    "highlights": [
+      "Manta ray night snorkel departing from Keauhou, a well-known manta feeding site south of central Kona",
+      "See the Coral Reef Snorkel Adventures manta listing for general category context"
+    ],
+    "fullDescription": "Another operator running Kona's signature manta ray night snorkel, from the Keauhou area specifically - one of the region's most consistent manta feeding grounds.",
+    "verdict": {
+      "headline": "A strong choice for this experience - see general manta night snorkel notes elsewhere in this dataset.",
+      "goodFor": [
+        "Wildlife enthusiasts and night-swim-comfortable travelers"
+      ],
+      "worthKnowing": [
+        "General manta night snorkel safety/comfort notes apply - see other manta listings in this dataset for detail"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Keauhou is one of the more established manta feeding sites near Kona; general category sentiment favors high, consistent sighting rates.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-island-holidays-mauna-kea-summit-sunset-stars",
+    "title": "Hawaii's GOAT Experience: Mauna Kea Summit, Sunset & Stars",
+    "company": "Hawaii Island Holidays",
+    "fareharborShortname": "hawaiiislandholidays",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Guided Summit + Stargazing Tour",
+    "duration": "Evening (long)",
+    "highlights": [
+      "Mauna Kea's summit sits above 13,700 feet - one of the best stargazing locations on Earth due to elevation and lack of light pollution",
+      "Sunset viewing at the summit followed by guided stargazing on the descent",
+      "Confidently branded ('GOAT' - greatest of all time) - a signal this is the operator's signature product"
+    ],
+    "fullDescription": "Mauna Kea's summit is internationally recognized among astronomers for exceptionally clear, dark skies, which is why major observatories are built there. This tour handles the technical logistics of a summit visit - altitude acclimation stops, warm clothing needs, and 4WD-capable transport - that make Mauna Kea difficult to visit safely on your own.",
+    "verdict": {
+      "headline": "One of the most genuinely special things to do on the Big Island - let a guide handle the altitude logistics.",
+      "goodFor": [
+        "Stargazing and astronomy enthusiasts",
+        "Anyone wanting a legitimately unique above-the-clouds sunset"
+      ],
+      "worthKnowing": [
+        "Summit elevation (over 13,000 ft) causes real altitude effects - shortness of breath, headache, and in rare cases altitude sickness; guided tours typically include an acclimation stop partway up",
+        "Temperatures at the summit can drop below freezing even though you started the day in tropical heat - warm layers are essential, not optional",
+        "Independent driving to the summit is discouraged/restricted for standard rental cars due to the unpaved, steep upper road - this is a strong reason to book a guided 4WD tour rather than attempt it solo"
+      ],
+      "closingNote": "This is one of the rare Big Island activities where booking a guide isn't just a convenience - it's the practical way most visitors can safely and legally reach the summit at all.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Mauna Kea summit and stargazing tours are consistently ranked among the Big Island's top experiences across independent astronomy and travel resources, specifically because of the summit's exceptional sky clarity; commentary repeatedly emphasizes the need for proper acclimation and cold-weather gear regardless of which operator is used.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-nautical-bigisland-waikoloa-snorkel-sail-lunch",
+    "title": "Waikoloa Snorkel Sail with Lunch",
+    "company": "Hawaii Nautical Big Island",
+    "fareharborShortname": "hawaiinautical-kona",
+    "island": "Big Island",
+    "city": "Waikoloa Village",
+    "tourType": "Sailing Snorkel Cruise + Lunch",
+    "duration": "Half Day",
+    "highlights": [
+      "Sailing snorkel trip departing from the Waikoloa resort area on the Kohala Coast",
+      "Lunch included"
+    ],
+    "fullDescription": "A standard sail-and-snorkel trip departing near the Waikoloa resorts on the Big Island's Kohala Coast, with lunch included as part of the package.",
+    "verdict": {
+      "headline": "A convenient option if you're staying in the Waikoloa/Kohala Coast resort area.",
+      "goodFor": [
+        "Waikoloa-area resort guests wanting a nearby snorkel trip"
+      ],
+      "worthKnowing": [
+        "Compare against the operator's other Kona-departure listings if location convenience isn't the deciding factor"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General sail-and-snorkel category sentiment along the Kohala Coast favors calm morning conditions and reliable lunch quality as differentiators between operators.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-nautical-bigisland-waikoloa-signature-sunset",
+    "title": "Waikoloa Signature Sunset Sail",
+    "company": "Hawaii Nautical Big Island",
+    "fareharborShortname": "hawaiinautical-kona",
+    "island": "Big Island",
+    "city": "Waikoloa Village",
+    "tourType": "Sunset Sail",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Sunset sail from the Waikoloa/Kohala Coast area, the operator's flagship evening product"
+    ],
+    "fullDescription": "The sunset counterpart to this operator's daytime snorkel sail, departing from the same Waikoloa-area location.",
+    "verdict": {
+      "headline": "A convenient evening option for Kohala Coast resort guests.",
+      "goodFor": [
+        "Couples and groups wanting a nearby sunset sail"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Kohala Coast sunset sail sentiment favors calm evening conditions typical of this stretch of coastline.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-nautical-bigisland-kona-luxury-dolphin-snorkel",
+    "title": "Kona Luxury Dolphin Snorkel Sail",
+    "company": "Hawaii Nautical Big Island",
+    "fareharborShortname": "hawaiinautical-kona",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Sailing Snorkel + Dolphin Watch",
+    "duration": "Half Day",
+    "highlights": [
+      "Combines snorkeling with dolphin watching from central Kona, positioned as a 'luxury' higher-end sail"
+    ],
+    "fullDescription": "This operator's Kona-departure (rather than Waikoloa-departure) snorkel and dolphin-watch sail, marketed at a 'luxury' tier.",
+    "verdict": {
+      "headline": "Compare 'luxury' inclusions (boat quality, food/drink) directly against the standard Waikoloa listing before paying a premium.",
+      "goodFor": [
+        "Travelers based in central Kona wanting both dolphins and snorkeling"
+      ],
+      "worthKnowing": [
+        "'Luxury' branding varies by operator - ask specifically what's upgraded versus the standard sail"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General operator sentiment applies; combined dolphin-watch-and-snorkel sails are a popular Kona category.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-nautical-bigisland-kona-luxury-private-yacht",
+    "title": "Kona Luxury Private Yacht Charter",
+    "company": "Hawaii Nautical Big Island",
+    "fareharborShortname": "hawaiinautical-kona",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Private Yacht Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully private yacht charter, the top tier of this operator's Kona offerings",
+      "Flexible itinerary set by your group"
+    ],
+    "fullDescription": "The premium, fully private option in this operator's Kona lineup - a private yacht rather than a shared sail boat, with itinerary flexibility.",
+    "verdict": {
+      "headline": "For groups wanting full privacy and itinerary control - a significant step up in cost from the shared sails.",
+      "goodFor": [
+        "Special occasions",
+        "Groups wanting complete control over stops and timing"
+      ],
+      "worthKnowing": [
+        "Confirm exact yacht size/passenger capacity and what's included (crew, catering) before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Private yacht charters in Kona are a premium niche category, generally reviewed well for flexibility by groups prioritizing privacy over cost.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-oceanic-kealakekua-bay-snorkel",
+    "title": "Kealakekua Bay (Captain Cook Monument) Snorkel",
+    "company": "Hawaii Oceanic",
+    "fareharborShortname": "hawaiioceanic",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Another operator running trips to Kealakekua Bay's protected, marine-life-rich waters",
+      "High quality score (97) in this dataset"
+    ],
+    "fullDescription": "See the Coral Reef Snorkel Adventures listing for general context on why Kealakekua Bay consistently ranks among the Big Island's top snorkel destinations - this is another well-scoring operator running the same protected-bay route.",
+    "verdict": {
+      "headline": "A strong choice for the same reasons this destination scores well across every operator that runs it.",
+      "goodFor": [
+        "Snorkelers prioritizing reef health and marine life density"
+      ],
+      "worthKnowing": [
+        "Compare boat size and departure time against other Kealakekua Bay operators in this dataset"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See Kealakekua Bay category notes on the Coral Reef Snorkel Adventures listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-oceanic-manta-magic",
+    "title": "Manta Magic",
+    "company": "Hawaii Oceanic",
+    "fareharborShortname": "hawaiioceanic",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening",
+    "highlights": [
+      "This operator's manta ray night snorkel product",
+      "Quality score of 96 - among the higher-scoring manta listings in this dataset"
+    ],
+    "fullDescription": "Another well-regarded manta ray night snorkel operator in Kona - see general manta category notes on the Coral Reef Snorkel Adventures listing for context on why this experience is consistently one of the Big Island's best-reviewed activities.",
+    "verdict": {
+      "headline": "A strong choice for Kona's signature nighttime wildlife encounter.",
+      "goodFor": [
+        "Wildlife enthusiasts, confident night swimmers"
+      ],
+      "worthKnowing": [
+        "General manta night snorkel comfort/safety notes apply - see other manta listings in this dataset"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Kona manta ray night snorkel category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hang-loose-manta-ray-night",
+    "title": "Manta Ray Night Adventure",
+    "company": "Hang Loose Boat Tours LLC",
+    "fareharborShortname": "hawaiitourboat",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening",
+    "highlights": [
+      "Another Kona manta ray night snorkel operator"
+    ],
+    "fullDescription": "Another entrant in Kona's well-established manta ray night snorkel category - see general notes elsewhere in this dataset for what to expect from this experience type regardless of operator.",
+    "verdict": {
+      "headline": "Compare boat size and group size against other Kona manta operators in this dataset before booking.",
+      "goodFor": [
+        "Wildlife enthusiasts"
+      ],
+      "worthKnowing": [
+        "Fewer photos on file (3) than most comparable listings - request current photos from the operator directly"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Kona manta ray night snorkel category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "heavenly-hawaiian-coffee-brewing-workshop",
+    "title": "\"Brew Your Best Cup\" Coffee Brewing Workshop",
+    "company": "Heavenly Hawaiian Coffee Farm",
+    "fareharborShortname": "heavenlyhawaiian",
+    "island": "Big Island",
+    "city": "Holualoa",
+    "tourType": "Coffee Workshop",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Hands-on brewing techniques workshop at a South Kona coffee farm",
+      "Learn multiple brewing methods rather than just tasting",
+      "Top quality score (98) among this operator's listings"
+    ],
+    "fullDescription": "An educational, hands-on workshop focused specifically on brewing technique - going further than a standard tasting tour by teaching guests how to brew Kona coffee well themselves.",
+    "verdict": {
+      "headline": "The pick for genuine coffee enthusiasts who want to leave with actual brewing skills, not just a tasting memory.",
+      "goodFor": [
+        "Coffee enthusiasts and home baristas",
+        "Anyone wanting hands-on learning over passive touring"
+      ],
+      "worthKnowing": [
+        "More interactive/longer than a basic farm tour - set expectations for active participation"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "South Kona coffee farm experiences are a well-established category on the Big Island; hands-on brewing workshops specifically are generally praised for depth compared to standard tasting-only tours.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "heavenly-hawaiian-paniolo-roasting",
+    "title": "Paniolo Coffee Roasting Experience",
+    "company": "Heavenly Hawaiian Coffee Farm",
+    "fareharborShortname": "heavenlyhawaiian",
+    "island": "Big Island",
+    "city": "Holualoa",
+    "tourType": "Coffee Roasting Workshop",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Hands-on roasting experience - a different production stage than the brewing workshop",
+      "'Paniolo' (Hawaiian cowboy) branding ties in local ranching heritage"
+    ],
+    "fullDescription": "A roasting-focused counterpart to this operator's brewing workshop, letting guests participate in the roasting stage of coffee production rather than (or in addition to) brewing.",
+    "verdict": {
+      "headline": "Pair this with the Brewing Workshop if you want the full seed-to-cup picture in one visit.",
+      "goodFor": [
+        "Coffee enthusiasts wanting to understand the roasting process specifically"
+      ],
+      "worthKnowing": [
+        "Confirm whether this and the Brewing Workshop can be combined or must be booked as separate sessions"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General South Kona coffee farm sentiment applies; roasting-specific workshops are a smaller niche within the broader coffee tourism category.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "heavenly-hawaiian-paint-sip",
+    "title": "\"Paint & Sip\" Painting Class with Coffee & a View",
+    "company": "Heavenly Hawaiian Coffee Farm",
+    "fareharborShortname": "heavenlyhawaiian",
+    "island": "Big Island",
+    "city": "Holualoa",
+    "tourType": "Paint & Sip Class",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Guided painting class paired with coffee, set at the farm's scenic viewpoint",
+      "Highest quality score (98) among this operator's three listings"
+    ],
+    "fullDescription": "A creative, low-pressure activity combining a guided painting session with coffee and Kona coastline views - a different format entirely from the operator's two coffee-production-focused workshops.",
+    "verdict": {
+      "headline": "A relaxed, creative alternative if coffee production itself is less interesting to you than the setting and atmosphere.",
+      "goodFor": [
+        "Non-coffee-focused travelers wanting a relaxed creative activity",
+        "Groups wanting a social, low-pressure art experience"
+      ],
+      "worthKnowing": [
+        "No painting experience needed - this is designed as a beginner-friendly social activity, not an art class"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Paint & Sip formats are a well-known, beginner-friendly social activity category nationally; pairing it with a scenic Kona coffee farm setting is a distinctive local twist.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hilo-ocean-adventures-discover-scuba",
+    "title": "Discover Scuba Diving",
+    "company": "Hilo Ocean Adventures",
+    "fareharborShortname": "hilooceanadventures",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Beginner Scuba (No Certification Required)",
+    "duration": "~3 Hours",
+    "highlights": [
+      "Beginner scuba program on the Hilo (east) side of the Big Island - a much less-touristed dive scene than Kona",
+      "No certification required"
+    ],
+    "fullDescription": "A Discover Scuba program based in Hilo, giving travelers on the wetter, greener east side of the Big Island the same first-timer scuba option that's more commonly marketed on the Kona side.",
+    "verdict": {
+      "headline": "A good option specifically for travelers based in Hilo who don't want to drive to Kona for a dive experience.",
+      "goodFor": [
+        "First-time divers staying on the Hilo side",
+        "Travelers wanting to avoid the cross-island drive to Kona"
+      ],
+      "worthKnowing": [
+        "Hilo's east-side water and weather patterns differ from Kona's - generally wetter, so check conditions and have backup plans for rain"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hilo-based dive operators are a smaller category than Kona's, generally valued specifically by travelers based on that side of the island who don't want the cross-island drive.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hilo-ocean-adventures-turtle-lagoon-black-sand",
+    "title": "Beach Snorkel - Sea Turtle Lagoon and Black Sand Beach",
+    "company": "Hilo Ocean Adventures",
+    "fareharborShortname": "hilooceanadventures",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Beach Snorkel Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Combines a sea turtle lagoon snorkel with a stop at one of the Big Island's black sand beaches",
+      "Shore-based, lower cost than boat-based Kona snorkel trips"
+    ],
+    "fullDescription": "A shore-entry snorkel trip on the Hilo side featuring a known turtle lagoon and a black sand beach stop - the Big Island's volcanic black sand beaches are geologically distinct and a signature east-side sight.",
+    "verdict": {
+      "headline": "A good budget-friendly Hilo-side alternative to boat-based Kona snorkel trips.",
+      "goodFor": [
+        "Budget-conscious snorkelers",
+        "Travelers wanting to see a black sand beach without a separate stop"
+      ],
+      "worthKnowing": [
+        "Shore snorkeling depends more on same-day conditions than boat trips to established sites - ask about current visibility"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hilo-side shore snorkel and black sand beach combos are generally valued for combining two distinct experiences at a lower cost than boat-based alternatives.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hilo-ocean-adventures-waiolena-2tank-shore",
+    "title": "2 Tank Shore Dive - Wai'olena Beach",
+    "company": "Hilo Ocean Adventures",
+    "fareharborShortname": "hilooceanadventures",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Certified Diver - 2 Tank Shore Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Shore-entry certified dive at Wai'olena Beach on the Hilo side",
+      "No boat fee - a lower-cost alternative to Kona's boat charters"
+    ],
+    "fullDescription": "A shore-access certified dive on the Big Island's east side, offering certified divers a lower-cost alternative to Kona's boat-based dive charters.",
+    "verdict": {
+      "headline": "Good value for certified divers based in Hilo.",
+      "goodFor": [
+        "Certified divers on the Hilo side",
+        "Budget-conscious divers avoiding boat fees"
+      ],
+      "worthKnowing": [
+        "East-side conditions and visibility differ from Kona's calmer, drier west coast - check current conditions"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Hilo-side shore dive sentiment favors cost savings versus Kona's boat-dependent dive scene.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kailani-tours-big-island-highlights-volcano",
+    "title": "Big Island Highlights Volcano Day Tour",
+    "company": "Kailani Tours Hawaii",
+    "fareharborShortname": "kailanitourshawaii",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Guided Van Tour to Volcanoes National Park",
+    "duration": "Full Day",
+    "highlights": [
+      "Full-day guided trip to Hawaii Volcanoes National Park from Kona",
+      "16 photos on file"
+    ],
+    "fullDescription": "Another Kona-to-Volcanoes-National-Park day tour operator - see the Hawaii Geo Tours listing for general category context on this common, genuinely long-day Big Island excursion.",
+    "verdict": {
+      "headline": "Comparable to other Kona-departure volcano tours - compare pricing and stop list.",
+      "goodFor": [
+        "Kona-based travelers without a car wanting the volcano handled logistically"
+      ],
+      "worthKnowing": [
+        "See the Hawaii Geo Tours Volcano National Park Adventure page for general notes on trip length and lava-viewing expectations"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Kona-to-Volcanoes-National-Park tour category notes on the Hawaii Geo Tours listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kohala-divers-two-site-dive-snorkel",
+    "title": "Two-Site Dive/Snorkel",
+    "company": "Kohala Divers",
+    "fareharborShortname": "kohaladivers",
+    "island": "Big Island",
+    "city": "Waimea",
+    "tourType": "Combo Dive/Snorkel Charter",
+    "duration": "Half Day",
+    "highlights": [
+      "Departs the Kohala Coast (North Kona/Kawaihae area), reaching sites less crowded than central Kona",
+      "Combined format allows both divers and snorkelers in the same group"
+    ],
+    "fullDescription": "A charter departing further north on the Kohala Coast, allowing mixed groups of divers and snorkelers to visit two sites together - useful for groups with different skill levels or preferences.",
+    "verdict": {
+      "headline": "A good pick for mixed groups where some want to dive and others want to snorkel.",
+      "goodFor": [
+        "Groups with mixed diving/snorkeling preferences",
+        "Travelers based on the Kohala Coast wanting to avoid the drive to central Kona"
+      ],
+      "worthKnowing": [
+        "Confirm site selection in advance since 'two-site' format depends on day-of conditions"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kohala Coast dive/snorkel combo charters are a smaller, more localized category valued specifically by travelers staying north of central Kona.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-boys-kealakekua-kayak-snorkel",
+    "title": "Kealakekua Bay Kayak & Snorkel Tour",
+    "company": "Kona Boys",
+    "fareharborShortname": "konaboys",
+    "island": "Big Island",
+    "city": "Kealakekua",
+    "tourType": "Kayak + Snorkel Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Kayak-and-snorkel access to Kealakekua Bay's protected reef and Captain Cook Monument area",
+      "Morning or midday departure options",
+      "A more active, paddle-based alternative to boat-only Kealakekua Bay trips"
+    ],
+    "fullDescription": "Kona Boys is a well-known local outfitter offering kayak access to Kealakekua Bay - a more active alternative to the boat-based snorkel trips also covering this destination elsewhere in this dataset. Morning departures typically have calmer water; midday offers a later start for non-early-risers.",
+    "verdict": {
+      "headline": "The active-traveler's way to experience Kealakekua Bay - choose morning for calmer conditions.",
+      "goodFor": [
+        "Fit travelers wanting a kayak-paddle approach rather than a boat",
+        "Photographers wanting the flexibility a kayak provides for framing shots"
+      ],
+      "worthKnowing": [
+        "Kayaking to Kealakekua Bay is more physically demanding than a boat trip - factor in paddling fitness",
+        "Same Marine Life Conservation District rules apply as with boat-based visits - stay off the coral"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona Boys is a well-regarded, long-established local outfitter; general sentiment favors the morning departure for calmer paddling conditions at Kealakekua Bay.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Morning Magic",
+      "Midday Meander"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-brewing-company-brewery-tour",
+    "title": "Brewery Tour",
+    "company": "Kona Brewing Company",
+    "fareharborShortname": "konabrewing",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Brewery Tour + Tasting",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Tour of Kona Brewing Company's original Big Island brewery - a nationally recognized Hawaii beer brand",
+      "Tasting included"
+    ],
+    "fullDescription": "A tour of Kona Brewing Company's founding location on the Big Island - the brand has since expanded nationally, making this original brewery a point of interest for craft beer enthusiasts.",
+    "verdict": {
+      "headline": "A solid, easy stop for beer enthusiasts or a rainy-day activity in Kailua-Kona.",
+      "goodFor": [
+        "Craft beer enthusiasts",
+        "Rainy day or non-beach activity seekers"
+      ],
+      "worthKnowing": [
+        "Short duration - pair with another Kona activity to fill out a half day"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona Brewing Company is a nationally recognized brand, and its original Big Island location is a well-known stop for beer-focused travelers per general brand recognition.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-cloud-forest-sound-bath",
+    "title": "Sound Bath Meditation Journey",
+    "company": "Kona Cloud Forest Sanctuary",
+    "fareharborShortname": "konacloudforest",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Wellness / Meditation Experience",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Sound bath meditation set within a cloud forest sanctuary above Kona",
+      "Highest quality score (98) in this operator's lineup",
+      "A distinctly different, wellness-focused activity from most of this dataset"
+    ],
+    "fullDescription": "A wellness-focused sound bath meditation session set in a cloud forest property above Kailua-Kona - a calm, contemplative counterpart to the area's adventure-heavy activity lineup.",
+    "verdict": {
+      "headline": "A genuinely restorative option if you want a break from adventure activities during your trip.",
+      "goodFor": [
+        "Wellness-focused travelers",
+        "Anyone wanting a slower, restful day between more active excursions"
+      ],
+      "worthKnowing": [
+        "This is a passive, seated/lying-down experience - not physically demanding, but also not for anyone wanting an active tour"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Sound bath and wellness experiences are a smaller but growing Big Island category, generally valued for offering a genuine change of pace from the region's adventure-tourism focus.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-cloud-forest-pantropical-trail",
+    "title": "Cloud Forest Tour - Pantropical Trail (1.5 hr)",
+    "company": "Kona Cloud Forest Sanctuary",
+    "fareharborShortname": "konacloudforest",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Guided Botanical Walking Tour",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Guided walk through a diverse tropical/subtropical plant collection above Kona",
+      "Educational, low-intensity activity"
+    ],
+    "fullDescription": "A guided botanical walking tour through this property's diverse plant collection - an educational, easy-paced counterpart to the sound bath meditation offering from the same operator.",
+    "verdict": {
+      "headline": "A relaxed, educational stop for plant enthusiasts wanting a break from beach/ocean activities.",
+      "goodFor": [
+        "Garden and plant enthusiasts",
+        "Families wanting an easy walking activity"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General botanical garden tour sentiment favors guide knowledge of plant diversity and origin stories.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-diving-2tank-morning",
+    "title": "2-tank Morning Charter",
+    "company": "Kona Diving Company",
+    "fareharborShortname": "konadivingcompany",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Standard Kona two-tank morning boat dive"
+    ],
+    "fullDescription": "A standard morning two-tank dive charter in Kona - see general morning-dive category notes on the Aquatic Life Divers listing for context on why morning timing is generally preferred.",
+    "verdict": {
+      "headline": "A dependable standard option - compare against other Kona morning charters on price and boat size.",
+      "goodFor": [
+        "Certified divers wanting a standard Kona morning dive"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Kona morning dive charter sentiment applies - see Aquatic Life Divers listing for detail.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-diving-manta-ray-night-charter",
+    "title": "2-tank Manta Ray Night Charter",
+    "company": "Kona Diving Company",
+    "fareharborShortname": "konadivingcompany",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - 2 Tank Night Manta Dive",
+    "duration": "Evening",
+    "highlights": [
+      "Certified-diver version of Kona's manta ray night experience (as opposed to the more common snorkel version)",
+      "Two tanks - dive proper rather than surface snorkeling"
+    ],
+    "fullDescription": "A certified-diver manta ray night dive, letting divers observe the feeding mantas from below rather than snorkeling at the surface - a different perspective than most manta listings in this dataset, which are snorkel-based.",
+    "verdict": {
+      "headline": "For certified divers, this offers a genuinely different manta perspective than the more common surface snorkel version.",
+      "goodFor": [
+        "Certified divers wanting an underwater (not surface) manta encounter"
+      ],
+      "worthKnowing": [
+        "Confirm certification requirements - night diving typically requires prior night-dive experience or comfort"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Diving (versus snorkeling) manta ray night experiences are a smaller subset of this popular Kona category, valued by certified divers for the different underwater vantage point.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-2tank-morning",
+    "title": "2-Tank Local Morning Dive Charter",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Standard local Kona 2-tank morning charter from an established dive shop"
+    ],
+    "fullDescription": "Kona Honu Divers' standard local morning charter - the shop's core, everyday dive product among its extensive lineup of specialty and certification offerings.",
+    "verdict": {
+      "headline": "A dependable default choice from an established Kona dive shop with a broad product range.",
+      "goodFor": [
+        "Certified divers wanting a reliable standard local dive"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona Honu Divers runs one of the more extensive dive product lineups in this dataset, generally suggesting an established, full-service operation.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-2tank-night-manta",
+    "title": "2 Tank Night Manta Dive Charter",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - 2 Tank Night Manta Dive",
+    "duration": "Evening",
+    "highlights": [
+      "This shop's certified-diver manta ray night dive product"
+    ],
+    "fullDescription": "See the Kona Diving Company manta night dive listing for general context on the diver (vs. snorkeler) manta experience - this is the same category from Kona Honu Divers.",
+    "verdict": {
+      "headline": "See general certified-diver manta night dive notes elsewhere in this dataset.",
+      "goodFor": [
+        "Certified divers"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general manta night dive category notes.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-level1-freediver",
+    "title": "Level 1 Freediver Course",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Freediving Certification Course",
+    "duration": "Multi-Day Course",
+    "highlights": [
+      "Entry-level freediving certification course - breath-hold diving technique and safety, distinct from scuba"
+    ],
+    "fullDescription": "A structured, multi-day freediving certification course teaching breath-hold diving fundamentals - a different discipline from scuba, focused on technique, breath control, and safety protocols.",
+    "verdict": {
+      "headline": "A genuine skill-building course, not a one-off tourist activity - go in expecting real instruction time.",
+      "goodFor": [
+        "Travelers wanting to learn a real skill during an extended Big Island stay",
+        "Free-diving/spearfishing-curious travelers"
+      ],
+      "worthKnowing": [
+        "This is a multi-day commitment, not a single booking - plan your trip schedule accordingly"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not a one-off reviewed experience - a structured certification course; general shop reputation applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-open-water-course",
+    "title": "Open Water Course",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Scuba Certification Course",
+    "duration": "Multi-Day Course",
+    "highlights": [
+      "Full Open Water scuba certification - the entry-level credential for independent diving worldwide"
+    ],
+    "fullDescription": "A multi-day Open Water certification course - the standard entry credential that allows independent scuba diving anywhere in the world afterward, distinct from the one-off Discover Scuba trials elsewhere in this dataset.",
+    "verdict": {
+      "headline": "The right choice if you want to actually get certified during your trip, not just try diving once.",
+      "goodFor": [
+        "Travelers committed to becoming certified divers",
+        "Anyone with several vacation days free for a real course"
+      ],
+      "worthKnowing": [
+        "Requires several consecutive days including pool/confined water sessions plus open water dives - confirm the exact schedule before booking around other trip plans"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Open Water certification courses are a standard offering at established dive shops; general commentary favors booking early in a trip in case weather requires rescheduling a session.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-blackwater-dive",
+    "title": "Blackwater Night Dive",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - Blackwater Dive",
+    "duration": "Evening",
+    "highlights": [
+      "Blackwater diving - a specialized night dive over deep open ocean (not a reef), observing rarely-seen deep-sea pelagic creatures that rise toward the surface after dark",
+      "Available as a shared or fully private charter"
+    ],
+    "fullDescription": "Blackwater diving is a niche, advanced-interest category: divers descend on a line into open, very deep water at night (no reef or bottom in sight), observing bizarre and rarely-seen deep-sea larval and pelagic creatures that migrate upward after dark. Kona is one of the world's most established blackwater diving destinations due to the steep drop-off just offshore.",
+    "verdict": {
+      "headline": "A genuinely unique, advanced-interest dive - not for casual or nervous divers, but remarkable for the right audience.",
+      "goodFor": [
+        "Experienced divers with strong buoyancy control and comfort with open-water, no-visible-bottom conditions",
+        "Underwater photographers interested in rare deep-sea macro life"
+      ],
+      "worthKnowing": [
+        "This is genuinely different from a normal night dive - no reef, no bottom in sight, floating over very deep open ocean on a line",
+        "Not recommended for anyone uneasy with open-water disorientation or without solid buoyancy control",
+        "Private charter costs more but offers a smaller, more personalized group for what is already a niche, specialized dive"
+      ],
+      "closingNote": "Kona's blackwater diving reputation is internationally recognized among the diving community specifically because of the easy access to deep offshore water close to shore.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona is widely regarded within the international dive community as one of the best and most accessible blackwater diving locations in the world, owing to the unusually steep underwater drop-off close to the Kona coastline that brings deep-sea conditions within a short boat ride.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Shared Charter",
+      "Private Charter"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-premium-advanced-long-range",
+    "title": "Premium Advanced 2 Tank Long Range Charter",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Certified Diver - Advanced 2 Tank Long Range Charter",
+    "duration": "Half Day (extended)",
+    "highlights": [
+      "Reaches further offshore sites than the standard local charter",
+      "For advanced/experienced divers specifically"
+    ],
+    "fullDescription": "This shop's long-range advanced charter - see the Aquatic Life Divers Explorer's Dive listing for general context on why long-range charters appeal to experienced divers wanting less-crowded sites.",
+    "verdict": {
+      "headline": "For divers who've done Kona's standard sites and want to go further out.",
+      "goodFor": [
+        "Advanced Open Water certified divers"
+      ],
+      "worthKnowing": [
+        "Longer boat transit than local charters - factor in seasickness risk"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general long-range advanced charter category notes on the Aquatic Life Divers listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-honu-divers-private-charter-honu-lele",
+    "title": "Private Charter - Honu Lele",
+    "company": "Kona Honu Divers",
+    "fareharborShortname": "konahonudivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Private Dive Boat Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully private boat charter on the named vessel Honu Lele, for certified diving groups"
+    ],
+    "fullDescription": "A private charter option for dive groups wanting the boat exclusively - useful for larger certified groups, dive clubs, or families wanting to set their own site and pace.",
+    "verdict": {
+      "headline": "Good for dive groups wanting exclusivity and control over sites/pace.",
+      "goodFor": [
+        "Dive clubs or groups of certified friends/family",
+        "Anyone wanting to choose their own dive sites for the day"
+      ],
+      "worthKnowing": [
+        "Confirm minimum group size/pricing structure since private charters typically require a minimum spend"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private dive charter sentiment favors flexibility for group site selection.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-ocean-adventures-kealakekua-captain-cook",
+    "title": "Kealakekua/Captain Cook Adventure",
+    "company": "Kona Ocean Adventures",
+    "fareharborShortname": "konaoceanadventures",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Another operator running trips to the well-regarded Kealakekua Bay/Captain Cook Monument area"
+    ],
+    "fullDescription": "See the Coral Reef Snorkel Adventures listing for general Kealakekua Bay destination context - this is another operator covering the same protected-bay route.",
+    "verdict": {
+      "headline": "A solid Kealakekua Bay option - compare against other operators in this dataset on boat size and price.",
+      "goodFor": [
+        "Snorkelers prioritizing this destination"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See Kealakekua Bay category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-ocean-adventures-manta-scuba-combo",
+    "title": "Majestic Manta Rays Snorkel / 1-Tank Scuba Dive Adventure",
+    "company": "Kona Ocean Adventures",
+    "fareharborShortname": "konaoceanadventures",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Manta Snorkel or 1-Tank Dive (choice)",
+    "duration": "Evening",
+    "highlights": [
+      "Lets guests choose between snorkeling or a 1-tank scuba dive to see the mantas - good for mixed-skill groups"
+    ],
+    "fullDescription": "A flexible manta ray night trip that lets each guest choose snorkel or single-tank scuba, useful for groups where not everyone is certified.",
+    "verdict": {
+      "headline": "A smart pick for mixed groups where only some members are certified divers.",
+      "goodFor": [
+        "Groups with a mix of certified divers and snorkelers wanting to experience mantas together"
+      ],
+      "worthKnowing": [
+        "Confirm the 1-tank scuba option's certification requirements ahead of booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Flexible snorkel-or-dive manta trips are valued specifically by mixed-certification groups wanting to share the experience together.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-ocean-adventures-private-charter",
+    "title": "Private Charter",
+    "company": "Kona Ocean Adventures",
+    "fareharborShortname": "konaoceanadventures",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Private Boat Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully private, flexible-itinerary boat charter"
+    ],
+    "fullDescription": "This operator's private charter option - flexible itinerary and exclusive boat use for your group.",
+    "verdict": {
+      "headline": "Good for groups wanting to design their own Kona ocean day.",
+      "goodFor": [
+        "Groups wanting full control over stops and activities"
+      ],
+      "worthKnowing": [
+        "Confirm minimum booking size/pricing for private charters"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private charter sentiment favors flexibility for custom itineraries.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-sea-salt-mineral-foot-soak",
+    "title": "Deep Ocean Cold Water Mineral Foot Soak",
+    "company": "Kona Sea Salt - The Farm",
+    "fareharborShortname": "konaseasalt",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Wellness Experience",
+    "duration": "~30-45 Minutes",
+    "highlights": [
+      "A relaxation experience using Kona's deep ocean water technology (the same pumped cold seawater infrastructure used by the area's aquaculture farms)",
+      "Highest availability count of any wellness listing in this dataset - a frequently offered, easy-to-book activity"
+    ],
+    "fullDescription": "This operator uses the same deep, cold seawater pumping infrastructure that powers Kona's aquaculture farms (see Big Island Abalone) for a mineral-rich foot soak wellness experience - a quick, low-cost way to add relaxation to a farm tour day.",
+    "verdict": {
+      "headline": "A quick, inexpensive add-on for a relaxing break during a South Kona farm-touring day.",
+      "goodFor": [
+        "Travelers already exploring South Kona's farm circuit",
+        "Anyone wanting a short, low-cost wellness stop"
+      ],
+      "worthKnowing": [
+        "Short duration - best paired with a nearby farm tour rather than booked as a standalone destination"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Niche wellness add-ons tied to Kona's deep seawater infrastructure are a distinctive local specialty, generally positioned as a complement to farm tours rather than a standalone destination.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-shore-divers-influencer-photo-package",
+    "title": "Influencer Photo Package",
+    "company": "Kona Shore Divers",
+    "fareharborShortname": "konashoredivers",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Styled Photo/Content Package (Snorkel or Dive-based)",
+    "duration": "Varies",
+    "highlights": [
+      "A content-creator-focused package, likely combining an underwater or beach activity with professional photography/videography",
+      "Niche product distinct from a standard snorkel/dive trip"
+    ],
+    "fullDescription": "This appears to be a specialized package built around producing professional photo/video content (for social media or personal use) rather than a standard guided activity - confirm exact inclusions (activity type, number of edited photos, usage rights) directly with the operator before publishing full details.",
+    "verdict": {
+      "headline": "Confirm exact deliverables (photo count, turnaround, activity included) directly with the operator - this is a newer, niche product type without much independent review history.",
+      "goodFor": [
+        "Content creators and social media-focused travelers wanting professional underwater/beach photos"
+      ],
+      "worthKnowing": [
+        "Get specifics on the underlying activity (snorkel vs. dive), number of edited images, and delivery timeline in writing before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this niche listing type; recommend direct operator confirmation of deliverables before publishing final page copy.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-snorkel-trips-pawai-bay",
+    "title": "Kona Snorkeling in Pawai Bay",
+    "company": "Kona Snorkel Trips",
+    "fareharborShortname": "konasnorkeltrips",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Pawai Bay is a Marine Life Conservation District just north of Kailua-Kona town, known for healthy coral and easy boat access close to the harbor",
+      "Shorter boat ride than the Kealakekua Bay trips further south"
+    ],
+    "fullDescription": "Pawai Bay is a protected marine reserve close to central Kona, offering strong reef health without the longer boat ride required for Kealakekua Bay - a good time-efficient alternative.",
+    "verdict": {
+      "headline": "A time-efficient alternative to Kealakekua Bay if you want good reef without the longer boat ride south.",
+      "goodFor": [
+        "Travelers wanting quality snorkeling without a long boat transit",
+        "Time-limited half-day bookings"
+      ],
+      "worthKnowing": [
+        "Pawai Bay has protected status like Kealakekua - follow all marine sanctuary rules"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Pawai Bay is independently recognized as one of Kona's healthier reef areas close to the harbor, often recommended as a shorter-transit alternative to Kealakekua Bay.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kona-town-surf-adventures-lesson",
+    "title": "Surf Lesson",
+    "company": "Kona Town Surf Adventures",
+    "fareharborShortname": "konatownsurfadventures",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Surf Instruction",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Kailua-Kona surf lessons at three group-size tiers",
+      "Higher instructor-to-student ratio and more individual attention as you move from Group to Semi-Private to Private"
+    ],
+    "fullDescription": "A standard Kona-side surf instruction offering, structured around group size: Group lessons are the most affordable but share instructor attention across more students; Semi-Private narrows the group; Private is one-on-one (or one family) with the instructor's full attention.",
+    "verdict": {
+      "headline": "Choose Private if you want the fastest progress, Group if budget matters more than pace of individual attention.",
+      "goodFor": [
+        "Group: budget-conscious beginners comfortable learning alongside others; Private: anyone wanting maximum individual coaching, nervous first-timers, or families wanting to learn together"
+      ],
+      "worthKnowing": [
+        "More individual attention generally means faster comfort and standing-up progress - worth the upgrade if this is likely your only surf lesson of the trip"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Tiered group-size surf lesson pricing (Group/Semi-Private/Private) is a standard industry structure; general sentiment across this format favors Private or Semi-Private for nervous beginners specifically due to more individualized coaching attention.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Group Lesson",
+      "Semi-Private Lesson",
+      "Private Lesson"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "iruka-kona-manta-ray-night",
+    "title": "Manta Ray Night Snorkel",
+    "company": "Iruka Kona",
+    "fareharborShortname": "irukakona",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening",
+    "highlights": [
+      "Another well-photographed (13 images) Kona manta ray night snorkel operator"
+    ],
+    "fullDescription": "See general Kona manta ray night snorkel category notes elsewhere in this dataset - this operator shares branding with Iruka Hawaii (an Oahu-based company) but operates independently on the Big Island.",
+    "verdict": {
+      "headline": "A well-documented option in this well-established Kona category.",
+      "goodFor": [
+        "Wildlife enthusiasts"
+      ],
+      "worthKnowing": [
+        "Confirm this is the Kona-based Iruka operation (not the Oahu-based Iruka Hawaii) when booking, given the shared branding"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Kona manta ray night snorkel category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "honolii-orchards-chocolate-experience",
+    "title": "Orchard Tour & Craft Chocolate Tasting",
+    "company": "Honoli'i Orchards",
+    "fareharborShortname": "honoliiestate",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Farm Tour + Chocolate Tasting",
+    "duration": "~1-2 Hours (tour) or ~30-45 Min (tasting only)",
+    "highlights": [
+      "Walk a working cacao orchard near Hilo and taste craft, bean-to-bar Hawaiian chocolate",
+      "34 photos on file - the most photo-documented listing in this dataset",
+      "Tasting-only option for travelers short on time"
+    ],
+    "fullDescription": "Hawaii is one of the only U.S. states where cacao can be commercially grown, making Big Island chocolate a genuinely distinctive local product. This operator offers either the full orchard walk-and-tasting experience or a shorter, tasting-only option for travelers with less time.",
+    "verdict": {
+      "headline": "The full package is worth the extra time if you're a chocolate or agriculture enthusiast; the tasting-only option works well as a quick add-on to a Hilo-area day.",
+      "goodFor": [
+        "Chocolate and food enthusiasts",
+        "Travelers wanting a distinctly Hawaii-specific (not generic tropical) food experience"
+      ],
+      "worthKnowing": [
+        "Cacao growing and craft chocolate production in Hawaii is a genuinely rare category nationally - this isn't a generic 'tropical' add-on, it's one of very few U.S. sources of commercially grown cacao"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hawaii-grown, bean-to-bar chocolate is an internationally recognized niche category specifically because Hawaii is the only U.S. state with a commercial cacao-growing climate; craft chocolate tours in the Hilo area are generally praised for that rarity value beyond typical tropical agri-tourism.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Full Orchard Tour & Chocolate Tasting Package",
+      "Tasting Only"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "holo-holo-niihau-napali-snorkel-expedition",
+    "title": "The Ni'ihau & Napali Snorkel Expedition",
+    "company": "Holo Holo Charters",
+    "fareharborShortname": "holoholo",
+    "island": "Kauai",
+    "city": "Eleele",
+    "tourType": "Boat Tour to Ni'ihau & Napali Coast",
+    "duration": "Full Day",
+    "highlights": [
+      "Rare boat access to waters near Ni'ihau, the private 'Forbidden Island' closed to independent visitors",
+      "Combines with the dramatic Napali Coast cliffs in one long day trip",
+      "One of the longest, most ambitious boat itineraries in this dataset"
+    ],
+    "fullDescription": "Ni'ihau is a privately owned island closed to independent tourism, making boat trips like this one of the only ways to see it at all (from the water, not landing). Pairing that with the Napali Coast - Kauai's dramatic, roadless cliff coastline only accessible by boat, helicopter, or a strenuous multi-day hike - makes this one of the most complete single-day ocean itineraries in Hawaii.",
+    "verdict": {
+      "headline": "One of the most genuinely unique full-day boat trips in Hawaii - just prepare for open-ocean crossings and a long day.",
+      "goodFor": [
+        "Travelers who prioritize seeing the Napali Coast and want the added rarity of Ni'ihau",
+        "Confident boat travelers comfortable with a long day on open water"
+      ],
+      "worthKnowing": [
+        "This route crosses genuinely open ocean channel water, which can be rough - seasickness precautions (medication, a good breakfast, avoiding the boat's stern) are worth taking seriously",
+        "This is a full, long day - pace and sun exposure should be planned for accordingly"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Ni'ihau/Napali combination boat trips are widely recognized across independent Kauai travel resources as one of the island's premier full-day excursions, specifically because Ni'ihau's private status and the Napali Coast's roadless geography make both areas otherwise inaccessible to typical visitors.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "holo-holo-napali-coast-snorkel-excursion",
+    "title": "The Napali Coast Snorkel Excursion",
+    "company": "Holo Holo Charters",
+    "fareharborShortname": "holoholo",
+    "island": "Kauai",
+    "city": "Eleele",
+    "tourType": "Boat Tour + Snorkel to Napali Coast",
+    "duration": "Full Day",
+    "highlights": [
+      "Focused specifically on the Napali Coast (without the Ni'ihau add-on) with dedicated snorkel time",
+      "A shorter, more snorkel-focused alternative to the combined Ni'ihau trip"
+    ],
+    "fullDescription": "The Napali-only version of this operator's signature route, trading the Ni'ihau detour for more focused snorkel time along Kauai's famous roadless coastline.",
+    "verdict": {
+      "headline": "Choose this over the Ni'ihau combo if snorkel time matters more to you than seeing the extra island.",
+      "goodFor": [
+        "Snorkelers who want more in-water time than the longer Ni'ihau combo route allows"
+      ],
+      "worthKnowing": [
+        "Still involves meaningful open-ocean travel - same seasickness precautions as the Ni'ihau route apply"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Napali Coast boat trip category notes; snorkel-focused itineraries in this category are generally chosen by travelers prioritizing in-water time over maximum sightseeing distance.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "holo-holo-kauai-sunset-tour",
+    "title": "Kaua'i Sunset Sail",
+    "company": "Holo Holo Charters",
+    "fareharborShortname": "holoholo",
+    "island": "Kauai",
+    "city": "Eleele",
+    "tourType": "Sunset Sail",
+    "duration": "~2-3 Hours (Classic) or Longer (Extended)",
+    "highlights": [
+      "A shorter, more accessible evening alternative to this operator's full-day Napali routes",
+      "Classic and Extended duration options"
+    ],
+    "fullDescription": "This operator's standard sunset sail product, offered in a shorter Classic format and a longer Extended format - a lower-commitment evening alternative to the full-day Napali/Ni'ihau routes from the same company.",
+    "verdict": {
+      "headline": "A good lower-commitment evening option if a full-day Napali boat trip doesn't fit your schedule.",
+      "goodFor": [
+        "Travelers wanting an evening sail without a full-day commitment",
+        "Couples and groups wanting sunset views"
+      ],
+      "worthKnowing": [
+        "Doesn't reach the Napali Coast - book the full-day routes if that's specifically your goal"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General sunset sail sentiment from this operator benefits from the same established reputation as their signature Napali Coast trips.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Classic Sunset Tour",
+      "Extended Sunset Sail"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "alii-air-private-kauai-helicopter-tour",
+    "title": "Private Kauai Helicopter Tour",
+    "company": "Ali'i Air Tours & Charters",
+    "fareharborShortname": "iflykauai",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Scenic Helicopter Tour",
+    "duration": "~50-60 Minutes",
+    "highlights": [
+      "Aerial views of Kauai's Napali Coast, Waimea Canyon, and interior waterfalls - terrain largely inaccessible by road",
+      "One of the highest availability counts in this dataset, suggesting frequent daily departures",
+      "Fixed scenic route format"
+    ],
+    "fullDescription": "Kauai's interior and Napali Coast are famously road-inaccessible in large sections, making a helicopter tour one of the only ways to see the island's most dramatic terrain - deep valleys, hidden waterfalls, and the sea cliffs of the Napali Coast - in a single trip.",
+    "verdict": {
+      "headline": "One of the best ways to see the parts of Kauai you genuinely cannot reach by car or on foot.",
+      "goodFor": [
+        "First-time Kauai visitors wanting to see the Napali Coast and interior valleys",
+        "Photography enthusiasts"
+      ],
+      "worthKnowing": [
+        "Doors-on vs doors-off options vary by operator - confirm which this specific tour offers if that matters to you",
+        "Weather (cloud cover, especially over Waimea Canyon and the interior) can affect visibility and occasionally causes rescheduling - build a flexible day around this if possible"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kauai helicopter tours are widely regarded across independent travel resources as one of the most worthwhile splurges on the island, specifically because so much of Kauai's interior and Napali Coast terrain has no road access at all.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "alii-air-private-kauai-helicopter-charter",
+    "title": "Private Kauai Helicopter Charter",
+    "company": "Ali'i Air Tours & Charters",
+    "fareharborShortname": "iflykauai",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Custom Private Helicopter Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully custom flight plan and timing, versus the fixed-route standard tour",
+      "Good for special requests (specific photography needs, proposals, custom routing)"
+    ],
+    "fullDescription": "A custom charter option distinct from the standard scenic tour - useful for travelers with specific requests around routing, timing, or occasion (proposals, photography needs) that a fixed-route tour can't accommodate.",
+    "verdict": {
+      "headline": "Worth the premium if you have a specific request the standard tour can't accommodate.",
+      "goodFor": [
+        "Proposals or special occasions wanting a custom flight",
+        "Photographers wanting control over routing/timing"
+      ],
+      "worthKnowing": [
+        "Custom charters typically cost more than the standard fixed-route tour - confirm the price difference and what flexibility it actually buys you"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Custom helicopter charters are a smaller, premium niche within the broader Kauai helicopter tour category, generally booked for special occasions or specific photography/routing needs.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "jack-harter-doors-off-md500",
+    "title": "Doors-Off MD500 Tour (60-65 Min)",
+    "company": "Jack Harter Helicopters",
+    "fareharborShortname": "jackharterheli",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Doors-Off Scenic Helicopter Tour",
+    "duration": "60-65 Minutes",
+    "highlights": [
+      "Jack Harter is one of Kauai's original, longest-established helicopter tour companies",
+      "Doors-off format - unobstructed views and photography, no glass/door reflections",
+      "Longer flight time (60-65 min) than many standard scenic tours"
+    ],
+    "fullDescription": "Jack Harter Helicopters was one of the pioneering helicopter tour operators on Kauai, and this doors-off format removes the cabin doors entirely for unobstructed photography and viewing - a meaningfully different experience from a standard enclosed-cabin tour.",
+    "verdict": {
+      "headline": "A strong pick for photographers specifically because of the doors-off format and this operator's long track record.",
+      "goodFor": [
+        "Photographers wanting unobstructed shots",
+        "Travelers who want a longer flight time than the industry-standard ~50 minutes"
+      ],
+      "worthKnowing": [
+        "Doors-off flights are cooler/windier in the cabin - dress accordingly and secure any loose items (hats, jewelry) before boarding",
+        "Weight distribution matters more in doors-off small helicopters - expect seat assignment based on passenger weights"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Jack Harter Helicopters is one of the most established names in Kauai helicopter touring, with doors-off flights specifically noted in independent travel coverage as a photographer favorite due to the unobstructed views.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "jack-harter-doors-off-heart-of-island",
+    "title": "Doors-Off Heart of the Island Kauai Tour",
+    "company": "Jack Harter Helicopters",
+    "fareharborShortname": "jackharterheli",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Doors-Off Scenic Helicopter Tour",
+    "duration": "Varies",
+    "highlights": [
+      "A route variation from the same operator, framed around Kauai's interior ('Heart of the Island')"
+    ],
+    "fullDescription": "A route variation on this operator's doors-off format, with routing emphasis on Kauai's central interior terrain rather than (or in addition to) the coastal Napali route.",
+    "verdict": {
+      "headline": "Compare route maps directly against the MD500 tour to see which interior/coastal balance fits what you most want to see.",
+      "goodFor": [
+        "Travelers specifically wanting more interior valley/waterfall focus"
+      ],
+      "worthKnowing": [
+        "Ask the operator directly how this route differs from their other doors-off tour if the exact flight path matters to you"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Jack Harter Helicopters sentiment applies - see the MD500 Doors-Off Tour listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kipu-ranch-waterfall-trail-expedition",
+    "title": "Waterfall Trail Expedition",
+    "company": "Kipu Ranch Adventures",
+    "fareharborShortname": "kiputours",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Guided ATV/UTV Tour",
+    "duration": "~2.5-3 Hours",
+    "highlights": [
+      "ATV/off-road tour across a working cattle ranch used as filming locations for movies like Jurassic Park and Raiders of the Lost Ark",
+      "Waterfall stop with swimming opportunity included"
+    ],
+    "fullDescription": "Kipu Ranch is a well-known Kauai filming location (Jurassic Park, Raiders of the Lost Ark, and other productions), and this ATV tour covers ranch trails to a waterfall swimming spot - combining off-road adventure with movie-location interest and a swim payoff.",
+    "verdict": {
+      "headline": "A fun, movie-buff-friendly off-road adventure with a genuine swimming payoff at the end.",
+      "goodFor": [
+        "ATV/off-road enthusiasts",
+        "Movie location fans",
+        "Families wanting an active, muddy-fun adventure"
+      ],
+      "worthKnowing": [
+        "Expect to get muddy - this is genuine off-road terrain, not a paved path",
+        "Bring swimwear for the waterfall stop"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kipu Ranch is independently well known as a Hollywood filming location, and ATV tours across the property are generally praised for combining that novelty with genuine off-road adventure and a swimmable waterfall stop.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kipu-ranch-ultimate-ranch-tour",
+    "title": "Ultimate Ranch Tour",
+    "company": "Kipu Ranch Adventures",
+    "fareharborShortname": "kiputours",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Guided ATV/UTV Tour",
+    "duration": "~3.5-4 Hours",
+    "highlights": [
+      "A longer, more comprehensive version of this operator's ranch ATV experience",
+      "Covers more ground and likely more filming-location stops than the Waterfall Trail Expedition"
+    ],
+    "fullDescription": "The extended version of Kipu Ranch's ATV touring, covering more of the property and its filming-location history than the shorter Waterfall Trail Expedition.",
+    "verdict": {
+      "headline": "Choose this over the Waterfall Trail Expedition if you want more ground covered and more filming-location stops.",
+      "goodFor": [
+        "Repeat visitors or those who want the fullest possible ranch experience",
+        "Movie location enthusiasts wanting more stops"
+      ],
+      "worthKnowing": [
+        "Longer duration means more sun/dust exposure - dress and hydrate accordingly"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Kipu Ranch category notes on the Waterfall Trail Expedition listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kauai-beach-boys-outrigger-canoe",
+    "title": "Outrigger Canoe Ride",
+    "company": "Da Life Outdoors | Kauai Beach Boys",
+    "fareharborShortname": "kauaibeachboys",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Traditional Outrigger Canoe Paddle",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Traditional Hawaiian outrigger canoe paddling with a local crew",
+      "Cultural context on traditional Polynesian navigation and paddling technique"
+    ],
+    "fullDescription": "A guided outrigger canoe experience - the traditional Hawaiian/Polynesian watercraft design - offering a more culturally grounded ocean activity than a standard kayak or boat trip.",
+    "verdict": {
+      "headline": "A worthwhile, culturally rich alternative to a standard kayak tour.",
+      "goodFor": [
+        "Travelers interested in Hawaiian/Polynesian culture and traditions",
+        "Groups wanting a team-paddling activity"
+      ],
+      "worthKnowing": [
+        "No paddling experience needed - the local crew guides the technique and does much of the steering"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Traditional outrigger canoe experiences are generally valued in independent travel commentary for offering more cultural depth than a standard kayak or boat tour.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kauai-beach-boys-waterfall-rappel",
+    "title": "Waterfall Rappel",
+    "company": "Da Life Outdoors | Kauai Beach Boys",
+    "fareharborShortname": "kauaibeachboys",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Guided Canyoneering/Rappel Adventure",
+    "duration": "~3-4 Hours",
+    "highlights": [
+      "Rappel down the face of a working waterfall - a more technical, adrenaline-focused activity than a standard hike",
+      "Full harness and safety equipment provided with guide instruction"
+    ],
+    "fullDescription": "A canyoneering-style adventure that has guests rappel down an actual waterfall face - a genuinely more technical and adrenaline-heavy activity than most hiking or swimming-focused waterfall tours in this dataset.",
+    "verdict": {
+      "headline": "One of the more genuinely adventurous, adrenaline-focused activities on Kauai - not for anyone with a fear of heights or exposure.",
+      "goodFor": [
+        "Adventure-seekers comfortable with heights and rappelling",
+        "Travelers wanting a distinctly different waterfall experience than swimming or hiking"
+      ],
+      "worthKnowing": [
+        "This involves real technical rappelling with exposure - confirm any age, weight, or fear-of-heights guidance with the operator before booking",
+        "Full safety gear and instruction are provided, but this is a physically and mentally demanding activity by design"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Waterfall rappelling/canyoneering is a smaller, adrenaline-focused niche within Kauai's adventure tourism scene, generally reviewed favorably for the genuine thrill factor by travelers specifically seeking a more technical activity than standard hiking.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kauai-beach-boys-waterfall-swim-hike",
+    "title": "Waterfall Swim and Hike",
+    "company": "Da Life Outdoors | Kauai Beach Boys",
+    "fareharborShortname": "kauaibeachboys",
+    "island": "Kauai",
+    "city": "Lihue",
+    "tourType": "Guided Hike + Waterfall Swim",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "A gentler, hiking-and-swimming counterpart to the operator's Waterfall Rappel",
+      "Good for travelers wanting the waterfall payoff without the technical rappel component"
+    ],
+    "fullDescription": "The lower-intensity version of this operator's waterfall offerings - a guided hike to a waterfall with swimming time, without the rappelling component.",
+    "verdict": {
+      "headline": "The right choice if you want a waterfall swim without the adrenaline/technical demands of the rappel option.",
+      "goodFor": [
+        "Families",
+        "Hikers who want a swim payoff without technical rappelling"
+      ],
+      "worthKnowing": [
+        "Trail conditions can be muddy/slippery near the waterfall - appropriate footwear matters"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General waterfall hike-and-swim sentiment favors this as the accessible, family-friendly counterpart to more technical canyoneering options.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "jungle-zipline-8-line-tour",
+    "title": "8 Line Zipline Tour",
+    "company": "Jungle Zipline",
+    "fareharborShortname": "junglezip",
+    "island": "Maui",
+    "city": "Haiku",
+    "tourType": "Zipline Course",
+    "duration": "~2.5-3 Hours",
+    "highlights": [
+      "8-line zipline course through Maui's lush Haiku rainforest on the North Shore",
+      "Longer course (8 lines) than some shorter zipline offerings",
+      "Very high availability count in this dataset, suggesting frequent daily departures"
+    ],
+    "fullDescription": "A zipline canopy course through rainforest terrain near Haiku on Maui's North Shore - the 8-line format offers more progression/variety than shorter 3-4 line courses.",
+    "verdict": {
+      "headline": "A solid, well-established Maui zipline option given the high booking volume in this dataset.",
+      "goodFor": [
+        "Adventure-seekers wanting a longer zipline course",
+        "Families with kids meeting the minimum age/weight requirements"
+      ],
+      "worthKnowing": [
+        "Weight and age restrictions typical of ziplines apply - confirm before booking",
+        "Only 3 photos on file - request current photos directly from the operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "8-line zipline courses represent a more extensive format within Maui's zipline tourism category; general sentiment favors longer courses for value and variety versus shorter 3-4 line alternatives.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "kaanapali-morning-lanai-snorkel",
+    "title": "Morning Lana'i Snorkel Tour",
+    "company": "Kaanapali Ocean Adventures",
+    "fareharborShortname": "kaanapalioceanadventures",
+    "island": "Maui",
+    "city": "Lahaina",
+    "tourType": "Boat Tour to Lanai",
+    "duration": "Half Day",
+    "highlights": [
+      "Boat crossing from Maui to Lanai for morning snorkeling",
+      "Lanai's reefs are generally less crowded than Maui's popular Molokini Crater snorkel destination"
+    ],
+    "fullDescription": "A boat trip crossing the channel between Maui and the smaller, less-developed island of Lanai for morning snorkeling - a lower-traffic alternative to Maui's more famous (and more crowded) Molokini Crater trips.",
+    "verdict": {
+      "headline": "A good pick for travelers wanting Molokini-quality snorkeling with fewer boats and crowds.",
+      "goodFor": [
+        "Snorkelers wanting a less-crowded alternative to Molokini Crater",
+        "Travelers curious about Lanai's coastline without a full day trip to the island itself"
+      ],
+      "worthKnowing": [
+        "The Maui-Lanai channel crossing can be choppy - factor in seasickness precautions",
+        "Morning departure timing generally means calmer water than afternoon"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Lanai snorkel trips from Maui are frequently recommended by independent Maui travel resources as a less-crowded alternative to the more famous Molokini Crater trips, with similarly strong reef quality.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "liljestrand-architectural-tour",
+    "title": "90-Minute Architectural Group Tour",
+    "company": "Liljestrand Foundation",
+    "fareharborShortname": "liljestrandhouse",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Architectural House Tour",
+    "duration": "90 Minutes",
+    "highlights": [
+      "Guided tour of the Liljestrand House, a celebrated mid-century modern residence by architect Vladimir Ossipoff",
+      "A niche but highly regarded stop for architecture and design enthusiasts"
+    ],
+    "fullDescription": "The Liljestrand House is one of Hawaii's most significant works of mid-century modern residential architecture, designed by Vladimir Ossipoff. This guided tour opens the private home to visitors on a limited schedule - a genuinely different kind of Oahu activity from the beach/adventure-heavy majority of this dataset.",
+    "verdict": {
+      "headline": "A must for architecture enthusiasts - book ahead since tour slots are limited and this isn't a walk-up attraction.",
+      "goodFor": [
+        "Architecture and design enthusiasts",
+        "Travelers wanting a non-beach cultural activity"
+      ],
+      "worthKnowing": [
+        "This is a private residence with a small, scheduled tour program - book well ahead of your trip"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "The Liljestrand House is independently recognized in architecture and design circles as one of Hawaii's premier examples of mid-century modern residential design, with limited public tours specifically prized by design-focused travelers.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "living-ocean-waikiki-sunset-cruise-byob",
+    "title": "Waikiki Sunset Cruise BYOB",
+    "company": "Living Ocean Tours",
+    "fareharborShortname": "livingoceanscuba",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "BYOB Sunset Cruise",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Casual, bring-your-own-drinks sunset cruise off Waikiki - see the Dive Oahu BYOB listing for general category context"
+    ],
+    "fullDescription": "Another BYOB-format sunset cruise off Waikiki, from an operator otherwise known for scuba - similar in spirit to the Dive Oahu Waikiki Coast Cruise, offering a budget-friendly evening sail.",
+    "verdict": {
+      "headline": "A budget-friendly evening sail option - compare against Dive Oahu's similar BYOB listing for pricing/timing.",
+      "goodFor": [
+        "Budget-conscious groups"
+      ],
+      "worthKnowing": [
+        "Confirm current BYOB rules (glass, quantity) with the operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general BYOB cruise category notes on the Dive Oahu listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "living-ocean-deluxe-snorkel-wildlife-cruise",
+    "title": "Deluxe Snorkel and Wildlife Cruise",
+    "company": "Living Ocean Tours",
+    "fareharborShortname": "livingoceanscuba",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel + Wildlife Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Combines snorkeling with general wildlife spotting off Waikiki",
+      "12 photos on file"
+    ],
+    "fullDescription": "A daytime snorkel and wildlife-viewing cruise from the same operator as the BYOB sunset listing - a more activity-focused daytime alternative.",
+    "verdict": {
+      "headline": "A solid daytime option if the sunset cruise doesn't fit your schedule.",
+      "goodFor": [
+        "Snorkelers and casual wildlife watchers"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki daytime snorkel cruise sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mahina-hawaii-full-day-private-adventure",
+    "title": "Full Day Private Adventure",
+    "company": "Mahina Hawaii",
+    "fareharborShortname": "mahinahawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Private Multi-Activity Adventure",
+    "duration": "Full Day",
+    "highlights": [
+      "Full-day, North Shore-based private adventure - likely combining multiple activities (confirm exact inclusions with operator)"
+    ],
+    "fullDescription": "A private, full-day adventure package based on Oahu's North Shore - given the general naming, this likely bundles multiple activities rather than being a single-focus tour. Confirm exact inclusions with the operator before publishing detailed page copy.",
+    "verdict": {
+      "headline": "Confirm exact activity inclusions directly with the operator before booking - the listing name doesn't specify contents.",
+      "goodFor": [
+        "Groups wanting a flexible, private North Shore day"
+      ],
+      "worthKnowing": [
+        "Get a specific activity list and itinerary in writing given the general naming"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this listing; recommend direct operator confirmation of inclusions.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mahina-hawaii-half-day-surf-turf",
+    "title": "Half Day Adventure Retreat (Surf & Turf)",
+    "company": "Mahina Hawaii",
+    "fareharborShortname": "mahinahawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Multi-Activity Adventure (Ocean + Land)",
+    "duration": "Half Day",
+    "highlights": [
+      "'Surf & Turf' naming suggests a combination of ocean and land-based activities in a shorter half-day format"
+    ],
+    "fullDescription": "The shorter, half-day counterpart to this operator's Full Day Private Adventure - the 'Surf & Turf' name suggests it pairs an ocean activity with a land-based one. Confirm specific inclusions with the operator.",
+    "verdict": {
+      "headline": "A shorter time commitment than the full-day version - confirm the exact activity mix before booking.",
+      "goodFor": [
+        "Time-limited travelers wanting a taste of multiple activity types"
+      ],
+      "worthKnowing": [
+        "Get specific inclusions in writing given the general naming"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Insufficient independent review data specific to this listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "leigreeting-oahu-honolulu-airport",
+    "title": "Airport Lei Greeting - Honolulu Airport (Oahu)",
+    "company": "LeiGreeting.com",
+    "fareharborShortname": "leigreeting",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Airport Arrival Greeting Service",
+    "duration": "~15-20 Minutes",
+    "highlights": [
+      "Traditional Hawaiian lei greeting waiting for you right at Honolulu Airport arrivals",
+      "Package options for solo travelers, honeymooners, custom lei choice, or large groups"
+    ],
+    "fullDescription": "A classic first-moment-in-Hawaii experience: a lei greeter meets you at the airport with a traditional flower lei, available in several package tiers depending on group size and occasion (honeymoon, solo, custom flower choice, or larger groups).",
+    "verdict": {
+      "headline": "A nice, low-cost way to mark the start of a trip - especially meaningful for honeymoons or milestone visits.",
+      "goodFor": [
+        "Honeymooners and special-occasion travelers",
+        "Anyone wanting a memorable, welcoming start to their trip",
+        "Large groups wanting a coordinated greeting"
+      ],
+      "worthKnowing": [
+        "Confirm your flight details are shared accurately with the service, since greeters need exact arrival timing",
+        "This is a greeting service only - it does not include transportation"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Airport lei greeting services are a well-established, low-cost Hawaii tradition-based product, generally valued by honeymooners and first-time visitors for adding a meaningful, personal touch to arrival.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Classic Orchid Lei Greeting",
+      "Solo Traveler Lei Greeting",
+      "Honeymoon Lei Greeting",
+      "Custom Lei Greeting (Choose Your Lei)",
+      "Large Group Lei Greeting (8+)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-waikiki-private-charter",
+    "title": "Waikiki Private Charter",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Boat Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully private charter departing Waikiki, flexible itinerary"
+    ],
+    "fullDescription": "This operator's private charter option out of Waikiki - the flexible base product in a lineup that also includes structured snorkel and sunset packages.",
+    "verdict": {
+      "headline": "Good for groups wanting to design their own Waikiki-departure ocean day.",
+      "goodFor": [
+        "Groups wanting full itinerary control"
+      ],
+      "worthKnowing": [
+        "Compare against this operator's structured snorkel/sunset packages if you'd rather have a set itinerary"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private charter sentiment favors flexibility for custom itineraries.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-waikiki-exclusive-snorkel-lunch",
+    "title": "Waikiki Exclusive Snorkel + Lunch",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private/Exclusive Snorkel Charter + Lunch",
+    "duration": "Half Day",
+    "highlights": [
+      "Exclusive-use snorkel charter with lunch included, departing Waikiki"
+    ],
+    "fullDescription": "A structured snorkel package with lunch, using exclusive (private-group) boat access rather than a shared charter.",
+    "verdict": {
+      "headline": "Good for groups wanting a structured snorkel-plus-meal package with boat exclusivity.",
+      "goodFor": [
+        "Groups wanting snorkeling and food handled in one booking"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General exclusive/private snorkel charter sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-waikiki-captains-sunset-tasting",
+    "title": "Waikiki Captain's Sunset + Tasting",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Sunset Sail + Tasting",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Sunset sail off Waikiki with a food/drink tasting component"
+    ],
+    "fullDescription": "This operator's sunset package, distinguished by an included tasting element - likely local food or drink samples during the sail.",
+    "verdict": {
+      "headline": "A nice sunset option if the tasting element appeals to you over a standard sail.",
+      "goodFor": [
+        "Couples and groups wanting a food/drink element with their sunset sail"
+      ],
+      "worthKnowing": [
+        "Confirm exactly what's included in the 'tasting' before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki sunset sail sentiment applies; tasting add-ons are a differentiator worth confirming specifics on.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-ko-olina-four-seasons-snorkel",
+    "title": "Ko Olina Four Seasons Snorkel",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Snorkel Charter",
+    "duration": "Half Day",
+    "highlights": [
+      "Snorkel trip departing from the Ko Olina resort area, near the Four Seasons Oahu"
+    ],
+    "fullDescription": "A Ko Olina-area snorkel trip, likely departing from or near the Four Seasons Oahu resort dock given the naming.",
+    "verdict": {
+      "headline": "Convenient for Ko Olina resort guests - confirm exact inclusions versus this operator's other Ko Olina snorkel listing.",
+      "goodFor": [
+        "Ko Olina resort guests"
+      ],
+      "worthKnowing": [
+        "Compare against 'Ko Olina Exclusive Snorkel + Lunch' from the same operator to see which fits your needs and budget"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Ko Olina snorkel charter sentiment favors the area's calm, protected lagoon conditions.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-ko-olina-nearshore-fishing",
+    "title": "Venture Ko Olina Nearshore Fishing",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Nearshore Fishing Charter",
+    "duration": "Half Day",
+    "highlights": [
+      "Nearshore (closer to coast, calmer water) fishing charter from Ko Olina - a gentler option than deep sea fishing"
+    ],
+    "fullDescription": "A nearshore fishing trip from Ko Olina, aimed at anglers wanting calmer conditions than a deep sea charter, or families with anglers of mixed experience.",
+    "verdict": {
+      "headline": "A good option for families or less experienced anglers wanting calmer water than deep sea fishing.",
+      "goodFor": [
+        "Families with mixed fishing experience",
+        "Anglers prone to seasickness on deeper-water charters"
+      ],
+      "worthKnowing": [
+        "Catch variety and size typically differ from deep sea trips - ask what's realistic for nearshore fishing that season"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Nearshore fishing charters are generally positioned as a family-friendly, calmer alternative to deep sea fishing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-ko-olina-wildlife-snorkel",
+    "title": "Venture Ko Olina Wildlife Snorkel",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Snorkel + Wildlife Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Wildlife-focused snorkel trip from Ko Olina on the same 'Venture' branded boat as the nearshore fishing trip"
+    ],
+    "fullDescription": "A wildlife-focused snorkel trip from Ko Olina, run on the same vessel/brand as the nearshore fishing charter from this operator.",
+    "verdict": {
+      "headline": "A good Ko Olina wildlife-snorkel option for West Oahu-based travelers.",
+      "goodFor": [
+        "Snorkelers and wildlife watchers based on the West side"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Ko Olina wildlife snorkel sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-ko-olina-exclusive-snorkel-lunch",
+    "title": "Ko Olina Exclusive Snorkel + Lunch",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Exclusive Snorkel Charter + Lunch",
+    "duration": "Half Day",
+    "highlights": [
+      "Exclusive-use snorkel charter with lunch, mirroring the Waikiki version but departing Ko Olina"
+    ],
+    "fullDescription": "The Ko Olina counterpart to this operator's Waikiki Exclusive Snorkel + Lunch package.",
+    "verdict": {
+      "headline": "Good for West Oahu-based groups wanting a structured snorkel-plus-meal package.",
+      "goodFor": [
+        "Groups based near Ko Olina"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General exclusive snorkel charter sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "mana-cruises-ko-olina-private-charter",
+    "title": "Ko Olina Private Charter",
+    "company": "MANA Cruises",
+    "fareharborShortname": "manacruises",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Private Boat Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully private, flexible charter from Ko Olina - the West-side counterpart to the Waikiki Private Charter"
+    ],
+    "fullDescription": "This operator's private charter option based from Ko Olina rather than Waikiki.",
+    "verdict": {
+      "headline": "Good for West Oahu-based groups wanting full itinerary flexibility.",
+      "goodFor": [
+        "Groups wanting to design their own day from Ko Olina"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private charter sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "north-shore-beach-bus-waimea-pali",
+    "title": "Tour of North Shore & Waimea Waterfall and Pali Lookout",
+    "company": "North Shore Beach Bus",
+    "fareharborShortname": "northshorebeachbus",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Shared Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "North Shore beaches, Waimea Waterfall, and Pali Lookout in one shared shuttle tour"
+    ],
+    "fullDescription": "A standard North Shore-focused shared tour covering popular stops including Waimea Waterfall and the dramatic Pali Lookout viewpoint.",
+    "verdict": {
+      "headline": "A solid, standard North Shore day for shared-shuttle travelers.",
+      "goodFor": [
+        "Travelers without a car wanting North Shore covered"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General North Shore shuttle tour sentiment applies across this common Oahu category.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "north-shore-beach-bus-pearl-harbor-kingdom-history",
+    "title": "Premier Pearl Harbor and Hawaiian Kingdom History Tour",
+    "company": "North Shore Beach Bus",
+    "fareharborShortname": "northshorebeachbus",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Historical Bus Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Combines Pearl Harbor with broader Hawaiian Kingdom history stops - more historically comprehensive than a standard Pearl Harbor-only tour"
+    ],
+    "fullDescription": "A history-focused tour pairing Pearl Harbor with stops covering the pre-annexation Hawaiian Kingdom era - a good option for travelers wanting broader historical context than the WWII-only tours.",
+    "verdict": {
+      "headline": "A good pick for history-minded travelers wanting more than just the Pearl Harbor story.",
+      "goodFor": [
+        "History enthusiasts wanting a fuller picture of Hawaiian history beyond WWII"
+      ],
+      "worthKnowing": [
+        "See the E Noa Corporation Pearl Harbor Tour page for general notes on what's free vs. paid at Pearl Harbor itself"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Tours combining Pearl Harbor with broader Hawaiian Kingdom history are a smaller, more educational niche within the Pearl Harbor tour category.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "north-shore-stables-beachfront-atv-farm",
+    "title": "Beachfront ATV, Farm Animals & Native Hawaiian Plant Experience",
+    "company": "North Shore Stables",
+    "fareharborShortname": "northshorestables",
+    "island": "Oahu",
+    "city": "Waialua",
+    "tourType": "ATV + Farm/Cultural Experience",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Combines beachfront ATV riding with farm animal interaction and native Hawaiian plant education",
+      "25 photos on file - one of the most photo-documented listings in this dataset",
+      "Broad appeal across age groups given the mix of adventure and gentle farm activities"
+    ],
+    "fullDescription": "A varied North Shore experience mixing ATV riding along the beachfront with a farm animal component and native plant education - good for families with a range of ages and interests in one booking.",
+    "verdict": {
+      "headline": "A well-rounded family activity mixing adventure with gentler farm/cultural elements.",
+      "goodFor": [
+        "Families with a mix of thrill-seekers and younger kids",
+        "Anyone wanting native Hawaiian plant education alongside adventure"
+      ],
+      "worthKnowing": [
+        "Confirm ATV age/height requirements if traveling with young children who may only participate in the farm portion"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Combined ATV-and-farm experiences are a distinctive North Shore niche, generally praised in this category for successfully appealing to mixed-age family groups.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "north-shore-ohana-surf-lesson",
+    "title": "Surf Lesson",
+    "company": "North Shore Ohana School of Surfing",
+    "fareharborShortname": "nsohanasurfschool",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Surf Instruction",
+    "duration": "~2 Hours",
+    "highlights": [
+      "North Shore surf lessons named after Hawaiian concepts - 'Ohana' (family/group) and 'Kapu' (sacred/exclusive) reflecting the group-size tiers",
+      "Very high booking volume for the 1-on-1 Kapu option, suggesting strong demand for private instruction"
+    ],
+    "fullDescription": "This school names its lesson tiers after Hawaiian cultural concepts: the 'Ohana' package accommodates a private group of 6-8 (good for families or friend groups), while 'Kapu' is fully exclusive one-on-one instruction.",
+    "verdict": {
+      "headline": "Choose Kapu for the fastest individual progress, Ohana if you're bringing a full family or friend group.",
+      "goodFor": [
+        "Ohana: families or groups of friends wanting to learn together; Kapu: individuals or couples wanting maximum instructor attention"
+      ],
+      "worthKnowing": [
+        "North Shore's beginner-appropriate breaks are seasonal - confirm the lesson uses summer-safe conditions if you're a first-timer visiting in winter"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "This school's private-lesson formats (both group and 1-on-1) are generally well regarded in the North Shore surf instruction category, with the high booking volume for the 1-on-1 option suggesting strong repeat demand.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "\"Ohana\" Private Group Lesson (6-8 Surfers)",
+      "\"Kapu\" Private 1-on-1 Lesson"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "oahu-boat-cruises-private-parties",
+    "title": "Private Parties",
+    "company": "Oahu Boat Cruises",
+    "fareharborShortname": "oahuboatcruises",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Event Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Boat charter specifically positioned for private parties/events rather than standard sightseeing"
+    ],
+    "fullDescription": "An event-oriented boat charter booking, distinct from a standard sightseeing cruise - suited to birthdays, celebrations, or group events on the water.",
+    "verdict": {
+      "headline": "Contact the operator directly to scope your specific event needs (capacity, catering, music).",
+      "goodFor": [
+        "Birthdays, celebrations, and group events wanting an on-water venue"
+      ],
+      "worthKnowing": [
+        "Get capacity, catering, and any noise/music policy details in writing before booking an event"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not applicable as a standard reviewed experience - an event-booking category rather than a fixed tour product.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "oahu-photography-beautiful-colors-tour",
+    "title": "Beautiful Colors of Hawaii Photo Tour",
+    "company": "Oahu Photography Tours",
+    "fareharborShortname": "oahuphotographytours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Guided Photo Tour",
+    "duration": "~3-4 Hours",
+    "highlights": [
+      "A guided photography tour to Oahu's most colorful/scenic spots, led by a photographer-guide",
+      "Both group and private booking tiers"
+    ],
+    "fullDescription": "A guided photo tour aimed at helping travelers capture Oahu's best scenic spots with expert composition and location guidance, rather than just visiting as a standard sightseeing stop.",
+    "verdict": {
+      "headline": "A worthwhile splurge for photography enthusiasts wanting more than snapshots.",
+      "goodFor": [
+        "Photography enthusiasts, amateur or serious",
+        "Couples wanting professionally-guided photos of their trip"
+      ],
+      "worthKnowing": [
+        "Confirm whether the guide provides photography instruction or is purely a location scout/logistics guide"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Guided photo tours are a growing Oahu niche, generally valued by both photography enthusiasts and casual travelers wanting expertly composed trip photos.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard Group",
+      "Private"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "oahu-photography-complete-island-sunrise",
+    "title": "Complete Island Adventure with Sunrise",
+    "company": "Oahu Photography Tours",
+    "fareharborShortname": "oahuphotographytours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Guided Photo Tour",
+    "duration": "Full Day (early start)",
+    "highlights": [
+      "A full circle-island photo tour timed to catch sunrise at the first stop",
+      "Group or private options"
+    ],
+    "fullDescription": "This operator's most comprehensive photo tour, starting at sunrise to catch the best light across a full-island route.",
+    "verdict": {
+      "headline": "The most comprehensive option in this operator's lineup - be ready for a genuinely early start.",
+      "goodFor": [
+        "Serious photography enthusiasts willing to wake up very early for the best light"
+      ],
+      "worthKnowing": [
+        "Sunrise starts mean waking up well before dawn - confirm exact pickup time before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Sunrise-timed photo tours are generally praised in this category for capturing the best light conditions of the day.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard Group",
+      "Private"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "oahu-photography-complete-island-waterfall",
+    "title": "Complete Island Adventure with Waterfall",
+    "company": "Oahu Photography Tours",
+    "fareharborShortname": "oahuphotographytours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Guided Photo Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "A full-island photo tour with a waterfall stop instead of the sunrise-timed route"
+    ],
+    "fullDescription": "A daytime version of this operator's comprehensive island photo tour, built around a waterfall stop rather than an early sunrise start.",
+    "verdict": {
+      "headline": "A more reasonable-hours alternative to the sunrise version, with a waterfall payoff instead.",
+      "goodFor": [
+        "Photography enthusiasts who'd rather not wake up before dawn"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General guided photo tour sentiment applies - see other Oahu Photography Tours listings for category context.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "oahu-photography-seacliff-sunset",
+    "title": "PRIVATE Honolulu Sea-cliff Tour with Sunset",
+    "company": "Oahu Photography Tours",
+    "fareharborShortname": "oahuphotographytours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Guided Photo Tour",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Private sunset photo tour focused on Honolulu's dramatic sea cliff viewpoints (likely including spots like Diamond Head or the Koko Head area)"
+    ],
+    "fullDescription": "A private, sunset-timed photo tour specifically focused on Honolulu's sea cliff scenery, rather than a full-island circuit.",
+    "verdict": {
+      "headline": "A focused, romantic option for couples wanting dramatic cliff-and-sunset photos without a full-day commitment.",
+      "goodFor": [
+        "Couples and photography enthusiasts wanting a shorter, focused session"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General guided photo tour sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "oahu-photography-sunset-light-painting",
+    "title": "Private Sunset & Light-Painting Experience",
+    "company": "Oahu Photography Tours",
+    "fareharborShortname": "oahuphotographytours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Guided Photo Tour (Light Painting)",
+    "duration": "Evening",
+    "highlights": [
+      "A technical, after-dark photography session using light-painting techniques - a distinctly different, more advanced photo product than this operator's daytime tours"
+    ],
+    "fullDescription": "A specialized evening photography session incorporating light-painting technique - aimed at travelers with genuine photography interest rather than a casual snapshot tour.",
+    "verdict": {
+      "headline": "The most technically advanced option in this operator's lineup - best for travelers who already know their way around a camera.",
+      "goodFor": [
+        "Serious photography hobbyists interested in light-painting technique"
+      ],
+      "worthKnowing": [
+        "This is more technical/specialized than the daytime photo tours - confirm your camera equipment is compatible with what the guide plans to teach"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Light-painting photography sessions are a specialized niche appealing specifically to more advanced photography hobbyists.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ohana-surf-project-surf-lessons",
+    "title": "Surf Lessons",
+    "company": "Ohana Surf Project",
+    "fareharborShortname": "ohanasurfproject",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Surf Instruction",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Honolulu-area surf lessons with a near-perfect quality score (99) in this dataset - one of the highest-rated listings overall"
+    ],
+    "fullDescription": "This operator's surf lesson product stands out with one of the highest quality scores in the entire dataset, suggesting particularly strong reviews and photo documentation.",
+    "verdict": {
+      "headline": "One of the top-scoring surf lesson operators in this dataset - a strong first choice for beginners in the Honolulu area.",
+      "goodFor": [
+        "First-time surfers",
+        "Anyone wanting a highly-rated, well-documented option"
+      ],
+      "worthKnowing": [],
+      "closingNote": "This operator's exceptionally high quality score across all three of its listings (surf, SUP, bodyboarding) stood out enough to flag specifically - worth prioritizing in on-site placement.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "This operator's near-perfect internal quality scores across its full activity lineup suggest a particularly strong, consistent guest experience relative to comparable Honolulu surf schools.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ohana-surf-project-sup-lessons",
+    "title": "SUP Lessons",
+    "company": "Ohana Surf Project",
+    "fareharborShortname": "ohanasurfproject",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "SUP Instruction",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Perfect quality score (100) - the only listing in this entire dataset with a maximum score"
+    ],
+    "fullDescription": "This operator's stand-up paddleboard lesson product, carrying a perfect internal quality score - the standout listing across this entire dataset by that measure.",
+    "verdict": {
+      "headline": "The single highest-scoring listing in the entire dataset - a strong candidate for featured/editor's-pick placement on the site.",
+      "goodFor": [
+        "First-time paddleboarders wanting a top-tier instructional experience"
+      ],
+      "worthKnowing": [],
+      "closingNote": "Given the perfect internal score, this is a strong candidate for an 'Editor's Pick' badge per the main design brief's badge system.",
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "This listing's perfect internal quality score is unmatched elsewhere in the dataset, suggesting an exceptionally consistent, well-reviewed instructional experience.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ohana-surf-project-bodyboarding-lessons",
+    "title": "Bodyboarding Lessons",
+    "company": "Ohana Surf Project",
+    "fareharborShortname": "ohanasurfproject",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Bodyboarding Instruction",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "A gentler, easier-to-learn alternative to standing surf lessons, from the same top-rated operator"
+    ],
+    "fullDescription": "Bodyboarding lessons from the same highly-rated operator - a lower-barrier-to-entry wave sport than standing surfing, good for younger kids or anyone wanting quicker success in the water.",
+    "verdict": {
+      "headline": "A great, easier entry point to wave sports for younger kids or first-timers intimidated by standing surf lessons.",
+      "goodFor": [
+        "Younger kids",
+        "Beginners wanting quicker in-water success than standing surfing typically allows"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See this operator's exceptionally strong general quality scores noted on its other listings.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pacific-historic-parks-self-guided-multimedia-tour",
+    "title": "Pearl Harbor Self-Guided Multimedia Tour",
+    "company": "Pacific Historic Parks",
+    "fareharborShortname": "phptours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Self-Guided Multimedia Tour",
+    "duration": "2-4 Hours depending on tier",
+    "highlights": [
+      "Official Pacific Historic Parks self-guided audio/multimedia tour of Pearl Harbor sites",
+      "Four tiers named after naval ranks, with the top tier adding a Virtual Reality component",
+      "Self-guided format lets you move at your own pace rather than following a group"
+    ],
+    "fullDescription": "Pacific Historic Parks is the official nonprofit partner managing several Pearl Harbor visitor experiences. This self-guided multimedia tour uses a handheld device or app for audio/video content as you move through the site independently, with four package tiers distinguished mainly by which sites/content are included and whether VR is added at the top tier.",
+    "verdict": {
+      "headline": "A good self-paced alternative to a guided bus tour - remember the core USS Arizona Memorial ticket itself is free through the National Park Service.",
+      "goodFor": [
+        "Independent travelers who prefer moving at their own pace over a group tour schedule",
+        "History enthusiasts wanting deeper content via the VR upgrade"
+      ],
+      "worthKnowing": [
+        "As with all Pearl Harbor tours, the USS Arizona Memorial itself is free and separately bookable through the National Park Service - this multimedia product is a paid add-on layer of content and convenience, not the only way to access the memorial",
+        "Confirm exactly which sites (Arizona, Missouri, aviation museum) are included at each tier before choosing"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Pacific Historic Parks is the recognized official nonprofit operator for several Pearl Harbor visitor experiences; self-guided multimedia tours in this category are generally valued for pacing flexibility, with independent commentary consistently reminding visitors that base USS Arizona Memorial access is free through NPS regardless of any paid add-on purchased.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Chief's Tier",
+      "Commander's Tier",
+      "Captain's Tier",
+      "Admiral's VIP Package (+ Virtual Reality)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pacific-historic-parks-uss-arizona-narrated",
+    "title": "USS Arizona Narrated Tour",
+    "company": "Pacific Historic Parks",
+    "fareharborShortname": "phptours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Live-Narrated Tour",
+    "duration": "~1-1.5 Hours",
+    "highlights": [
+      "Live guide narration rather than the self-guided multimedia format"
+    ],
+    "fullDescription": "A live, guide-narrated version of the USS Arizona experience, for travelers who prefer a human guide over a self-guided audio device.",
+    "verdict": {
+      "headline": "Choose this over the multimedia tour if you prefer a live guide's narration and Q&A over an audio device.",
+      "goodFor": [
+        "Travelers who prefer live narration and the ability to ask questions"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Pacific Historic Parks category notes on the Self-Guided Multimedia Tour listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pacific-historic-parks-deluxe-combo-vr",
+    "title": "Official Pearl Harbor Deluxe Combo: Self-Guided Multimedia Tour & VR Experience",
+    "company": "Pacific Historic Parks",
+    "fareharborShortname": "phptours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Self-Guided Multimedia + VR Combo",
+    "duration": "3-4 Hours",
+    "highlights": [
+      "Bundles the multimedia tour with the separate VR experience at a combined price"
+    ],
+    "fullDescription": "A bundled package combining the self-guided multimedia tour with the standalone Skies Over Pearl VR experience - likely a better value than booking the two separately if you want both.",
+    "verdict": {
+      "headline": "Compare this combo price against booking the multimedia tour and VR experience separately.",
+      "goodFor": [
+        "Travelers wanting both the multimedia tour and VR experience without booking separately"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Pacific Historic Parks category notes.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pacific-historic-parks-skies-over-pearl-vr",
+    "title": "Skies Over Pearl Virtual Reality Experience",
+    "company": "Pacific Historic Parks",
+    "fareharborShortname": "phptours",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Standalone VR Experience",
+    "duration": "~30-45 Minutes",
+    "highlights": [
+      "A standalone virtual reality recreation of the December 7, 1941 attack from an aerial perspective"
+    ],
+    "fullDescription": "A standalone VR product recreating the attack on Pearl Harbor from an aerial viewpoint - can be booked alone or combined with the multimedia tour via the Deluxe Combo listing.",
+    "verdict": {
+      "headline": "A compelling, shorter add-on if you don't want the full multimedia tour but want an immersive historical experience.",
+      "goodFor": [
+        "Travelers with limited time wanting a shorter, high-impact historical experience"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "VR historical recreations at Pearl Harbor are a newer product category, generally praised for making the historical events feel more immersive than static exhibits alone.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pink-sails-turtle-snorkeling-guaranteed",
+    "title": "Turtle Snorkeling Adventure + Guaranteed Sightings",
+    "company": "Pink Sails Waikiki",
+    "fareharborShortname": "pinksailswaikiki",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Explicitly markets a turtle-sighting guarantee - worth confirming the actual policy (rebooking vs. refund) if a sighting doesn't happen"
+    ],
+    "fullDescription": "A Waikiki-departure turtle snorkel trip that markets a sighting guarantee - a strong claim worth verifying the specific terms of (what happens if no turtle is spotted) before booking, in the spirit of transparent, non-marketing-driven copy.",
+    "verdict": {
+      "headline": "Confirm the specifics of the 'guarantee' before booking - is it a refund, a free rebooking, or just a strong confidence claim?",
+      "goodFor": [
+        "Travelers who specifically prioritize turtle sightings and want assurance"
+      ],
+      "worthKnowing": [
+        "Green sea turtles are genuinely common along Oahu's south shore reefs, which is likely why this guarantee is offered with confidence - but always read the exact guarantee terms rather than assuming 'guaranteed' means a full refund"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Turtle sighting guarantees are a differentiator some Oahu operators use given how common sea turtles are on south shore reefs; independent commentary generally recommends confirming the specific guarantee terms before booking regardless of operator.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "pink-sails-sunset-splash",
+    "title": "Sunset Splash Adventure",
+    "company": "Pink Sails Waikiki",
+    "fareharborShortname": "pinksailswaikiki",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Sunset Sail + Swim",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Sunset sail with a swim component, from the same Waikiki operator as the turtle snorkel trip"
+    ],
+    "fullDescription": "This operator's sunset product, adding a swim stop to the standard sunset sail format.",
+    "verdict": {
+      "headline": "A good evening option if you want a swim break built into your sunset sail.",
+      "goodFor": [
+        "Couples and groups wanting a swim-and-sunset combo"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki sunset sail sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "polynesian-adventure-wwii-pearl-harbor-tour",
+    "title": "World War II Heroes Deluxe Pearl Harbor Tour with Lunch",
+    "company": "Polynesian Adventure Activities",
+    "fareharborShortname": "polyad-activities",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Historical Bus Tour + Lunch",
+    "duration": "5-8 Hours depending on departure",
+    "highlights": [
+      "Full Pearl Harbor tour with lunch included",
+      "Available with inter-island flight logistics bundled in for Kauai-based travelers"
+    ],
+    "fullDescription": "A comprehensive Pearl Harbor day tour with lunch included, offered both for Oahu-based travelers and, in a bundled version, for Kauai-based travelers who need inter-island flight logistics handled to make the day trip work.",
+    "verdict": {
+      "headline": "The Kauai-departure version is a genuinely useful option for Kauai guests wanting a Pearl Harbor day trip without arranging flights themselves.",
+      "goodFor": [
+        "Oahu travelers wanting lunch included",
+        "Kauai-based travelers wanting a full day-trip solution to Pearl Harbor"
+      ],
+      "worthKnowing": [
+        "The Kauai version is a long day given the added flight time - confirm total door-to-door hours before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Pearl Harbor tour category sentiment applies; inter-island day-trip packages for Kauai-based guests are a smaller niche valued specifically for handling flight logistics.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Departing from Oahu",
+      "Departing from Kauai (includes inter-island flight)"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "polynesian-adventure-oahu-grand-circle-waimea-dole",
+    "title": "Oahu Grand Circle Island Tour - Waimea Valley & Dole Plantation",
+    "company": "Polynesian Adventure Activities",
+    "fareharborShortname": "polyad-activities",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Shared Circle Island Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Circle-island tour specifically including Waimea Valley (botanical garden + waterfall) and the Dole Plantation - two named, ticketed attractions rather than just drive-by scenic stops"
+    ],
+    "fullDescription": "This circle-island tour explicitly includes two named attractions - Waimea Valley and the Dole Plantation - rather than being purely a drive-by scenic loop, which is worth noting for travelers comparing 'circle island tour' listings against each other.",
+    "verdict": {
+      "headline": "A good pick if you specifically want Waimea Valley and Dole Plantation included as stops rather than a generic drive-by loop.",
+      "goodFor": [
+        "First-time visitors wanting named, walkable attraction stops rather than pure scenic drive-bys"
+      ],
+      "worthKnowing": [
+        "Confirm whether Waimea Valley and Dole Plantation admission fees are included in the tour price or paid separately on-site"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Circle island tours that include named, ticketed attractions (versus drive-by-only stops) are generally valued by first-time visitors for offering more substantial stops.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "queens-waikiki-luau",
+    "title": "Queen's Waikiki Luau",
+    "company": "Queens Waikiki Luau",
+    "fareharborShortname": "queenswaikikiluau",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Luau (Hawaiian Feast + Show)",
+    "duration": "~3 Hours",
+    "highlights": [
+      "Traditional Hawaiian luau in Waikiki with a stage show and buffet feast",
+      "Three seating tiers by proximity to the stage - Front, Middle, and Back"
+    ],
+    "fullDescription": "A standard Waikiki luau format - buffet-style Hawaiian food paired with a cultural stage show (hula, fire dancing, live music) - with seating priced by proximity to the stage.",
+    "verdict": {
+      "headline": "Book Front section if stage views matter to you; Back section is a genuinely reasonable value if you're happy with the atmosphere over a close-up view.",
+      "goodFor": [
+        "First-time luau attendees wanting the classic Waikiki experience",
+        "Groups wanting to choose their own budget/view tradeoff"
+      ],
+      "worthKnowing": [
+        "Even 'Back' section luau seating typically still has a reasonable view given how these venues are laid out - it's not a bad-seats situation, just further from the stage"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Waikiki luaus are a well-established, high-volume tourist category; general sentiment across similar venues favors Front section specifically for photography and stage interaction, while Back section is frequently recommended as solid value for budget-conscious groups.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Front Section",
+      "Middle Section",
+      "Back Section"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "rainbow-watersports-sup-group-lesson",
+    "title": "SUP Open Group Lesson",
+    "company": "Rainbow Watersports Adventure, LLC",
+    "fareharborShortname": "rainbowwatersportsadventure",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "SUP Instruction",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "North Shore SUP group lesson, calmer-water format"
+    ],
+    "fullDescription": "A standard group SUP lesson on Oahu's North Shore - confirm the specific launch location's conditions given the North Shore's seasonal surf variability.",
+    "verdict": {
+      "headline": "A solid group SUP option - confirm launch site conditions are appropriate for beginners on your specific date.",
+      "goodFor": [
+        "First-time paddleboarders in a group setting"
+      ],
+      "worthKnowing": [
+        "North Shore conditions vary seasonally - confirm the lesson uses a protected, beginner-appropriate launch spot"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General North Shore SUP lesson sentiment favors operators who select calm, protected launch points regardless of the broader area's seasonal surf.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "rainbow-watersports-rentals",
+    "title": "Rentals",
+    "company": "Rainbow Watersports Adventure, LLC",
+    "fareharborShortname": "rainbowwatersportsadventure",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Equipment Rental",
+    "duration": "Flexible",
+    "highlights": [
+      "General water sports equipment rental on the North Shore"
+    ],
+    "fullDescription": "A general equipment rental listing from this operator, for independent paddlers/surfers.",
+    "verdict": {
+      "headline": "Good for confident, independent water sports enthusiasts.",
+      "goodFor": [
+        "Experienced paddlers/surfers wanting flexible, unguided access to gear"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General equipment rental sentiment centers on gear condition and convenience.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "north-shore-catamaran-morning-sail-snorkel",
+    "title": "Morning Sail & Snorkel",
+    "company": "North Shore Catamaran Charters",
+    "fareharborShortname": "sailingcat",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Sailing Snorkel Cruise",
+    "duration": "Half Day",
+    "highlights": [
+      "North Shore-departure sail-and-snorkel trip - a less common departure point than the Waikiki/West Coast majority in this dataset"
+    ],
+    "fullDescription": "A morning sail-and-snorkel trip departing from Oahu's North Shore - most sail/snorkel operators in this dataset depart from Waikiki or the West Coast, making this a distinctive option for North Shore-based travelers.",
+    "verdict": {
+      "headline": "A convenient option specifically for North Shore-based travelers who don't want to drive to Waikiki.",
+      "goodFor": [
+        "North Shore resort/vacation rental guests"
+      ],
+      "worthKnowing": [
+        "North Shore water conditions are more seasonal than Waikiki's - confirm current conditions, especially outside summer"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "North Shore-departure sail and snorkel trips are a smaller category valued specifically by travelers based on that side of the island.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "sea-board-sports-nature-turtle-tour",
+    "title": "Nature & Turtle Tour",
+    "company": "Sea & Board Sports Hawaii LLC",
+    "fareharborShortname": "sbshawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Nature/Wildlife Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "North Shore nature and turtle-viewing tour"
+    ],
+    "fullDescription": "A North Shore nature tour with turtle viewing as a highlight - likely a paddle or boat-based format given the operator's name.",
+    "verdict": {
+      "headline": "A solid North Shore wildlife-viewing option.",
+      "goodFor": [
+        "Wildlife and nature enthusiasts"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General North Shore nature tour sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "scuba-lounge-hawaii-beginner-scuba",
+    "title": "Beginner Scuba Diving Tour With Free Video Package",
+    "company": "Scuba Lounge Hawaii",
+    "fareharborShortname": "scubaloungehawaii",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Beginner Scuba (No Certification Required)",
+    "duration": "~3 Hours",
+    "highlights": [
+      "No certification required - includes a free video package as a keepsake"
+    ],
+    "fullDescription": "A Discover Scuba program on Oahu with a complimentary video package included, giving first-timers a keepsake of the experience without an extra add-on fee.",
+    "verdict": {
+      "headline": "A good value pick given the included video keepsake at no extra charge.",
+      "goodFor": [
+        "First-time divers wanting a documented keepsake of the experience"
+      ],
+      "worthKnowing": [
+        "Not a certification - a separate course is needed to dive independently afterward"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Beginner scuba programs including complimentary photo/video packages are generally valued for the added keepsake value at no extra cost.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "north-shore-shark-adventures-shark-dive",
+    "title": "Shark Dive",
+    "company": "North Shore Shark Adventures / Whale Encounters / Turtle Encounters",
+    "fareharborShortname": "sharktourshawaii",
+    "island": "Oahu",
+    "city": "Haleiwa",
+    "tourType": "Shark Snorkel/Cage Dive",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Another well-established North Shore shark tour operator - the company name signals it also runs whale and turtle-focused trips seasonally"
+    ],
+    "fullDescription": "A North Shore shark tour operator whose broader branding (also covering whale and turtle encounters) suggests a seasonally adaptive lineup - confirm which specific wildlife focus applies to your booking date.",
+    "verdict": {
+      "headline": "See general North Shore cageless/cage shark tour category notes elsewhere in this dataset for safety and logistics context.",
+      "goodFor": [
+        "Adventurous travelers and wildlife photographers"
+      ],
+      "worthKnowing": [
+        "Confirm cage vs. cageless format specifically, since this varies by operator and sometimes by booking option within one operator"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general North Shore shark tour category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "snorkel-with-turtles-honolulu",
+    "title": "Snorkel with Turtles",
+    "company": "Snorkel With Turtles",
+    "fareharborShortname": "snorkelwithturtles",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "A straightforwardly-named turtle-focused snorkel trip off Honolulu"
+    ],
+    "fullDescription": "A snorkel trip specifically marketed around turtle sightings off Honolulu's south shore, where green sea turtles are commonly found.",
+    "verdict": {
+      "headline": "A straightforward, turtle-focused snorkel option.",
+      "goodFor": [
+        "Turtle-focused snorkelers"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Honolulu turtle snorkel category sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "stars-above-hawaii-ko-olina-star-show",
+    "title": "Star Tour Show at Ko Olina",
+    "company": "Stars Above Hawaii",
+    "fareharborShortname": "starsabovehawaii",
+    "island": "Oahu",
+    "city": "Kapolei",
+    "tourType": "Stargazing Show",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Stargazing experience at Ko Olina on Oahu - a much lower-elevation, more accessible alternative to the Big Island's Mauna Kea tours",
+      "Top quality score (99) in this dataset"
+    ],
+    "fullDescription": "An Oahu-based stargazing experience at Ko Olina - far more accessible than the Big Island's Mauna Kea summit tours (no altitude, no long drive), though the sky darkness/clarity is necessarily less extreme given the lower elevation and West Oahu's greater light exposure than Mauna Kea's remote summit.",
+    "verdict": {
+      "headline": "A convenient, accessible stargazing option for Oahu-based travelers - just don't expect Mauna Kea-level sky darkness.",
+      "goodFor": [
+        "Families and travelers wanting stargazing without the altitude/drive demands of a Big Island trip",
+        "West Oahu/Ko Olina resort guests"
+      ],
+      "worthKnowing": [
+        "This is a good, accessible option, but genuinely can't match the sky clarity of Mauna Kea's remote 13,000+ foot summit - set expectations accordingly if you're comparing the two"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Ko Olina stargazing shows are generally positioned and reviewed as an accessible, family-friendly Oahu alternative to more remote, higher-elevation stargazing locations like the Big Island's Mauna Kea.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "adventure-boat-snorkel-adventure-tour",
+    "title": "Adventure / Snorkel Tour",
+    "company": "The Adventure Boat",
+    "fareharborShortname": "theadventureboat",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Multi-Activity Boat Tour",
+    "duration": "~4 Hours",
+    "highlights": [
+      "A flexible, multi-activity boat outing off Honolulu combining elements of snorkeling and general adventure"
+    ],
+    "fullDescription": "A flexible boat trip combining snorkeling with a broader 'adventure' format - confirm exact activity inclusions directly with the operator given the general naming.",
+    "verdict": {
+      "headline": "Confirm specific inclusions before booking given the general 'adventure' naming.",
+      "goodFor": [
+        "Groups wanting a flexible, activity-mixed boat day"
+      ],
+      "worthKnowing": [
+        "Get a specific activity list in writing at booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General flexible/multi-activity boat tour sentiment favors operators who clearly itemize planned activities in advance.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard",
+      "4-Hour Custom Adventure"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "adventure-boat-sunset-cruise",
+    "title": "Tiki Escape Sunset Cruise",
+    "company": "The Adventure Boat",
+    "fareharborShortname": "theadventureboat",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Sunset Cruise (with optional swim)",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Tiki-themed sunset cruise off Honolulu, with an option to add swim time"
+    ],
+    "fullDescription": "A themed sunset cruise with an optional swim-stop upgrade - choose the swim version if you want to get in the water during the trip.",
+    "verdict": {
+      "headline": "Add the swim option if you want more than just a scenic ride.",
+      "goodFor": [
+        "Couples and groups wanting a themed sunset outing"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General themed sunset cruise sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Sunset Cruise Only",
+      "Sunset Cruise & Swim"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "adventure-boat-semi-private-snorkel",
+    "title": "Semi-Private Snorkeling Adventure",
+    "company": "The Adventure Boat",
+    "fareharborShortname": "theadventureboat",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Semi-Private Snorkel Boat",
+    "duration": "Half Day",
+    "highlights": [
+      "Smaller group snorkel format than this operator's general Adventure/Snorkel Tour"
+    ],
+    "fullDescription": "A semi-private (smaller group) snorkel option from the same operator, for travelers wanting fewer other guests aboard.",
+    "verdict": {
+      "headline": "Choose this over the standard Adventure/Snorkel Tour for a smaller group experience.",
+      "goodFor": [
+        "Travelers wanting a more intimate group size"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General semi-private snorkel boat sentiment favors smaller groups for more personalized crew attention.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "three-tikis-waikiki-sunset-sail",
+    "title": "Waikiki Sunset Sail",
+    "company": "Three Tiki's Sailing",
+    "fareharborShortname": "threetikisailing",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Sunset Sail",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Standard Waikiki sunset sail, tiki-themed branding"
+    ],
+    "fullDescription": "A standard Waikiki sunset sail from a tiki-branded operator.",
+    "verdict": {
+      "headline": "Compare against other Waikiki sunset sail listings in this dataset on price and boat size.",
+      "goodFor": [
+        "Couples and groups wanting a classic sunset sail"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki sunset sail sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "three-tikis-waikiki-turtle-snorkeling",
+    "title": "Waikiki Turtle Snorkeling",
+    "company": "Three Tiki's Sailing",
+    "fareharborShortname": "threetikisailing",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Turtle-focused daytime snorkel trip from the same tiki-branded operator"
+    ],
+    "fullDescription": "This operator's daytime turtle snorkel offering, complementing their sunset sail product.",
+    "verdict": {
+      "headline": "A solid daytime complement to this operator's sunset sail.",
+      "goodFor": [
+        "Snorkelers wanting turtle sightings"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki turtle snorkel sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "tradewind-reef-fishing-snorkeling-charter",
+    "title": "Reef Fishing & Snorkeling Adventure Private Charter",
+    "company": "Tradewind Charters",
+    "fareharborShortname": "tradewindcharters",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Charter (Fishing + Snorkeling)",
+    "duration": "Half Day",
+    "highlights": [
+      "Combines reef fishing and snorkeling in one private charter",
+      "Available on either of two named catamarans"
+    ],
+    "fullDescription": "A private charter combining reef fishing with snorkeling, available on two different named vessels from the same operator.",
+    "verdict": {
+      "headline": "Good for groups wanting both fishing and snorkeling in a single private booking.",
+      "goodFor": [
+        "Mixed-interest groups wanting fishing and snorkeling together"
+      ],
+      "worthKnowing": [
+        "Ask if there's a meaningful size/amenity difference between the two boats before choosing"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private charter sentiment favors flexibility for combining multiple activity types in one booking.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Sea Scape Sailing Catamaran",
+      "Aloha Kai Catamaran"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "tradewind-friday-fireworks-cruise",
+    "title": "Waikiki Friday Fireworks Cruise Private Charter",
+    "company": "Tradewind Charters",
+    "fareharborShortname": "tradewindcharters",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Charter - Fireworks Viewing",
+    "duration": "~2 Hours (Fridays only)",
+    "highlights": [
+      "Private charter timed to view Waikiki's weekly Friday night fireworks show from the water",
+      "Only available on Fridays given the fixed fireworks schedule"
+    ],
+    "fullDescription": "Waikiki hosts a regular Friday night fireworks show, and this private charter is timed specifically to view it from the water - a distinctive vantage point compared to watching from the beach.",
+    "verdict": {
+      "headline": "A great option if your trip includes a Friday and you want a unique fireworks vantage point.",
+      "goodFor": [
+        "Travelers with a Friday evening free",
+        "Special occasions wanting a memorable, scenic finale"
+      ],
+      "worthKnowing": [
+        "Only runs on Fridays given the fixed fireworks schedule - plan your trip dates accordingly if this is a priority"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Waikiki's weekly Friday fireworks show is a well-known, free public event; watching it from a private charter is a differentiator some operators offer for a premium, elevated vantage point.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Aloha Kai Catamaran"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "try-scuba-honolulu-discover-scuba",
+    "title": "Try Scuba Diving Tour",
+    "company": "Try Scuba Diving - Honolulu",
+    "fareharborShortname": "tryscuba-honolulu",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Beginner Scuba (No Certification Required)",
+    "duration": "~3 Hours",
+    "highlights": [
+      "No certification required - group option includes free video package",
+      "Private option for more individual instructor attention"
+    ],
+    "fullDescription": "A Discover Scuba program in Honolulu, offered as a group booking with a free video package or as a private (exclusive instructor attention) option.",
+    "verdict": {
+      "headline": "Choose Private for maximum individual attention, Group for the included video keepsake at a lower price.",
+      "goodFor": [
+        "Group: budget-conscious first-timers wanting a keepsake video; Private: nervous beginners wanting full instructor focus"
+      ],
+      "worthKnowing": [
+        "Not a certification - a separate course is needed to dive independently afterward"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General beginner scuba category sentiment applies; group formats with included video packages are commonly valued for the keepsake at no extra charge.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Group (+ Free Videos)",
+      "Private"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "try-scuba-honolulu-guided-snorkel",
+    "title": "Guided Snorkel Tour + Free Videos",
+    "company": "Try Scuba Diving - Honolulu",
+    "fareharborShortname": "tryscuba-honolulu",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Guided Snorkel Tour",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Snorkel-only option (no scuba) from the same operator, also with a free video package"
+    ],
+    "fullDescription": "A snorkel-only guided trip from this scuba-focused operator, for travelers who want the guided experience and video keepsake without trying scuba.",
+    "verdict": {
+      "headline": "The right pick if you want a guided snorkel experience rather than trying scuba.",
+      "goodFor": [
+        "Snorkelers not interested in trying scuba"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General guided snorkel tour sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wai-kai-wave-sessions",
+    "title": "Wave Pool Sessions",
+    "company": "Wai Kai",
+    "fareharborShortname": "waikai-atthelineup",
+    "island": "Oahu",
+    "city": "Ewa Beach",
+    "tourType": "Man-Made Wave Pool Surfing",
+    "duration": "~1-2 Hours per session",
+    "highlights": [
+      "Engineered, consistent wave pool surfing at Wai Kai's man-made lagoon - a genuinely different product from ocean surf lessons",
+      "Two wave-size tiers to match skill level"
+    ],
+    "fullDescription": "Wai Kai is a technology-driven wave pool facility producing consistent, engineered waves - a fundamentally different experience from ocean surfing, appealing to surfers wanting predictable conditions to practice specific skills, or complete beginners wanting a controlled environment.",
+    "verdict": {
+      "headline": "A genuinely unique Oahu experience distinct from ocean surfing - choose wave size based on your skill level.",
+      "goodFor": [
+        "Surfers wanting consistent, predictable wave practice",
+        "Beginners wanting a more controlled environment than open ocean surf breaks"
+      ],
+      "worthKnowing": [
+        "This is a very different experience from ocean surfing - manage expectations if you're looking for a traditional Hawaii beach surf lesson instead"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Wai Kai's engineered wave pool is a distinctive, technology-driven addition to Oahu's surf tourism scene, generally covered in independent media as a novel complement to (not replacement for) traditional ocean surfing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "65ft Wave Sessions",
+      "100ft Wave Sessions"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wai-kai-lagoon-sport-rentals",
+    "title": "Lagoon Sport Rentals",
+    "company": "Wai Kai",
+    "fareharborShortname": "waikai-atthelineup",
+    "island": "Oahu",
+    "city": "Ewa Beach",
+    "tourType": "Water Sport Equipment Rental",
+    "duration": "Flexible",
+    "highlights": [
+      "Equipment rental for Wai Kai's calm, protected lagoon (separate from the wave pool)"
+    ],
+    "fullDescription": "Rental equipment for the calmer lagoon portion of the Wai Kai property, distinct from the engineered wave pool sessions.",
+    "verdict": {
+      "headline": "A good calmer-water option for families or non-surfers visiting Wai Kai.",
+      "goodFor": [
+        "Families wanting calm-water activities alongside the wave pool"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General lagoon rental sentiment applies as a complement to the wave pool's main draw.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wai-kai-kekoa-cazimero-pro-surfer",
+    "title": "Kekoa Cazimero (Pro Surfer) Surf Experience",
+    "company": "Wai Kai",
+    "fareharborShortname": "waikai-atthelineup",
+    "island": "Oahu",
+    "city": "Ewa Beach",
+    "tourType": "Pro-Instructed Wave Pool Session",
+    "duration": "Session-based",
+    "highlights": [
+      "Coaching from a named professional surfer at the wave pool facility - a premium, name-brand instructional product"
+    ],
+    "fullDescription": "A premium session with named professional surfer Kekoa Cazimero at the Wai Kai wave pool - a step up from a standard session for surfers wanting professional-level coaching.",
+    "verdict": {
+      "headline": "Worth it for surfers serious about improving with professional-level coaching in a controlled environment.",
+      "goodFor": [
+        "Intermediate-to-advanced surfers wanting professional coaching",
+        "Fans of the named pro surfer"
+      ],
+      "worthKnowing": [
+        "Confirm the pro's actual availability for your travel dates, since named-instructor sessions typically depend on their schedule"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Named-professional coaching sessions at wave pool facilities are a premium niche, generally valued by serious surfers wanting expert-level technique feedback in controlled wave conditions.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wai-kai-ultimate-experience",
+    "title": "Wai Kai Ultimate Experience",
+    "company": "Wai Kai",
+    "fareharborShortname": "waikai-atthelineup",
+    "island": "Oahu",
+    "city": "Ewa Beach",
+    "tourType": "Multi-Activity Combo Pass",
+    "duration": "Full Day / Combo",
+    "highlights": [
+      "This property's top-tier combo pass, likely bundling wave pool sessions, lagoon access, and other on-site amenities"
+    ],
+    "fullDescription": "A comprehensive combo pass covering multiple Wai Kai activities in one booking - likely the best value if you want to experience more than just the wave pool.",
+    "verdict": {
+      "headline": "The best-value option if you want to experience multiple parts of the Wai Kai property in one visit.",
+      "goodFor": [
+        "Families wanting a full day at the property with variety",
+        "Anyone wanting more than just the wave pool"
+      ],
+      "worthKnowing": [
+        "Confirm exactly what's bundled versus available as separate add-ons"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Combo passes at multi-activity properties like Wai Kai are generally recommended for value if visitors plan to try more than one on-site activity.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "waikiki-beach-services-surf-lesson",
+    "title": "One-on-One Individual Surf Lesson",
+    "company": "Waikiki Beach Services",
+    "fareharborShortname": "waikikibeachservices",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Surf Instruction",
+    "duration": "~1-1.5 Hours",
+    "highlights": [
+      "Fully private, one-on-one surf lesson directly on Waikiki Beach - one of the highest availability counts in this dataset"
+    ],
+    "fullDescription": "A private surf lesson right on Waikiki Beach, from a beach services operator with very high booking frequency in this dataset, suggesting an established, easy-to-book presence directly on the sand.",
+    "verdict": {
+      "headline": "A convenient, established choice given its right-on-the-beach presence and high booking frequency.",
+      "goodFor": [
+        "First-time surfers wanting maximum convenience and individual attention"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Beachfront surf instruction services directly on Waikiki Beach are generally valued for convenience and no-advance-planning-needed accessibility.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "waikiki-beach-services-sup-lesson",
+    "title": "One-on-One Individual Stand-Up Paddle Lesson",
+    "company": "Waikiki Beach Services",
+    "fareharborShortname": "waikikibeachservices",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private SUP Instruction",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Private SUP lesson directly on Waikiki Beach from the same beach services operator"
+    ],
+    "fullDescription": "This operator's private SUP lesson counterpart to their surf lesson product - same beachfront convenience.",
+    "verdict": {
+      "headline": "A convenient beachfront SUP option.",
+      "goodFor": [
+        "First-time paddleboarders wanting beachfront convenience"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General beachfront SUP instruction sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "waikiki-beach-services-outrigger-surfing",
+    "title": "Outrigger Canoe Surfing",
+    "company": "Waikiki Beach Services",
+    "fareharborShortname": "waikikibeachservices",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Outrigger Canoe Wave Riding",
+    "duration": "~30-45 Minutes",
+    "highlights": [
+      "A classic Waikiki activity - riding waves in a traditional outrigger canoe with a local crew steering",
+      "One of the most iconic, historically-rooted Waikiki beach activities"
+    ],
+    "fullDescription": "Outrigger canoe surfing is one of Waikiki's oldest tourist traditions, dating back over a century - a crew paddles the canoe into position and rides incoming waves toward shore, no paddling skill required from guests.",
+    "verdict": {
+      "headline": "A genuinely iconic, low-effort Waikiki bucket-list activity suitable for almost anyone.",
+      "goodFor": [
+        "Families and travelers of any fitness level",
+        "Anyone wanting a quintessential, historically-rooted Waikiki experience"
+      ],
+      "worthKnowing": [
+        "No paddling skill needed - the crew does the work, guests just enjoy the ride"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Outrigger canoe surfing is widely recognized as one of Waikiki's oldest and most iconic tourist traditions, generally reviewed favorably for being an accessible, fun activity suitable for nearly any fitness level.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "waikiki-beach-services-outrigger-charter",
+    "title": "Outrigger Canoe Charter",
+    "company": "Waikiki Beach Services",
+    "fareharborShortname": "waikikibeachservices",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Private Outrigger Canoe Charter",
+    "duration": "Flexible",
+    "highlights": [
+      "Fully private outrigger canoe booking, distinct from the standard shared wave-riding session"
+    ],
+    "fullDescription": "A private charter version of the outrigger canoe experience - exclusive use rather than joining a shared session.",
+    "verdict": {
+      "headline": "Good for groups wanting the outrigger experience exclusively for their party.",
+      "goodFor": [
+        "Private groups and special occasions"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general outrigger canoe category notes on the Outrigger Canoe Surfing listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "waikiki-dive-center-shipwreck-reef",
+    "title": "Magnificent 2 Tank Shipwreck and/or Reef Boat Dive",
+    "company": "Waikiki Dive Center",
+    "fareharborShortname": "waikikidivecenter",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Oahu shipwreck and/or reef diving departing near Waikiki - convenient for Waikiki-based certified divers"
+    ],
+    "fullDescription": "A certified-diver two-tank charter offering shipwreck and/or reef sites, departing conveniently near Waikiki.",
+    "verdict": {
+      "headline": "A convenient option for certified divers staying in Waikiki.",
+      "goodFor": [
+        "Certified divers based in Waikiki"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Oahu shipwreck/reef dive charter sentiment favors convenient Waikiki-area departure points.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "holokai-catamaran-waikiki-afternoon-sail",
+    "title": "Waikiki Afternoon Sail",
+    "company": "Holokai Catamaran",
+    "fareharborShortname": "waikikirigger",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Daytime Catamaran Sail",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Standard afternoon sail off Waikiki"
+    ],
+    "fullDescription": "A standard afternoon sail from this Waikiki catamaran operator, complementing their turtle snorkel product.",
+    "verdict": {
+      "headline": "A solid daytime sail option - compare against this operator's Turtle Canyon Snorkel listing if wildlife viewing matters to you.",
+      "goodFor": [
+        "Travelers wanting a simple daytime sail"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Waikiki daytime sail sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "holokai-catamaran-turtle-canyon-snorkel",
+    "title": "Turtle Canyon Snorkel",
+    "company": "Holokai Catamaran",
+    "fareharborShortname": "waikikirigger",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Another operator running trips to Turtle Canyon off Waikiki - see Captain Max Boat Tours' listing for general destination context"
+    ],
+    "fullDescription": "See the Captain Max Boat Tours Turtle Canyon Snorkel listing for general destination context on this shared, popular Waikiki snorkel site.",
+    "verdict": {
+      "headline": "Comparable to other Turtle Canyon operators - compare boat size and price.",
+      "goodFor": [
+        "Turtle-focused snorkelers"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Turtle Canyon category notes on the Captain Max Boat Tours listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wildlife-hawaii-north-shore-shuttle",
+    "title": "Round Trip North Shore Haleiwa Shuttle",
+    "company": "Wildlife Hawaii",
+    "fareharborShortname": "wildlifehawaii",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Shuttle Transportation",
+    "duration": "Round Trip",
+    "highlights": [
+      "Transportation-only shuttle to and from Haleiwa/North Shore"
+    ],
+    "fullDescription": "A transportation service rather than a guided tour - round-trip shuttle access to the North Shore for travelers without a car.",
+    "verdict": {
+      "headline": "A useful logistics option, not an experience in itself - consider filing under transportation/services rather than tours.",
+      "goodFor": [
+        "Travelers without a car wanting North Shore access"
+      ],
+      "worthKnowing": [
+        "This is transport only - pair with an actual North Shore activity booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Not applicable - a transportation service rather than a reviewed experience.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "xtreme-parasail-diamond-head",
+    "title": "Parasail",
+    "company": "X-Treme Parasail & Diamond Head Parasail",
+    "fareharborShortname": "xtreme",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Parasailing",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Another established Waikiki-area parasail operator with high booking volume",
+      "Diamond Head views included in the flight"
+    ],
+    "fullDescription": "See general Waikiki parasail category notes on other parasail listings in this dataset - this operator specifically emphasizes Diamond Head views in its branding.",
+    "verdict": {
+      "headline": "Comparable to other Waikiki parasail operators - compare current pricing and departure times.",
+      "goodFor": [
+        "First-time parasailers"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Waikiki parasail category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "yoga-floats-sup-yoga",
+    "title": "SUP Yoga",
+    "company": "Yoga Floats",
+    "fareharborShortname": "yogafloats",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Paddleboard Yoga Class",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Yoga practiced on a stand-up paddleboard in calm water - a wellness-adventure hybrid activity"
+    ],
+    "fullDescription": "A yoga class conducted on paddleboards in calm, protected water - combining the balance/core-engagement challenge of an unstable surface with a standard yoga practice.",
+    "verdict": {
+      "headline": "A fun, moderately challenging twist on standard yoga for anyone comfortable on the water.",
+      "goodFor": [
+        "Yoga practitioners wanting a novel setting",
+        "Travelers wanting a lower-intensity water activity than surfing"
+      ],
+      "worthKnowing": [
+        "Basic balance and comfort with occasionally falling in the water is helpful - this isn't as stable as practicing on land"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "SUP yoga is a well-established wellness-tourism hybrid category, generally reviewed favorably for combining relaxation with a genuine physical/balance challenge.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "yoga-floats-light-up-the-night",
+    "title": "Light up the Night",
+    "company": "Yoga Floats",
+    "fareharborShortname": "yogafloats",
+    "island": "Oahu",
+    "city": "Honolulu",
+    "tourType": "Illuminated Evening Paddleboard Event",
+    "duration": "Evening",
+    "highlights": [
+      "An evening/night version of the paddleboard activity, likely using LED-lit boards or accessories for a visual event experience"
+    ],
+    "fullDescription": "An evening-format paddleboard experience distinct from the daytime SUP Yoga class - likely a more social, visually-themed event rather than a standard instructional class.",
+    "verdict": {
+      "headline": "A fun, novel evening activity if you want something visually different from a standard sunset cruise.",
+      "goodFor": [
+        "Groups wanting a unique, social evening water activity"
+      ],
+      "worthKnowing": [
+        "Confirm exact format (guided activity vs. free-form social event) before booking"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Illuminated evening paddleboard events are a smaller novelty category, generally positioned as a social/visual experience rather than a fitness class.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "lavaloha-tree-to-chocolate-tour",
+    "title": "Tree-to-Chocolate Tour",
+    "company": "Lavaloha",
+    "fareharborShortname": "lavaloha",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Cacao Farm Tour + Chocolate Tasting",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Full seed-to-bar cacao farm tour near Hilo with tasting",
+      "See the Honoli'i Orchards listing for general context on why Hawaii-grown chocolate is a genuinely rare category"
+    ],
+    "fullDescription": "Another Hilo-area cacao farm and chocolate tasting tour - see the Honoli'i Orchards listing for general context on Hawaii's rare status as a U.S. cacao-growing region.",
+    "verdict": {
+      "headline": "Compare against Honoli'i Orchards on price and tour depth - both cover this distinctive Hilo specialty.",
+      "goodFor": [
+        "Chocolate and agriculture enthusiasts"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Hawaii cacao/chocolate tourism category notes on the Honoli'i Orchards listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "malahini-tours-volcanoes-national-park",
+    "title": "Hawaii's Volcanoes National Park Tour",
+    "company": "Malahini Tours",
+    "fareharborShortname": "malahinitours",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Guided Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "A Hilo-departure version of the Volcanoes National Park tour - a significantly shorter drive than the Kona-departure versions elsewhere in this dataset"
+    ],
+    "fullDescription": "Since Hilo sits much closer to Hawaii Volcanoes National Park than Kona, this Hilo-departure tour offers a meaningfully shorter day than the Kona-side equivalents covered elsewhere in this dataset.",
+    "verdict": {
+      "headline": "A better time-efficiency choice than Kona-departure volcano tours if you're based on the Hilo side.",
+      "goodFor": [
+        "Hilo-based travelers wanting to avoid the longer Kona-departure drive"
+      ],
+      "worthKnowing": [
+        "Confirm current lava viewing status directly, as with any Volcanoes National Park tour"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hilo-departure Volcanoes National Park tours are generally recommended over Kona-departure versions specifically for the shorter drive time, given Hilo's proximity to the park.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "malahini-tours-majestic-waterfalls",
+    "title": "Majestic Waterfalls Tour",
+    "company": "Malahini Tours",
+    "fareharborShortname": "malahinitours",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Guided Waterfall Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Waterfall-focused tour on the lush, wetter Hilo side of the Big Island"
+    ],
+    "fullDescription": "A waterfall-focused tour taking advantage of the Hilo side's much wetter climate and denser rainforest, which produces significantly more waterfalls than the drier Kona side.",
+    "verdict": {
+      "headline": "A great pick specifically because Hilo's climate produces far more waterfalls than Kona's.",
+      "goodFor": [
+        "Waterfall and rainforest enthusiasts"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hilo's significantly wetter climate compared to Kona is well documented, making it the go-to side of the island for waterfall-focused touring.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ohana-ranch-atv-tour",
+    "title": "Ohana Ranch ATV Tour",
+    "company": "Ohana Ranch",
+    "fareharborShortname": "ohanaranch",
+    "island": "Big Island",
+    "city": "Mountain View",
+    "tourType": "Guided ATV Tour",
+    "duration": "~2 Hours",
+    "highlights": [
+      "ATV riding across a working Big Island ranch property"
+    ],
+    "fullDescription": "An ATV tour across ranch land near Mountain View on the Big Island's east side.",
+    "verdict": {
+      "headline": "A solid off-road option for Hilo-side/east Big Island travelers.",
+      "goodFor": [
+        "ATV enthusiasts based on the east side of the Big Island"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Big Island ranch ATV tour sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "ohana-ranch-petting-zoo-goats",
+    "title": "Petting Zoo + Cuddle Baby Goats",
+    "company": "Ohana Ranch",
+    "fareharborShortname": "ohanaranch",
+    "island": "Big Island",
+    "city": "Mountain View",
+    "tourType": "Farm Animal Experience",
+    "duration": "~1 Hour",
+    "highlights": [
+      "Hands-on farm animal interaction, including baby goats - a gentle, family-friendly alternative to the ATV tour"
+    ],
+    "fullDescription": "A gentle, hands-on farm animal experience from the same ranch, ideal for young children or anyone wanting a low-key activity.",
+    "verdict": {
+      "headline": "A great pick for young kids or anyone wanting a gentle, low-key farm activity.",
+      "goodFor": [
+        "Families with young children"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hands-on farm animal experiences are a reliable family-friendly category, generally praised for being accessible to very young children.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "shaka-braddah-big-island-day-tour",
+    "title": "Big Island Day Tour w/ Lunch",
+    "company": "Shaka Braddah Tours",
+    "fareharborShortname": "shakabraddahtours",
+    "island": "Big Island",
+    "city": "Hilo",
+    "tourType": "Guided Van Tour + Lunch",
+    "duration": "Full Day",
+    "highlights": [
+      "General Big Island sightseeing day tour with lunch included, departing Hilo"
+    ],
+    "fullDescription": "A general-purpose Big Island day tour from a Hilo-based operator, with lunch included.",
+    "verdict": {
+      "headline": "A convenient, all-inclusive day option for Hilo-based travelers.",
+      "goodFor": [
+        "Hilo-based travelers wanting a general island overview with meals handled"
+      ],
+      "worthKnowing": [
+        "Confirm specific stops since 'Big Island Day Tour' is a general name"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Big Island day tour category sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "volcano-ohana-5hr-fat-tire-cruise-passengers",
+    "title": "5 Hour Fat Tire E-Bike Tour for Cruise Passengers - Volcanoes National Park",
+    "company": "Volcano Ohana",
+    "fareharborShortname": "volcanoohana",
+    "island": "Big Island",
+    "city": "Keaau",
+    "tourType": "Guided E-Bike Tour",
+    "duration": "5 Hours",
+    "highlights": [
+      "E-bike tour of Hawaii Volcanoes National Park, specifically timed for cruise ship passengers with limited port time"
+    ],
+    "fullDescription": "An e-bike tour of Volcanoes National Park designed around cruise ship arrival/departure schedules - useful for cruise passengers with a fixed, limited window in port.",
+    "verdict": {
+      "headline": "Specifically designed for cruise passengers - confirm your ship's port schedule aligns with the tour timing before booking.",
+      "goodFor": [
+        "Cruise ship passengers with limited port time wanting to see Volcanoes National Park"
+      ],
+      "worthKnowing": [
+        "Timing is built around cruise ship schedules - land-based travelers should compare this against the operator's other e-bike tour, which may have more flexible timing"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Cruise-passenger-timed shore excursions are a distinct category built around fixed port schedules; general e-bike touring sentiment for Volcanoes National Park applies otherwise.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "volcano-ohana-kalapana-beach-road",
+    "title": "Fat Tire E-Bike Tour - Kalapana Beach Road and Volcanoes National Park",
+    "company": "Volcano Ohana",
+    "fareharborShortname": "volcanoohana",
+    "island": "Big Island",
+    "city": "Keaau",
+    "tourType": "Guided E-Bike Tour",
+    "duration": "Half Day",
+    "highlights": [
+      "Covers Kalapana Beach Road - the area covered by relatively recent lava flows - in addition to the National Park",
+      "Likely more flexible timing than the cruise-passenger-specific version"
+    ],
+    "fullDescription": "This version adds Kalapana Beach Road to the route - an area shaped by relatively recent volcanic activity, offering a different perspective than the standard park route alone.",
+    "verdict": {
+      "headline": "Choose this over the cruise-passenger version if you want Kalapana Beach Road included and more flexible timing.",
+      "goodFor": [
+        "Land-based travelers wanting the Kalapana lava-flow area included"
+      ],
+      "worthKnowing": [
+        "Compare the two Volcano Ohana e-bike listings directly on exact route and timing before choosing"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kalapana's relatively recent lava flow areas are independently noted as a distinctive, less-commonly-toured part of the Big Island's volcanic landscape.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wasabi-tours-big-island-grand-circle",
+    "title": "Big Island Grand Circle Island Tour",
+    "company": "Wasabi Tours Hawaii",
+    "fareharborShortname": "wasabi",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Guided Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Full-day, full-island overview tour from Kona covering the Big Island's varied landscapes"
+    ],
+    "fullDescription": "A comprehensive Big Island circle tour - given the island's large size and dramatically varied climate zones, a full circle tour here covers far more ground than an Oahu equivalent.",
+    "verdict": {
+      "headline": "A good pick for first-time Big Island visitors wanting to see the island's dramatic geographic variety in one day.",
+      "goodFor": [
+        "First-time Big Island visitors with limited days"
+      ],
+      "worthKnowing": [
+        "The Big Island is significantly larger than Oahu - a 'circle island' tour here is a genuinely long day of driving"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Big Island circle tour sentiment applies; the island's size makes this a longer commitment than similarly-named Oahu tours.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wasabi-tours-twilight-volcano-stargazing",
+    "title": "Twilight Volcano and Stargazing Tour",
+    "company": "Wasabi Tours Hawaii",
+    "fareharborShortname": "wasabi",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Guided Evening Tour",
+    "duration": "Evening",
+    "highlights": [
+      "Combines evening volcano viewing with stargazing - a lower-elevation alternative to a full Mauna Kea summit tour"
+    ],
+    "fullDescription": "An evening tour pairing volcano viewing with stargazing - likely at a lower elevation and shorter time commitment than a full Mauna Kea summit tour.",
+    "verdict": {
+      "headline": "A good lower-commitment evening alternative to a full Mauna Kea summit tour.",
+      "goodFor": [
+        "Travelers wanting evening volcano/stars content without the altitude demands of Mauna Kea"
+      ],
+      "worthKnowing": [
+        "Compare sky darkness expectations against the Hawaii Island Holidays Mauna Kea listing if maximum star visibility is your priority"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Lower-elevation evening volcano/stargazing tours are generally positioned as a more accessible alternative to full Mauna Kea summit tours.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "wasabi-tours-waterfalls-adventure",
+    "title": "Big Island Waterfalls Adventure",
+    "company": "Wasabi Tours Hawaii",
+    "fareharborShortname": "wasabi",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Guided Waterfall Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "A Kona-departure waterfall tour - a longer drive than the Hilo-side equivalent since waterfalls concentrate on the wetter side of the island"
+    ],
+    "fullDescription": "This Kona-departure waterfall tour necessarily involves a longer drive than Hilo-side equivalents, since the Big Island's waterfalls concentrate on the wetter windward (Hilo) side.",
+    "verdict": {
+      "headline": "Consider the Malahini Tours Majestic Waterfalls listing instead if you're based in Hilo, to save significant drive time.",
+      "goodFor": [
+        "Kona-based travelers without their own transportation to the wetter side of the island"
+      ],
+      "worthKnowing": [
+        "This involves substantially more drive time than a Hilo-departure waterfall tour would - factor this into your day"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Kona-departure waterfall tours necessarily involve longer transit than Hilo-departure versions given the island's geography.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "umauma-falls-private-waterfall-swim",
+    "title": "Private Waterfall and River Swim",
+    "company": "Umauma Falls & ZipLine Experience",
+    "fareharborShortname": "ziplinehawaii",
+    "island": "Big Island",
+    "city": "Hakalau",
+    "tourType": "Private Waterfall Swim",
+    "duration": "~1-1.5 Hours",
+    "highlights": [
+      "Private access to a waterfall and river swimming spot on the Hamakua Coast",
+      "A gentler alternative to this operator's zipline products"
+    ],
+    "fullDescription": "A private, low-intensity waterfall swim experience from an operator otherwise known for ziplining - good for travelers wanting the relaxing payoff without the adventure activity.",
+    "verdict": {
+      "headline": "A relaxing complement to (or alternative from) this operator's zipline offerings.",
+      "goodFor": [
+        "Travelers wanting a swim without a ziplining component",
+        "Families with members who prefer not to zipline"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Hamakua Coast waterfall swim sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "umauma-falls-zip-n-dip-combo",
+    "title": "Zip N Dip Combo",
+    "company": "Umauma Falls & ZipLine Experience",
+    "fareharborShortname": "ziplinehawaii",
+    "island": "Big Island",
+    "city": "Hakalau",
+    "tourType": "Zipline + Waterfall Swim Combo",
+    "duration": "~2.5-3 Hours",
+    "highlights": [
+      "Combines this operator's zipline course with the waterfall swim in one booking"
+    ],
+    "fullDescription": "The combo product pairing ziplining with a waterfall swim - likely better value than booking both separately if you want the full experience.",
+    "verdict": {
+      "headline": "Good value if you want both the zipline and the swim - compare against booking each separately.",
+      "goodFor": [
+        "Travelers wanting the full range of this operator's activities in one visit"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Hamakua Coast zipline/waterfall combo sentiment favors the value of bundling versus separate bookings.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "hawaii-zipline-tours-honomu",
+    "title": "Zipline Adventure",
+    "company": "Hawaii Zipline Tours",
+    "fareharborShortname": "ziplinetourshawaii",
+    "island": "Big Island",
+    "city": "Honomu",
+    "tourType": "Zipline Course",
+    "duration": "~3 Hours",
+    "highlights": [
+      "Another Hamakua Coast-area zipline operator, near Honomu (close to Akaka Falls)",
+      "High availability count in this dataset, suggesting a well-established, frequently-run operation"
+    ],
+    "fullDescription": "A zipline course near Honomu on the Hamakua Coast, close to the well-known Akaka Falls State Park - a good pairing if you're already visiting that area.",
+    "verdict": {
+      "headline": "A convenient zipline stop if you're already visiting nearby Akaka Falls.",
+      "goodFor": [
+        "Travelers touring the Hamakua Coast/Akaka Falls area"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hamakua Coast zipline operators near Akaka Falls are a well-established category, generally valued for convenient pairing with that popular waterfall stop.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "sea-paradise-sailing-snorkeling",
+    "title": "Sailing & Snorkeling Tour",
+    "company": "Sea Paradise",
+    "fareharborShortname": "seaparadise",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Sailing Snorkel Cruise",
+    "duration": "Half Day",
+    "highlights": [
+      "Standard Kona sail-and-snorkel trip with morning or afternoon departure options"
+    ],
+    "fullDescription": "A standard Kona sail-and-snorkel product with flexible timing - morning departures typically offer calmer water.",
+    "verdict": {
+      "headline": "Choose morning for calmer conditions, afternoon if it fits your schedule better.",
+      "goodFor": [
+        "Snorkelers wanting flexible timing"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Kona sail-and-snorkel category sentiment applies; morning departures are generally preferred for calmer water.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Morning",
+      "Afternoon"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "sea-paradise-manta-ray-night-snorkel",
+    "title": "Manta Ray Night Snorkeling Tour",
+    "company": "Sea Paradise",
+    "fareharborShortname": "seaparadise",
+    "island": "Big Island",
+    "city": "Kailua-Kona",
+    "tourType": "Night Snorkel Tour",
+    "duration": "Evening",
+    "highlights": [
+      "This operator's manta ray night snorkel, offered across two nightly departure times to accommodate more guests"
+    ],
+    "fullDescription": "See general Kona manta ray night snorkel category notes elsewhere in this dataset - this operator runs two nightly sessions to handle demand for this popular experience.",
+    "verdict": {
+      "headline": "Two nightly time slots give more scheduling flexibility than single-departure competitors.",
+      "goodFor": [
+        "Wildlife enthusiasts wanting scheduling flexibility"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Kona manta ray night snorkel category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "First Departure",
+      "Second Departure"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-bombers-upcountry-food-cruise",
+    "title": "Upcountry Food Cruise",
+    "company": "Maui Bombers",
+    "fareharborShortname": "mauibombers",
+    "island": "Maui",
+    "city": "Wailea-Makena",
+    "tourType": "Food Tour (Upcountry Maui)",
+    "duration": "Half Day",
+    "highlights": [
+      "A food-focused tour of Maui's Upcountry region (Kula, Makawao area) - farms, local eateries, and agricultural producers"
+    ],
+    "fullDescription": "Maui's Upcountry region, at higher elevation on the slopes of Haleakala, has a distinct cooler-climate agricultural scene (lavender, protea flowers, produce farms) different from the coastal tourist areas - this food tour covers that side of Maui.",
+    "verdict": {
+      "headline": "A great way to see a genuinely different side of Maui than the beaches - cooler, greener, and food-focused.",
+      "goodFor": [
+        "Food enthusiasts",
+        "Travelers wanting to see Maui's agricultural Upcountry region"
+      ],
+      "worthKnowing": [
+        "Upcountry Maui is noticeably cooler than the coast - bring a light layer"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Upcountry Maui food tours are increasingly recognized in independent travel coverage as a way to experience the island's distinct highland agricultural scene, separate from its beach-resort identity.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-diamond-lanai-cathedrals",
+    "title": "Lanai Cathedrals (2-Tank Dive)",
+    "company": "Maui Diamond Sea Sports",
+    "fareharborShortname": "mauidreamsdiveco",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Another operator running the well-regarded Lanai Cathedrals dive site - see the Dive Maui listing for general destination context"
+    ],
+    "fullDescription": "See the Dive Maui 2 Tank Lanai Cathedral Dive listing for general context on this internationally recognized dive site featuring collapsed lava tube caverns.",
+    "verdict": {
+      "headline": "Comparable to other Lanai Cathedrals operators - compare boat size and price.",
+      "goodFor": [
+        "Certified divers interested in cavern diving"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Lanai Cathedrals category notes on the Dive Maui listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-diamond-molokini-2tank",
+    "title": "Molokini Crater 2-Tank Dive Charter",
+    "company": "Maui Diamond Sea Sports",
+    "fareharborShortname": "mauidreamsdiveco",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Certified Diver - 2 Tank Boat Dive",
+    "duration": "Half Day",
+    "highlights": [
+      "Molokini Crater is Maui's most famous marine site - a partially submerged volcanic crater forming a natural, protected reef",
+      "Certified-diver version of a destination more commonly snorkeled"
+    ],
+    "fullDescription": "Molokini Crater is Maui's signature marine destination - a crescent-shaped, partially submerged volcanic crater whose walls create a naturally protected, exceptionally clear-water reef. This is the certified-diver version, going deeper than the snorkel trips that dominate Molokini tourism.",
+    "verdict": {
+      "headline": "A must for certified divers visiting Maui - Molokini's clarity and protected status make it one of Hawaii's premier dive sites.",
+      "goodFor": [
+        "Certified divers wanting Maui's signature underwater destination"
+      ],
+      "worthKnowing": [
+        "Molokini gets crowded with snorkel boats by mid-morning - early departures are worth prioritizing for a less crowded experience"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Molokini Crater is internationally recognized as one of Hawaii's premier snorkel and dive destinations, owing to its unique horseshoe-shaped crater geography that creates exceptionally clear, protected water.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-off-road-lahaina-adventure",
+    "title": "Lahaina Adventure",
+    "company": "Maui Off Road Adventures West Side",
+    "fareharborShortname": "mauioffroadadventureswestside",
+    "island": "Maui",
+    "city": "Lahaina",
+    "tourType": "Guided Off-Road ATV/UTV Tour",
+    "duration": "~2-3 Hours",
+    "highlights": [
+      "Off-road adventure tour in the Lahaina area on Maui's West Side"
+    ],
+    "fullDescription": "An off-road ATV/UTV tour covering West Maui terrain near Lahaina.",
+    "verdict": {
+      "headline": "A good off-road option for West Maui-based travelers.",
+      "goodFor": [
+        "Off-road/ATV enthusiasts based in West Maui"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General West Maui off-road tour sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "makena-coast-molokini-turtle-town",
+    "title": "Molokini Crater & Turtle Town Snorkeling",
+    "company": "Makena Coast Charters",
+    "fareharborShortname": "mauiunderwater",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "~3 Hours",
+    "highlights": [
+      "Combines Molokini Crater with Turtle Town, Maui's other signature snorkel destination, in one trip",
+      "High quality score (97) in this dataset"
+    ],
+    "fullDescription": "A combination trip covering both of Maui's premier snorkel destinations - Molokini Crater and Turtle Town (a reef area known for reliable green sea turtle sightings) - in a single, relatively short 3-hour outing.",
+    "verdict": {
+      "headline": "An efficient way to see both of Maui's top snorkel destinations without needing two separate bookings.",
+      "goodFor": [
+        "Snorkelers wanting maximum destination coverage in limited time",
+        "First-time Maui visitors"
+      ],
+      "worthKnowing": [
+        "Early morning departures typically mean calmer water and fewer crowds at Molokini specifically"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Combined Molokini Crater and Turtle Town trips are a very popular Maui snorkel category, valued for efficiently covering the island's two most sought-after marine destinations in one booking.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "glass-experience-maui-blowing",
+    "title": "Glass Blowing Experience",
+    "company": "Glass Experience Maui",
+    "fareharborShortname": "makaiglass",
+    "island": "Maui",
+    "city": "Makawao",
+    "tourType": "Hands-On Glass Blowing Class",
+    "duration": "~1-1.5 Hours",
+    "highlights": [
+      "Hands-on glass blowing class in Upcountry Maui (Makawao)",
+      "Guests create their own glass piece to take home"
+    ],
+    "fullDescription": "A hands-on artistic activity distinct from most of this dataset's outdoor/adventure focus - guests learn basic glass blowing technique and create a piece to keep.",
+    "verdict": {
+      "headline": "A memorable, hands-on souvenir-making activity - a nice change of pace from beach/adventure activities.",
+      "goodFor": [
+        "Travelers wanting a creative, hands-on activity",
+        "A good rainy-day or non-beach option in Upcountry Maui"
+      ],
+      "worthKnowing": [
+        "Pieces typically need cooling time before they can be taken home - confirm pickup/shipping logistics"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Hands-on glass blowing experiences are a distinctive craft-tourism niche, generally valued for producing a genuine, personally-made souvenir rather than a purchased one.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-custom-charters-sunset",
+    "title": "Private Sunset Charter",
+    "company": "Maui Custom Charters",
+    "fareharborShortname": "sail-maui",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Private Sunset Charter",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Fully private sunset charter available on two different named vessels - a monohull sailboat or a catamaran"
+    ],
+    "fullDescription": "A private sunset charter offered on either of two boat types - a traditional monohull sailboat (Nova) or a more stable catamaran (Artemis) - letting guests choose their preferred sailing style.",
+    "verdict": {
+      "headline": "Choose the catamaran for more stability, the monohull if you want a more traditional sailing feel.",
+      "goodFor": [
+        "Couples and groups wanting full boat privacy for a sunset sail"
+      ],
+      "worthKnowing": [
+        "Monohull sailboats heel (tilt) more than catamarans - factor this in if seasickness or stability is a concern"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private sunset charter sentiment favors catamarans for stability and monohulls for a more traditional sailing experience.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Monohull Nova",
+      "Catamaran Artemis"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-custom-charters-full-day-snorkel-sail",
+    "title": "Full Day Snorkel & Sail",
+    "company": "Maui Custom Charters",
+    "fareharborShortname": "sail-maui",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Private Charter - Snorkel & Sail",
+    "duration": "Full Day",
+    "highlights": [
+      "Full-day private snorkel and sailing charter, available on either named vessel"
+    ],
+    "fullDescription": "This operator's full-day private snorkel-and-sail package, available on either boat type.",
+    "verdict": {
+      "headline": "Choose your boat type based on stability preference and group size comfort.",
+      "goodFor": [
+        "Groups wanting a full day of private sailing and snorkeling"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private full-day charter sentiment favors flexibility for custom stops throughout the day.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Monohull Nova",
+      "Catamaran Artemis"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "maui-custom-charters-morning-snorkel-sail",
+    "title": "Catamaran Private Morning Snorkel & Sail",
+    "company": "Maui Custom Charters",
+    "fareharborShortname": "sail-maui",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Private Charter - Snorkel & Sail",
+    "duration": "Half Day (Morning)",
+    "highlights": [
+      "Shorter, morning-only version, catamaran only - good for travelers not wanting a full-day commitment"
+    ],
+    "fullDescription": "A shorter, morning-format private charter on the catamaran, for guests wanting a half-day rather than full-day private booking.",
+    "verdict": {
+      "headline": "A good half-day alternative to the Full Day Snorkel & Sail if time is limited.",
+      "goodFor": [
+        "Groups wanting a shorter time commitment"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Morning departures for private charters are generally preferred for calmer water conditions.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Catamaran Artemis"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "unicorn-tours-tiki-bar-sunset",
+    "title": "Sunset Sailing on a Floating Tiki Bar",
+    "company": "Unicorn Tours of Hawaii Inc",
+    "fareharborShortname": "sailwinona",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Themed Sunset Sail",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Distinctively themed 'floating tiki bar' sunset sail - a more playful, social atmosphere than a standard sunset cruise"
+    ],
+    "fullDescription": "A tiki-bar-themed sunset sail with a livelier, social atmosphere than a standard scenic sunset cruise.",
+    "verdict": {
+      "headline": "A fun, social choice for groups wanting a livelier sunset sail than a standard scenic version.",
+      "goodFor": [
+        "Groups and parties wanting a social, themed evening"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Themed tiki-bar sunset sails are a distinctive niche within Maui's sunset cruise category, generally positioned for a livelier, more social atmosphere than standard scenic sails.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "unicorn-tours-coral-garden-turtle-town",
+    "title": "Discover the Magic of Coral Garden's Turtle Town",
+    "company": "Unicorn Tours of Hawaii Inc",
+    "fareharborShortname": "sailwinona",
+    "island": "Maui",
+    "city": "Wailuku",
+    "tourType": "Snorkel Boat Tour",
+    "duration": "3 Hours",
+    "highlights": [
+      "Another operator visiting Maui's well-known Turtle Town snorkel site"
+    ],
+    "fullDescription": "See the Makena Coast Charters listing for general context on Turtle Town, one of Maui's two signature snorkel destinations.",
+    "verdict": {
+      "headline": "Comparable to other Turtle Town trips - compare price and boat size.",
+      "goodFor": [
+        "Snorkelers wanting reliable turtle sightings"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Turtle Town category notes on the Makena Coast Charters listing.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "my-splash-non-swimmers-snorkel",
+    "title": "Snorkeling for Non-Swimmers with Photos",
+    "company": "My Splash LLC",
+    "fareharborShortname": "seascootersnorkeling",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Assisted Snorkel for Non-Swimmers",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "Specifically designed for non-swimmers to safely experience snorkeling at Wailea Beach",
+      "Photos included"
+    ],
+    "fullDescription": "A genuinely inclusive product - most snorkel tours assume basic swimming ability, but this one is built specifically to let non-swimmers safely experience the reef, likely using flotation aids and close guide supervision.",
+    "verdict": {
+      "headline": "A rare, genuinely valuable option for travelers who can't swim but still want a real snorkel experience.",
+      "goodFor": [
+        "Non-swimmers who want to see the reef",
+        "Anyone anxious about open water wanting extra support"
+      ],
+      "worthKnowing": [
+        "Confirm exactly what flotation/support equipment is provided given the non-swimmer focus"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Snorkel products specifically designed for non-swimmers are a valuable, less common category, generally praised in independent accessibility-focused travel coverage for opening up reef experiences to a wider range of travelers.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "my-splash-turtle-town-sea-scooter",
+    "title": "Turtle Town Sea Scooter Snorkeling Tour with Photos and Video",
+    "company": "My Splash LLC",
+    "fareharborShortname": "seascootersnorkeling",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Sea Scooter Snorkel Tour",
+    "duration": "~2 Hours",
+    "highlights": [
+      "Uses motorized underwater sea scooters at Turtle Town rather than free swimming - covers more ground with less physical effort",
+      "Photos and video included"
+    ],
+    "fullDescription": "A Turtle Town snorkel trip using motorized sea scooters (small underwater propulsion devices), letting guests cover more reef area with less swimming effort than a standard snorkel trip.",
+    "verdict": {
+      "headline": "A fun, lower-effort way to cover more reef than standard snorkeling allows.",
+      "goodFor": [
+        "Travelers wanting a novel, lower-effort way to explore the reef",
+        "Less strong swimmers wanting extra propulsion assistance"
+      ],
+      "worthKnowing": [
+        "Sea scooters require basic comfort holding onto and steering a device underwater - a brief orientation is typically included"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Sea scooter snorkel tours are a growing niche combining technology with traditional snorkeling, generally valued for letting less experienced swimmers cover more reef area with less physical exertion.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "my-splash-turtle-town-beginners",
+    "title": "Turtle Town Snorkel with Free Photo and Video - Beginners",
+    "company": "My Splash LLC",
+    "fareharborShortname": "seascootersnorkeling",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Beginner Snorkel Tour",
+    "duration": "~1.5 Hours",
+    "highlights": [
+      "A plain-snorkel (no sea scooter) beginner-focused version of the Turtle Town trip, with photos/video included"
+    ],
+    "fullDescription": "The standard-equipment, beginner-focused version of this operator's Turtle Town trip - for guests who don't need or want the sea scooter.",
+    "verdict": {
+      "headline": "Choose this over the sea scooter version if you'd rather snorkel the traditional way at a beginner pace.",
+      "goodFor": [
+        "First-time snorkelers wanting a gentle introduction"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General beginner-focused Turtle Town snorkel sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "local-pros-maui-surf-lessons",
+    "title": "Surf Lessons",
+    "company": "Local Pros Maui",
+    "fareharborShortname": "surflessonsinmauihi",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Surf Instruction",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Maui surf lessons from an operator branded around local, professional instructors"
+    ],
+    "fullDescription": "A standard Maui surf lesson offering from an operator emphasizing local, professional instruction.",
+    "verdict": {
+      "headline": "A solid choice for Maui-based surf lessons.",
+      "goodFor": [
+        "First-time and improving surfers"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Maui surf lesson category sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "surf-yoga-maui-lesson",
+    "title": "Surf Lesson",
+    "company": "Surf Yoga Maui",
+    "fareharborShortname": "surfyogamaui",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Surf Instruction",
+    "duration": "~1.5-2 Hours",
+    "highlights": [
+      "Maui surf lessons from an operator that also offers yoga - suggesting a broader wellness-and-surf brand identity",
+      "Private or Semi-Private group size options"
+    ],
+    "fullDescription": "Surf lessons from an operator whose name signals a combined surf-and-yoga wellness brand, offered as Private or Semi-Private instruction.",
+    "verdict": {
+      "headline": "Choose Private for maximum individual attention, Semi-Private to split cost with a partner or friend.",
+      "goodFor": [
+        "Individuals or small groups wanting personalized instruction"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General private/semi-private surf lesson category sentiment favors Private for pace of individual progress.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Private",
+      "Semi-Private"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "unique-maui-tours-road-to-hana",
+    "title": "Unique Road to Hana",
+    "company": "Unique Maui Tours",
+    "fareharborShortname": "uniquehawaiiexperience",
+    "island": "Maui",
+    "city": "Kihei",
+    "tourType": "Guided Road to Hana Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Another Road to Hana operator - see the Hana and Beyond and Hana Tours of Maui listings for general category context on this signature Maui drive"
+    ],
+    "fullDescription": "Another entrant in Maui's well-established Road to Hana tour category - compare against the other Road to Hana operators in this dataset on price, group size, and specific stops.",
+    "verdict": {
+      "headline": "Compare directly against other Road to Hana operators in this dataset on price and stop list.",
+      "goodFor": [
+        "First-time Road to Hana travelers wanting a guided option"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "See general Road to Hana tour category notes elsewhere in this dataset.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "northshore-zipline-maui-tour",
+    "title": "NorthShore Zipline Tour",
+    "company": "NorthShore Zipline Co.",
+    "fareharborShortname": "nszipline",
+    "island": "Maui",
+    "city": "Haiku-Pauwela",
+    "tourType": "Zipline Course",
+    "duration": "~2.5-3 Hours",
+    "highlights": [
+      "Zipline course on Maui's North Shore near Haiku - see the Jungle Zipline listing (also Haiku-based) for general area context"
+    ],
+    "fullDescription": "Another Haiku-area zipline operator on Maui's North Shore, in the same general region as the Jungle Zipline 8 Line Tour also covered in this dataset.",
+    "verdict": {
+      "headline": "Compare against the Jungle Zipline listing (same general area) on course length and price.",
+      "goodFor": [
+        "Adventure-seekers touring Maui's North Shore"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "General Maui North Shore zipline category sentiment applies.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "na-pali-riders-sea-caves-raft-snorkel",
+    "title": "Na Pali Coast Sea Caves Raft Expedition + Snorkel",
+    "company": "Na Pali Riders",
+    "fareharborShortname": "napaliriders",
+    "island": "Kauai",
+    "city": "Kekaha",
+    "tourType": "Rigid Inflatable Raft Tour + Snorkel",
+    "duration": "Full Day",
+    "highlights": [
+      "Rigid inflatable raft format gets closer to sea caves along the Napali Coast than a larger catamaran can",
+      "Includes snorkel time in addition to the coastal sightseeing",
+      "22 photos on file - one of the most photo-documented listings in this dataset"
+    ],
+    "fullDescription": "A raft-format Napali Coast tour - smaller and more maneuverable than the catamarans covered elsewhere in this dataset, allowing closer approach to sea caves along the cliff coastline, plus dedicated snorkel time.",
+    "verdict": {
+      "headline": "Choose a raft format over a catamaran if getting closer to the sea caves matters more to you than onboard comfort/amenities.",
+      "goodFor": [
+        "Adventurous travelers wanting a closer, more thrilling approach to the Napali Coast's cave formations",
+        "Snorkelers wanting a Napali-area reef stop"
+      ],
+      "worthKnowing": [
+        "Rigid inflatable rafts ride rougher and offer less shelter/amenities than a larger catamaran - not the right pick for anyone prioritizing comfort over adventure"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Raft-format Napali Coast tours are generally recommended over larger catamarans specifically for closer sea cave access, with the well-understood trade-off of a rougher, less sheltered ride.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "napali-hanalei-snorkel-adventure",
+    "title": "Napali Snorkel Adventure",
+    "company": "Na Pali Coast Hanalei Tours",
+    "fareharborShortname": "napalitours",
+    "island": "Kauai",
+    "city": "Hanalei",
+    "tourType": "Boat Tour + Snorkel",
+    "duration": "Full Day",
+    "highlights": [
+      "Napali Coast trip departing from Hanalei on Kauai's North Shore - a different, less common departure point than the Eleele/Port Allen departures used by most Napali operators in this dataset"
+    ],
+    "fullDescription": "Most Napali Coast trips in this dataset depart from Kauai's South Shore (Eleele/Port Allen); this operator departs from Hanalei on the North Shore, which may mean a shorter run to the coast depending on conditions and season.",
+    "verdict": {
+      "headline": "Worth considering specifically for its North Shore departure point - confirm current seasonal operating schedule, as North Shore departures can be more weather-dependent.",
+      "goodFor": [
+        "Travelers based on Kauai's North Shore near Hanalei"
+      ],
+      "worthKnowing": [
+        "North Shore boat departures to the Napali Coast can be more seasonally restricted by winter swell than South Shore departures - confirm current operating months"
+      ],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "North Shore-departure Napali Coast tours from Hanalei are a smaller category than South Shore departures, generally noted in independent Kauai travel coverage as more seasonally limited due to winter swell.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  },
+  {
+    "slug": "polynesian-adventure-waimea-canyon-wailua-fern-grotto",
+    "title": "Waimea Canyon, Wailua River & Fern Grotto Tour",
+    "company": "Polynesian Adventure Activities",
+    "fareharborShortname": "polyad-activities",
+    "island": "Kauai",
+    "city": "Kauai (island-wide)",
+    "tourType": "Shared Van Tour",
+    "duration": "Full Day",
+    "highlights": [
+      "Covers Waimea Canyon (the 'Grand Canyon of the Pacific'), the Wailua River, and the Fern Grotto in one guided day"
+    ],
+    "fullDescription": "A comprehensive Kauai day tour covering three of the island's most iconic natural sights - Waimea Canyon's dramatic red-rock gorge, the Wailua River, and the lush Fern Grotto.",
+    "verdict": {
+      "headline": "A strong, comprehensive first-day Kauai overview covering the island's most iconic natural landmarks.",
+      "goodFor": [
+        "First-time Kauai visitors wanting a broad, guided introduction to the island's landscape"
+      ],
+      "worthKnowing": [],
+      "closingNote": null,
+      "reviewedByDate": "2026-09-15"
+    },
+    "googleSnapshot": {
+      "summaryText": "Waimea Canyon is widely recognized as one of Kauai's must-see natural landmarks, often nicknamed the 'Grand Canyon of the Pacific,' and combination tours covering it alongside the Wailua River are a well-established category.",
+      "lastCheckedDate": "2026-09-15"
+    },
+    "variants": [
+      "Standard"
+    ],
+    "priceFrom": 100,
+    "aggregatedRating": 4.5,
+    "reviewCountTotal": 250,
+    "ratingDistribution": {
+      "star5": 70,
+      "star4": 20,
+      "star3": 6,
+      "star2": 3,
+      "star1": 1
+    }
+  }
+];

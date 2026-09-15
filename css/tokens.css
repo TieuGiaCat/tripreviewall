@@ -1,0 +1,85 @@
+/* ============================================================
+   tripreviewall.com — "The Honest Guide" Design Tokens
+   Source of truth: tripreviewall-design-brief.md v2.0
+   Do NOT add colors/fonts outside this file.
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --color-bg: #FAF6EF;
+  --color-bg-alt: #FFFFFF;
+
+  /* Text */
+  --color-text: #26313A;
+  --color-text-muted: #5C6670;
+
+  /* Brand */
+  --color-primary: #0B3B4F;
+  --color-primary-hover: #0A3040;
+
+  /* CTA */
+  --color-cta: #B8592F;
+  --color-cta-hover: #A34E29;
+  --color-accent-display: #D97B4F;
+
+  /* Data / rating semantics */
+  --color-positive: #5C8A72;
+  --color-positive-text: #3F6B54;
+  --color-negative: #B85C4A;
+  --color-negative-text: #8F4536;
+
+  /* System (non-rating) */
+  --color-error: #C0392B;
+  --color-success-ui: #3F6B54;
+
+  /* Structure */
+  --color-border: #D8D2C4;
+  --color-border-strong: #B9B0A0;
+
+  /* Radii */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  /* Shadow — used sparingly, hover only */
+  --shadow-card-hover: 0 2px 10px rgba(11, 59, 79, 0.10);
+
+  /* Fonts */
+  --font-serif: "Fraunces", "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+
+  /* Type scale — desktop */
+  --text-display: 3rem;
+  --text-h1: 2.44rem;
+  --text-h2: 1.95rem;
+  --text-h3: 1.56rem;
+  --text-h4: 1.25rem;
+  --text-body-lg: 1.125rem;
+  --text-body: 1rem;
+  --text-meta: 0.875rem;
+  --text-caption: 0.75rem;
+
+  /* Spacing scale (8px base) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px; --space-16: 64px;
+  --space-24: 96px; --space-32: 128px;
+
+  --container-max: 1280px;
+  --gutter: 24px;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --text-display: 2.25rem;
+    --text-h1: 1.875rem;
+    --text-h2: 1.5rem;
+    --text-h3: 1.25rem;
+    --text-h4: 1.125rem;
+    --text-body-lg: 1rem;
+  }
+}
+
+/* Shared photo color-grade filter — brand brief §9 */
+.tour-photo {
+  filter: saturate(0.92) contrast(1.02);
+}

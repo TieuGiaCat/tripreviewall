@@ -1,0 +1,79 @@
+/* ============================================================
+   tripreviewall.com — Transportation page styles
+   Per tripreviewall-transportation-brief.md
+   ============================================================ */
+
+.tp-hero { position: relative; min-height: 420px; display: flex; align-items: center; color: var(--color-bg); }
+.tp-hero-bg { position: absolute; inset: 0; background: linear-gradient(160deg,#0B3B4F 0%,#134a61 60%,#0B3B4F 100%); }
+.tp-hero-bg::after { content: ""; position: absolute; inset: 0; background: rgba(11,59,79,0.45); }
+.tp-hero-content { position: relative; z-index: 2; max-width: 640px; }
+.tp-hero-eyebrow { font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; opacity: 0.9; }
+.tp-hero-headline { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-display); line-height: 1.1; margin: 0 0 16px; }
+.tp-hero-sub { font-size: var(--text-body-lg); opacity: 0.9; margin: 0 0 28px; }
+.tp-hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.tp-hero-disclosure { font-size: 12px; font-style: italic; opacity: 0.75; }
+
+/* Trust strip */
+.tp-trust-strip { display: flex; flex-wrap: wrap; gap: 0; padding: 20px 0; }
+.tp-trust-item { display: flex; align-items: center; gap: 8px; font-size: var(--text-meta); color: var(--color-text-muted); padding: 0 20px; border-right: 1px solid var(--color-border); }
+.tp-trust-item:last-child { border-right: none; }
+.tp-trust-item svg { width: 16px; height: 16px; color: var(--color-primary); flex-shrink: 0; }
+
+/* Fleet filter tabs */
+.tp-fleet-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.tp-fleet-tab { padding: 8px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: var(--text-meta); background: var(--color-bg-alt); color: var(--color-text); }
+.tp-fleet-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+
+.tp-fleet-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 768px) { .tp-fleet-grid { grid-template-columns: repeat(3, 1fr); } }
+.tp-fleet-card { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.tp-fleet-img { aspect-ratio: 3/2; }
+.tp-fleet-body { padding: 16px; }
+.tp-fleet-name { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h4); margin: 0 0 8px; }
+.tp-fleet-specs { display: grid; gap: 6px; margin-bottom: 12px; }
+.tp-fleet-specs li { display: flex; align-items: center; gap: 6px; font-size: var(--text-meta); color: var(--color-text-muted); }
+.tp-fleet-specs svg { width: 14px; height: 14px; color: var(--color-primary); }
+.tp-fleet-footer { display: flex; align-items: center; justify-content: space-between; }
+.tp-fleet-price { font-weight: 700; font-size: var(--text-body-lg); }
+
+/* Rate table */
+.rate-table { width: 100%; border-collapse: collapse; background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.rate-table th, .rate-table td { border-bottom: 1px solid var(--color-border); padding: 12px 16px; text-align: left; font-size: var(--text-body); }
+.rate-table th { background: var(--color-bg); font-weight: 700; font-size: var(--text-meta); text-transform: uppercase; letter-spacing: 0.03em; }
+.rate-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.rate-table tr:last-child td { border-bottom: none; }
+.rate-table a { color: var(--color-primary); }
+.rate-footnote { font-size: var(--text-caption); color: var(--color-text-muted); margin-top: 12px; }
+
+/* Services grid */
+.tp-services-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 640px) { .tp-services-grid { grid-template-columns: repeat(2, 1fr); } }
+.tp-service-card { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 24px; }
+.tp-service-icon { width: 44px; height: 44px; color: var(--color-primary); margin-bottom: 12px; }
+.tp-service-title { font-size: var(--text-h4); font-weight: 700; margin: 0 0 6px; }
+.tp-service-desc { color: var(--color-text-muted); font-size: var(--text-body); margin: 0; }
+
+/* Why-partner blocks */
+.tp-why-block { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: center; margin-bottom: 56px; }
+@media (min-width: 768px) { .tp-why-block { grid-template-columns: 1fr 1fr; } }
+.tp-why-block.reverse .tp-why-img { order: 2; }
+.tp-why-img { aspect-ratio: 4/3; border-radius: var(--radius-lg); }
+.tp-why-title { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h3); margin: 0 0 12px; }
+.tp-why-text { color: var(--color-text); font-size: var(--text-body-lg); line-height: 1.6; }
+
+/* Stats bar */
+.tp-stats-bar { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; padding: 32px 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); text-align: center; }
+@media (min-width: 640px) { .tp-stats-bar { grid-template-columns: repeat(4,1fr); } }
+.tp-stat-number { font-size: var(--text-h2); font-weight: 700; }
+.tp-stat-label { font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-muted); }
+
+/* Inquiry form section */
+.tp-form-section { background: var(--color-primary); color: var(--color-bg); padding: 64px 0; }
+.tp-form-layout { display: grid; grid-template-columns: 1fr; gap: 32px; }
+@media (min-width: 900px) { .tp-form-layout { grid-template-columns: 1fr 1.3fr; } }
+.tp-form-copy h2 { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h2); margin: 0 0 12px; }
+.tp-form-copy p { opacity: 0.9; line-height: 1.6; margin-bottom: 8px; }
+.tp-form-card { background: var(--color-bg-alt); border-radius: var(--radius-md); padding: 32px; color: var(--color-text); }
+.tp-form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 640px) { .tp-form-grid { grid-template-columns: 1fr 1fr; } }
+.tp-form-grid .full { grid-column: 1 / -1; }
