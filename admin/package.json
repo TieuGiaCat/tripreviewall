@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node src/server.js",
     "migrate": "node src/migrate.js",
-    "import-tours": "node src/import-tours.js"
+    "import-tours": "node src/import-tours.js",
+    "bulk-update-links": "node src/bulk-update-links.js",
+    "bulk-import-images": "node src/bulk-import-images.js"
   },
   "dependencies": {
     "pg": "^8.11.5",
