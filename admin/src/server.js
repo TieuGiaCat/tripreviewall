@@ -8,6 +8,7 @@ const { requireAuth } = require("./middleware");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const toursRoutes = require("./routes/toursRoutes");
+const publicApi = require("./routes/publicApi");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -65,6 +66,16 @@ const server = http.createServer(async (req, res) => {
     if (method === "GET" && pathname === "/admin/login") return authRoutes.handleLoginGet(req, res);
     if (method === "POST" && pathname === "/admin/login") return authRoutes.handleLoginPost(req, res);
     if (method === "GET" && pathname === "/admin/logout") return authRoutes.handleLogout(req, res);
+
+    // ---- Public read-only API (no session required) — the public website
+    // fetches from these to render tours live from the database. ----
+    if (method === "GET" && pathname === "/api/tours") {
+      return publicApi.listPublishedTours(req, res);
+    }
+    const apiTourMatch = pathname.match(/^\/api\/tours\/([^/]+)$/);
+    if (method === "GET" && apiTourMatch) {
+      return publicApi.getPublishedTourBySlug(req, res, apiTourMatch[1]);
+    }
 
     // ---- Everything below requires a session ----
     const session = requireAuth(req, res);

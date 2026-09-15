@@ -9,10 +9,10 @@
 
 const EDITORS_PICK = ["ohana-surf-project-sup-lessons"];
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof ALL_TOURS === "undefined") return;
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
+  window.ALL_TOURS = await loadAllTours();
   const tour = ALL_TOURS.find((t) => t.slug === slug);
 
   if (!tour) {

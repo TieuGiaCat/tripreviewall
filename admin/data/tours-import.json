@@ -1,29 +1,13 @@
-/* ============================================================
-   ALL_TOURS — SINGLE SOURCE OF TRUTH for the whole site
-   265 real Hawaii tours, merged from client's 10 batch JSON files
-   (batch-01, 02a/b/c, 03a/b/c, 04a x2, 04b)
-   Excluded: batch-04c Maine (11), all lodging entries, 5 Aruba tours
-   ------------------------------------------------------------
-   REAL fields: slug, title, company, island, city, tourType,
-   duration, highlights, fullDescription, verdict.*, googleSnapshot.*,
-   variants, fareharborShortname
-
-   MOCK fields (flat placeholders, per client instruction —
-   to be entered manually per tour before launch):
-   priceFrom ($100), aggregatedRating (4.5), reviewCountTotal (250),
-   ratingDistribution
-   ============================================================ */
-
-const ALL_TOURS_FALLBACK = [
+[
   {
     "slug": "chinamans-hat-mokolii-kayak-kaneohe",
-    "title": "Chinaman's Hat (Mokoli'i) Kayak Experience",
+    "name": "Chinaman's Hat (Mokoli'i) Kayak Experience",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kaneohe",
     "tourType": "Self-Guided Kayak Tour",
-    "duration": "1.5 - 2.5 Hours (guide-dependent, often runs long)",
+    "durationLabel": "1.5 - 2.5 Hours (guide-dependent, often runs long)",
+    "fareharborShortname": "",
     "highlights": [
       "Paddle across Kaneohe Bay to the basalt islet of Mokoli'i (Chinaman's Hat)",
       "Optional guided hike to the summit for panoramic Windward Coast views",
@@ -70,13 +54,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaneohe-bay-coral-reef-kayak",
-    "title": "Kaneohe Bay Coral Reef Self-Guided Kayaking Adventure",
+    "name": "Kaneohe Bay Coral Reef Self-Guided Kayaking Adventure",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kaneohe",
     "tourType": "Self-Guided Kayak + Snorkel",
-    "duration": "Half Day (self-guided window)",
+    "durationLabel": "Half Day (self-guided window)",
+    "fareharborShortname": "",
     "highlights": [
       "Paddle out to Kaneohe Bay's coral reef flats",
       "Bring your own mask/snorkel to explore reef life in shallow water",
@@ -118,13 +102,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaneohe-bay-sandbar-kayak",
-    "title": "Kaneohe Bay Sandbar Kayak Experience",
+    "name": "Kaneohe Bay Sandbar Kayak Experience",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kaneohe",
     "tourType": "Self-Guided Kayak Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "",
     "highlights": [
       "Paddle out to the sandbar in the middle of Kaneohe Bay",
       "Stand in waist-deep turquoise water far from shore",
@@ -167,13 +151,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "sharks-cove-self-guided-snorkel-haleiwa",
-    "title": "Sharks Cove Self-Guided Snorkel",
+    "name": "Sharks Cove Self-Guided Snorkel",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Self-Guided Snorkel Rental",
-    "duration": "Half Day rental window",
+    "durationLabel": "Half Day rental window",
+    "fareharborShortname": "",
     "highlights": [
       "Snorkel gear rental for North Shore's famous Sharks Cove",
       "Home to some of Oahu's best shallow-reef marine life viewing (summer conditions)",
@@ -214,13 +198,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kahana-kaaawa-rainforest-river-kayak",
-    "title": "Kahana / Kaaawa Rainforest River Kayak",
+    "name": "Kahana / Kaaawa Rainforest River Kayak",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kaaawa",
     "tourType": "Self-Guided River Kayak",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "",
     "highlights": [
       "Paddle a calm, jungle-lined river instead of open ocean",
       "Good beginner option - flat water, no surf or currents",
@@ -262,13 +246,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kailua-kayak-rentals-general",
-    "title": "Kailua Kayak Rentals",
+    "name": "Kailua Kayak Rentals",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Bare Kayak Rental",
-    "duration": "Flexible rental window",
+    "durationLabel": "Flexible rental window",
+    "fareharborShortname": "",
     "highlights": [
       "Flexible, unguided kayak rental for exploring Kailua Bay on your own schedule"
     ],
@@ -307,13 +291,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mokulua-islands-twin-islands-kayak-kailua",
-    "title": "Mokulua Islands (Twin Islands) Kayak Tour",
+    "name": "Mokulua Islands (Twin Islands) Kayak Tour",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Kayak Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "",
     "highlights": [
       "Paddle to the twin Mokulua Islands off Kailua Beach",
       "Land on Na Mokulua's protected beach (seasonal access rules apply)",
@@ -355,13 +339,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "popoia-island-kailua-bay-kayak-tour",
-    "title": "Popoia Island (Flat Island) & Kailua Bay Kayak Tour",
+    "name": "Popoia Island (Flat Island) & Kailua Bay Kayak Tour",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Kayak Tour",
-    "duration": "Half Day or Full Day",
+    "durationLabel": "Half Day or Full Day",
+    "fareharborShortname": "",
     "highlights": [
       "Shorter, calmer paddle than the Mokulua route - good for beginners",
       "Explore Popoia (Flat) Island just offshore from Kailua Beach Park",
@@ -404,13 +388,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kailua-bay-popoia-paddleboard-lesson",
-    "title": "Kailua Bay & Popoia Island Paddle Board Lesson",
+    "name": "Kailua Bay & Popoia Island Paddle Board Lesson",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "SUP Lesson",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "",
     "highlights": [
       "Stand-up paddleboard instruction in Kailua Bay's calm, protected water",
       "Beginner-friendly flat-water conditions",
@@ -449,13 +433,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mokulua-islands-kayak-ebike-combo",
-    "title": "Guided Mokulua Islands Kayak Tour & E-Bike Adventure",
+    "name": "Guided Mokulua Islands Kayak Tour & E-Bike Adventure",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Multi-Activity Combo",
-    "duration": "Full Day (combo)",
+    "durationLabel": "Full Day (combo)",
+    "fareharborShortname": "",
     "highlights": [
       "Combines the guided Mokulua Islands kayak crossing with an e-bike ride around Kailua",
       "Covers two activities and more ground than a single-activity booking",
@@ -495,13 +479,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "popoia-island-kayak-ebike-combo",
-    "title": "Popoia Island Kayak & E-Bike Guided Adventure Tour",
+    "name": "Popoia Island Kayak & E-Bike Guided Adventure Tour",
     "company": "",
-    "fareharborShortname": "",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Multi-Activity Combo",
-    "duration": "Half or Full Day",
+    "durationLabel": "Half or Full Day",
+    "fareharborShortname": "",
     "highlights": [
       "Combines the beginner-friendly Popoia Island kayak tour with an e-bike leg around Kailua",
       "Full-day version adds more leisure/exploration time",
@@ -541,13 +525,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pearl-harbor-city-tour-uss-arizona-aloha-hawaii-tours",
-    "title": "Pearl Harbor City Tour / USS Arizona Memorial",
+    "name": "Pearl Harbor City Tour / USS Arizona Memorial",
     "company": "Aloha Hawaii Tours",
-    "fareharborShortname": "alohahawaiitours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Historical / Bus Tour",
-    "duration": "~5 Hours",
+    "durationLabel": "~5 Hours",
+    "fareharborShortname": "alohahawaiitours",
     "highlights": [
       "Round-trip hotel pickup from Waikiki",
       "Entry to USS Arizona Memorial and Pearl Harbor Visitor Center",
@@ -587,13 +571,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "private-oahu-grand-circle-island-tour",
-    "title": "Private Oahu Grand Circle Island Tour",
+    "name": "Private Oahu Grand Circle Island Tour",
     "company": "Aloha Sunshine Tours",
-    "fareharborShortname": "alohasunshinetours",
     "island": "Oahu",
     "city": "Honolulu (Waikiki pickup)",
     "tourType": "Private Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "alohasunshinetours",
     "highlights": [
       "Private vehicle, not a shared shuttle",
       "Circle-island route covering North Shore, Windward Coast, and scenic lookouts",
@@ -633,13 +617,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dolphins-and-you",
-    "title": "Dolphins and You",
+    "name": "Dolphins and You",
     "company": "And You Creations",
-    "fareharborShortname": "andyoucreations",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Boat Tour / Dolphin Watch",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "andyoucreations",
     "highlights": [
       "Boat excursion focused on spotting wild spinner dolphins off Oahu's coast",
       "Small-group boat setting"
@@ -678,13 +662,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "island-and-you",
-    "title": "Island and You",
+    "name": "Island and You",
     "company": "And You Creations",
-    "fareharborShortname": "andyoucreations",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private/Custom Island Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "andyoucreations",
     "highlights": [
       "Custom, flexible island exploration experience",
       "Personalized itinerary rather than a fixed route"
@@ -721,13 +705,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "blue-planet-adventure-paddle-rentals",
-    "title": "Paddle Rentals",
+    "name": "Paddle Rentals",
     "company": "Blue Planet Adventure Company",
-    "fareharborShortname": "blueplanetadventure",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "SUP/Kayak Rental",
-    "duration": "Flexible rental window",
+    "durationLabel": "Flexible rental window",
+    "fareharborShortname": "blueplanetadventure",
     "highlights": [
       "North Shore paddle equipment rental (SUP and/or kayak)",
       "Explore Haleiwa's harbor and coastline independently"
@@ -765,13 +749,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "rage-room-splatter-art-studio-honolulu",
-    "title": "Rage Room & Splatter Art Studio",
+    "name": "Rage Room & Splatter Art Studio",
     "company": "Break'N Anger",
-    "fareharborShortname": "breaknanger",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Indoor Experience (non-outdoor)",
-    "duration": "45-90 Minutes",
+    "durationLabel": "45-90 Minutes",
+    "fareharborShortname": "breaknanger",
     "highlights": [
       "Smash breakable items in a padded room with protective gear provided",
       "Splatter-paint studio as a calmer alternative or add-on",
@@ -814,13 +798,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "captain-max-turtle-canyon-snorkel",
-    "title": "Turtle Canyon Snorkel (Semi-Private Boat Tour)",
+    "name": "Turtle Canyon Snorkel (Semi-Private Boat Tour)",
     "company": "Captain Max Boat Tours",
-    "fareharborShortname": "captainmaxboattours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Semi-Private Snorkel Boat",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "captainmaxboattours",
     "highlights": [
       "Semi-private boat (smaller group than large commercial catamarans)",
       "Turtle Canyon off Waikiki is one of Oahu's most reliable sea turtle snorkel spots",
@@ -860,13 +844,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "captain-max-private-waikiki-sunset-cruise",
-    "title": "Private Waikiki Sunset Cruise",
+    "name": "Private Waikiki Sunset Cruise",
     "company": "Captain Max Boat Tours",
-    "fareharborShortname": "captainmaxboattours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Charter",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "captainmaxboattours",
     "highlights": [
       "Fully private boat charter for your group only",
       "Sunset timing off Waikiki's coastline"
@@ -904,13 +888,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "captain-max-private-waikiki-boat-tour",
-    "title": "Private Waikiki Boat Tour",
+    "name": "Private Waikiki Boat Tour",
     "company": "Captain Max Boat Tours",
-    "fareharborShortname": "captainmaxboattours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Charter",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "captainmaxboattours",
     "highlights": [
       "Private daytime charter along the Waikiki coastline",
       "Flexible itinerary since the boat is exclusive to your group"
@@ -948,13 +932,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "aloha-scuba-wreck-reef-2-tank",
-    "title": "Wreck & Reef - 2 Tank Dive Charter",
+    "name": "Wreck & Reef - 2 Tank Dive Charter",
     "company": "Aloha Scuba Diving Co.",
-    "fareharborShortname": "divealohascuba",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "divealohascuba",
     "highlights": [
       "Two-tank dive covering a wreck site and a reef site off Oahu",
       "For certified divers only"
@@ -992,13 +976,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "aloha-scuba-reef-explorer-2-tank",
-    "title": "Reef Explorer - 2 Tank Dive Charter",
+    "name": "Reef Explorer - 2 Tank Dive Charter",
     "company": "Aloha Scuba Diving Co.",
-    "fareharborShortname": "divealohascuba",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "divealohascuba",
     "highlights": [
       "Two reef-focused dive sites off Oahu",
       "For certified divers"
@@ -1035,13 +1019,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "aloha-scuba-divemaster",
-    "title": "Divemaster (Professional Course)",
+    "name": "Divemaster (Professional Course)",
     "company": "Aloha Scuba Diving Co.",
-    "fareharborShortname": "divealohascuba",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Professional Certification Course",
-    "duration": "Multi-Day Course",
+    "durationLabel": "Multi-Day Course",
+    "fareharborShortname": "divealohascuba",
     "highlights": [
       "Divemaster-level professional certification training",
       "Not a tourist activity - a multi-day training program"
@@ -1079,13 +1063,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "aloha-scuba-night-dive",
-    "title": "Night Dive - Tuesday & Friday",
+    "name": "Night Dive - Tuesday & Friday",
     "company": "Aloha Scuba Diving Co.",
-    "fareharborShortname": "divealohascuba",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Certified Diver - Night Dive",
-    "duration": "Evening / ~2-3 Hours",
+    "durationLabel": "Evening / ~2-3 Hours",
+    "fareharborShortname": "divealohascuba",
     "highlights": [
       "Scheduled night dives on Tuesdays and Fridays only",
       "Nocturnal marine life viewing with dive lights"
@@ -1124,13 +1108,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dive-oahu-waikiki-coast-cruise-byob",
-    "title": "Waikiki Coast Cruise - BYOB",
+    "name": "Waikiki Coast Cruise - BYOB",
     "company": "Dive Oahu",
-    "fareharborShortname": "diveoahu",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Boat Cruise (bring your own alcohol)",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "diveoahu",
     "highlights": [
       "Casual boat cruise along the Waikiki coastline",
       "Bring-your-own-beverage format keeps pricing lower than catered cruises"
@@ -1169,13 +1153,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dolphin-excursion-waianae",
-    "title": "Dolphin Excursion",
+    "name": "Dolphin Excursion",
     "company": "Dolphin Excursions",
-    "fareharborShortname": "dolphinexcursions",
     "island": "Oahu",
     "city": "Waianae",
     "tourType": "Boat Tour / Dolphin & Snorkel",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "dolphinexcursions",
     "highlights": [
       "Departs from Waianae Harbor on Oahu's less-touristed Leeward Coast",
       "Wild dolphin viewing with typically calmer, clearer water than Waikiki-departure boats"
@@ -1214,13 +1198,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "waikiki-parasail",
-    "title": "Parasail",
+    "name": "Parasail",
     "company": "Waikiki Parasail",
-    "fareharborShortname": "gohawaii-waikikiparasail",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Parasailing",
-    "duration": "~1.5-2 Hours (short flight time)",
+    "durationLabel": "~1.5-2 Hours (short flight time)",
+    "fareharborShortname": "gohawaii-waikikiparasail",
     "highlights": [
       "Aerial views of Waikiki and Diamond Head from up to several hundred feet",
       "One of the highest-volume listings in this dataset by availability count"
@@ -1259,13 +1243,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-hawaii-watersports-parasailing",
-    "title": "Parasailing",
+    "name": "Parasailing",
     "company": "Go Hawaii Watersports",
-    "fareharborShortname": "gohawaii-watersports",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Parasailing",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "gohawaii-watersports",
     "highlights": [
       "Another high-volume Waikiki-area parasail operator",
       "Similar format to Waikiki Parasail (separate company)"
@@ -1302,13 +1286,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-hawaii-watersports-deep-sea-fishing",
-    "title": "Private Charter Deep Sea Fishing Tour",
+    "name": "Private Charter Deep Sea Fishing Tour",
     "company": "Go Hawaii Watersports",
-    "fareharborShortname": "gohawaii-watersports",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Fishing Charter",
-    "duration": "Half or Full Day",
+    "durationLabel": "Half or Full Day",
+    "fareharborShortname": "gohawaii-watersports",
     "highlights": [
       "Exclusive-use fishing charter for your group",
       "Oahu deep sea fishing for species like mahi-mahi, ono, and tuna depending on season"
@@ -1347,13 +1331,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-hawaii-watersports-waikiki-snorkel-playground",
-    "title": "2-Hour Waikiki Snorkel & Ocean Playground Adventure",
+    "name": "2-Hour Waikiki Snorkel & Ocean Playground Adventure",
     "company": "Go Hawaii Watersports",
-    "fareharborShortname": "gohawaii-watersports",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel + Water Activities",
-    "duration": "2 Hours",
+    "durationLabel": "2 Hours",
+    "fareharborShortname": "gohawaii-watersports",
     "highlights": [
       "Combines snorkeling with other water 'playground' elements (confirm exact inclusions - e.g. inflatables, paddleboards)",
       "Short, accessible 2-hour format"
@@ -1391,13 +1375,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "gone-surfing-hawaii-rentals",
-    "title": "Surfboard & Paddleboard Rentals",
+    "name": "Surfboard & Paddleboard Rentals",
     "company": "Gone Surfing Hawaii",
-    "fareharborShortname": "gonesurfinghawaii",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Equipment Rental",
-    "duration": "Flexible rental window",
+    "durationLabel": "Flexible rental window",
+    "fareharborShortname": "gonesurfinghawaii",
     "highlights": [
       "Surfboard and SUP rental near Waikiki",
       "No lesson included - equipment only"
@@ -1434,13 +1418,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-nuts-hawaii-north-shore-surf-camp",
-    "title": "North Shore Surf Camp",
+    "name": "North Shore Surf Camp",
     "company": "Go Nuts Hawaii",
-    "fareharborShortname": "gonuts-hawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Surf Instruction",
-    "duration": "Multi-Day / Camp Format",
+    "durationLabel": "Multi-Day / Camp Format",
+    "fareharborShortname": "gonuts-hawaii",
     "highlights": [
       "Multi-session surf camp format on Oahu's famous North Shore",
       "Structured progression rather than a single one-off lesson"
@@ -1478,13 +1462,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ultimate-circle-island-tour-oahu",
-    "title": "Oahu Ultimate Circle Island Tour - Visiting 21+ Locations",
+    "name": "Oahu Ultimate Circle Island Tour - Visiting 21+ Locations",
     "company": "Ultimate Circle Island Tours",
-    "fareharborShortname": "haleiwaturtletours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Van/Bus Circle Island Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "haleiwaturtletours",
     "highlights": [
       "Claims 21+ stops across the island in a single day",
       "Broad overview tour for first-time Oahu visitors with limited time"
@@ -1523,13 +1507,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "aquatic-life-divers-explorers-dive",
-    "title": "The Explorer's Dive: Advanced Long Range Two Tank Charter",
+    "name": "The Explorer's Dive: Advanced Long Range Two Tank Charter",
     "company": "Aquatic Life Divers",
-    "fareharborShortname": "aquaticlifedivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - Advanced 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "aquaticlifedivers",
     "highlights": [
       "Long-range boat trip to sites further from the harbor than standard charters",
       "For advanced/experienced divers - not a beginner trip"
@@ -1568,13 +1552,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "aquatic-life-divers-signature-morning-dive",
-    "title": "Signature Morning Dive: Two Tank Morning Charter",
+    "name": "Signature Morning Dive: Two Tank Morning Charter",
     "company": "Aquatic Life Divers",
-    "fareharborShortname": "aquaticlifedivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day (Morning)",
+    "durationLabel": "Half Day (Morning)",
+    "fareharborShortname": "aquaticlifedivers",
     "highlights": [
       "Standard morning two-tank charter - the shop's core, everyday dive offering",
       "Morning timing generally means calmer water and better visibility"
@@ -1612,13 +1596,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "big-island-abalone-farm-tours",
-    "title": "Farm Tours",
+    "name": "Farm Tours",
     "company": "Big Island Abalone",
-    "fareharborShortname": "bigislandabalone",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Farm/Aquaculture Tour",
-    "duration": "~1-1.5 Hours",
+    "durationLabel": "~1-1.5 Hours",
+    "fareharborShortname": "bigislandabalone",
     "highlights": [
       "Tour of a working abalone aquaculture farm on the Kona Coast",
       "Learn how abalone (a shellfish delicacy) is farmed using deep-sea water",
@@ -1658,13 +1642,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "big-island-bees-beekeeping-tour",
-    "title": "Beekeeping Tour",
+    "name": "Beekeeping Tour",
     "company": "Big Island Bees",
-    "fareharborShortname": "bigislandbees",
     "island": "Big Island",
     "city": "Captain Cook",
     "tourType": "Farm/Apiary Tour",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "bigislandbees",
     "highlights": [
       "Tour a working apiary and honey-processing facility in South Kona",
       "Honey tasting typically included",
@@ -1703,13 +1687,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "body-glove-deluxe-snorkel-dolphin-watch",
-    "title": "Deluxe Snorkel & Dolphin Watch",
+    "name": "Deluxe Snorkel & Dolphin Watch",
     "company": "Body Glove Hawaii",
-    "fareharborShortname": "bodyglove",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Large Boat Snorkel Cruise",
-    "duration": "~4-5 Hours",
+    "durationLabel": "~4-5 Hours",
+    "fareharborShortname": "bodyglove",
     "highlights": [
       "Established, large-boat commercial snorkel cruise off Kona",
       "Dolphin watching en route, typically with a snorkel stop at Pawai Bay or similar reef",
@@ -1748,13 +1732,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "body-glove-historical-lunch-cruise",
-    "title": "Historical Lunch Cruise",
+    "name": "Historical Lunch Cruise",
     "company": "Body Glove Hawaii",
-    "fareharborShortname": "bodyglove",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Sightseeing Cruise with Narration",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "bodyglove",
     "highlights": [
       "Coastal cruise along Kona's historic shoreline with narrated history",
       "Lunch included, non-snorkel format"
@@ -1793,13 +1777,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "body-glove-super-raft-sunset-tour",
-    "title": "Super-Raft Sunset Tour",
+    "name": "Super-Raft Sunset Tour",
     "company": "Body Glove Hawaii",
-    "fareharborShortname": "bodyglove",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Rigid Inflatable (RIB) Sunset Tour",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "bodyglove",
     "highlights": [
       "Smaller, faster rigid inflatable boat rather than the large Body Glove vessel",
       "Sunset timing along the Kona Coast",
@@ -1838,13 +1822,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "botanical-world-zipline",
-    "title": "Zip Line at Botanical World Adventures",
+    "name": "Zip Line at Botanical World Adventures",
     "company": "Botanical World Adventures",
-    "fareharborShortname": "bwa",
     "island": "Big Island",
     "city": "Hakalau",
     "tourType": "Zipline Course",
-    "duration": "~2.5 Hours",
+    "durationLabel": "~2.5 Hours",
+    "fareharborShortname": "bwa",
     "highlights": [
       "Zipline course through Hamakua Coast rainforest/garden setting",
       "Combines adventure activity with lush tropical scenery",
@@ -1884,13 +1868,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "botanical-world-garden-day-pass",
-    "title": "Self-Guided Garden Tour Day Pass",
+    "name": "Self-Guided Garden Tour Day Pass",
     "company": "Botanical World Adventures",
-    "fareharborShortname": "bwa",
     "island": "Big Island",
     "city": "Hakalau",
     "tourType": "Self-Guided Botanical Garden",
-    "duration": "Full Day Access",
+    "durationLabel": "Full Day Access",
+    "fareharborShortname": "bwa",
     "highlights": [
       "Self-guided walk through tropical gardens and a waterfall viewpoint",
       "20 photos on file - the most photo-documented listing from this operator",
@@ -1929,13 +1913,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "coral-reef-kealakekua-bay-snorkel",
-    "title": "Kealakekua Bay / Captain Cook Monument Snorkel",
+    "name": "Kealakekua Bay / Captain Cook Monument Snorkel",
     "company": "Coral Reef Snorkel Adventures",
-    "fareharborShortname": "coralreef",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "coralreef",
     "highlights": [
       "Kealakekua Bay is a Marine Life Conservation District with some of Kona's clearest water and richest reef life",
       "Passes the Captain Cook Monument, accessible only by boat or a steep trail",
@@ -1975,13 +1959,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "coral-reef-manta-ray-night-snorkel",
-    "title": "Manta Ray Night Snorkel",
+    "name": "Manta Ray Night Snorkel",
     "company": "Coral Reef Snorkel Adventures",
-    "fareharborShortname": "coralreef",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening / ~2.5 Hours",
+    "durationLabel": "Evening / ~2.5 Hours",
+    "fareharborShortname": "coralreef",
     "highlights": [
       "Kona is one of the few places in the world with reliable nightly manta ray encounters",
       "Underwater lights attract plankton, which draws feeding mantas close to snorkelers",
@@ -2021,13 +2005,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dolphin-discoveries-manta-ray-night-snorkel",
-    "title": "Manta Ray Night Snorkel",
+    "name": "Manta Ray Night Snorkel",
     "company": "Dolphin Discoveries",
-    "fareharborShortname": "dolphindiscoveries",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "dolphindiscoveries",
     "highlights": [
       "Another Kona operator running the manta ray night snorkel experience",
       "Smaller-boat alternative to larger commercial operators"
@@ -2065,13 +2049,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dolphin-discoveries-captain-cook-snorkel",
-    "title": "Captain Cook Snorkel Adventure",
+    "name": "Captain Cook Snorkel Adventure",
     "company": "Dolphin Discoveries",
-    "fareharborShortname": "dolphindiscoveries",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "dolphindiscoveries",
     "highlights": [
       "Boat snorkel trip to the Captain Cook Monument / Kealakekua Bay area",
       "Highest quality score (98) in this operator's lineup"
@@ -2108,13 +2092,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dolphin-discoveries-deluxe-kona-snorkel",
-    "title": "Deluxe Kona Snorkel Adventure (2 Snorkel Spots)",
+    "name": "Deluxe Kona Snorkel Adventure (2 Snorkel Spots)",
     "company": "Dolphin Discoveries",
-    "fareharborShortname": "dolphindiscoveries",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "dolphindiscoveries",
     "highlights": [
       "Two separate snorkel stops in one trip for site variety",
       "Good option if you want more than one reef environment in a single booking"
@@ -2152,13 +2136,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-forest-trail-hidden-craters-hike",
-    "title": "Hidden Craters Hike",
+    "name": "Hidden Craters Hike",
     "company": "Hawaii Forest & Trail",
-    "fareharborShortname": "hawaiiforestandtrail",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Guided Hike",
-    "duration": "~5 Hours",
+    "durationLabel": "~5 Hours",
+    "fareharborShortname": "hawaiiforestandtrail",
     "highlights": [
       "Private-land access to Hualalai Volcano's upper slopes and hidden craters/fissures",
       "3-4 miles through native cloud forest with a lava tube walk-through",
@@ -2200,13 +2184,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-geo-tours-volcano-national-park-adventure",
-    "title": "Volcano National Park Adventure",
+    "name": "Volcano National Park Adventure",
     "company": "Hawaii Geo Tours",
-    "fareharborShortname": "hawaiigeotours",
     "island": "Big Island",
     "city": "Kailua-Kona / Waikoloa Village",
     "tourType": "Guided Van Tour to Hawaii Volcanoes National Park",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiigeotours",
     "highlights": [
       "Full-day guided trip to Hawaii Volcanoes National Park from the Kona side of the island",
       "Geology-focused narration (the operator's name signals a science/education angle)",
@@ -2248,13 +2232,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "common-ground-kauai-farm-food-experience",
-    "title": "Farm and Food Experience",
+    "name": "Farm and Food Experience",
     "company": "Common Ground Kauai",
-    "fareharborShortname": "commongroundkauai",
     "island": "Kauai",
     "city": "Kilauea",
     "tourType": "Farm Tour + Tasting",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "commongroundkauai",
     "highlights": [
       "Working regenerative farm tour on Kauai's North Shore near Kilauea",
       "Farm-to-table tasting typically included",
@@ -2293,13 +2277,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dive-kauai-discover-scuba",
-    "title": "Discover Scuba Dive - OCEAN EXPERIENCE",
+    "name": "Discover Scuba Dive - OCEAN EXPERIENCE",
     "company": "Dive Kauai",
-    "fareharborShortname": "divekauai",
     "island": "Kauai",
     "city": "Poipu",
     "tourType": "Beginner Scuba (No Certification Required)",
-    "duration": "~3-4 Hours",
+    "durationLabel": "~3-4 Hours",
+    "fareharborShortname": "divekauai",
     "highlights": [
       "No certification required - includes basic instruction plus a real ocean dive",
       "South Shore Poipu location, generally calmer water than the North Shore",
@@ -2339,13 +2323,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dive-kauai-twilight-night-dive",
-    "title": "Twilight & Night Dive",
+    "name": "Twilight & Night Dive",
     "company": "Dive Kauai",
-    "fareharborShortname": "divekauai",
     "island": "Kauai",
     "city": "Poipu",
     "tourType": "Certified Diver - Night Dive",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "divekauai",
     "highlights": [
       "Twilight-to-night dive off Kauai's South Shore",
       "See nocturnal reef species not visible during the day"
@@ -2382,13 +2366,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "fathom-five-koloa-landing-shore-dive",
-    "title": "Koloa Landing Shore Dive",
+    "name": "Koloa Landing Shore Dive",
     "company": "Fathom Five Divers",
-    "fareharborShortname": "fathomfive",
     "island": "Kauai",
     "city": "Koloa",
     "tourType": "Certified Diver - Shore Dive",
-    "duration": "Varies by option (1.5-4 hours)",
+    "durationLabel": "Varies by option (1.5-4 hours)",
+    "fareharborShortname": "fathomfive",
     "highlights": [
       "Koloa Landing is one of Hawaii's best-known and most accessible shore dive sites",
       "No boat required - walk in directly from shore, which keeps costs lower than boat charters",
@@ -2431,13 +2415,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "fathom-five-2-tank-boat-dive",
-    "title": "2-Tank Boat Dive",
+    "name": "2-Tank Boat Dive",
     "company": "Fathom Five Divers",
-    "fareharborShortname": "fathomfive",
     "island": "Kauai",
     "city": "Koloa",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "fathomfive",
     "highlights": [
       "Boat access to Kauai South Shore sites not reachable from shore",
       "Two tanks at two distinct sites in one trip"
@@ -2475,13 +2459,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "fathom-five-discover-scuba-koloa",
-    "title": "1-Tank Discover SCUBA - Koloa Landing",
+    "name": "1-Tank Discover SCUBA - Koloa Landing",
     "company": "Fathom Five Divers",
-    "fareharborShortname": "fathomfive",
     "island": "Kauai",
     "city": "Koloa",
     "tourType": "Beginner Scuba (No Certification Required)",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "fathomfive",
     "highlights": [
       "No certification required - a real ocean dive at Koloa Landing with close instructor supervision",
       "Uses the same well-regarded, easy-entry site as the operator's certified shore dives"
@@ -2519,13 +2503,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "emountain-bike-experience-tour-kihei",
-    "title": "The Experience Tour",
+    "name": "The Experience Tour",
     "company": "Emountain Bike Tour Maui",
-    "fareharborShortname": "emountainbiketourmauillc",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Guided E-Mountain Bike Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "emountainbiketourmauillc",
     "highlights": [
       "Guided electric mountain bike route in the Kihei/Upcountry area",
       "E-bike assist makes climbs accessible to a wider fitness range",
@@ -2564,13 +2548,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "emountain-bike-grand-tour-kihei",
-    "title": "The Grand Tour",
+    "name": "The Grand Tour",
     "company": "Emountain Bike Tour Maui",
-    "fareharborShortname": "emountainbiketourmauillc",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Guided E-Mountain Bike Tour",
-    "duration": "Full Day (longer than Experience Tour)",
+    "durationLabel": "Full Day (longer than Experience Tour)",
+    "fareharborShortname": "emountainbiketourmauillc",
     "highlights": [
       "Longer, more extensive route than the operator's Experience Tour",
       "More varied terrain and greater distance covered"
@@ -2608,13 +2592,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-hawaii-vip-road-to-hana-haleakala-sunset",
-    "title": "VIP Road to Hana Tour + Haleakala Sunset",
+    "name": "VIP Road to Hana Tour + Haleakala Sunset",
     "company": "Experience Hawaii",
-    "fareharborShortname": "experiencemauitours",
     "island": "Maui",
     "city": "Kahului",
     "tourType": "Private/VIP Van Tour",
-    "duration": "Full Day (very long)",
+    "durationLabel": "Full Day (very long)",
+    "fareharborShortname": "experiencemauitours",
     "highlights": [
       "Combines the Road to Hana drive with a Haleakala sunset finish in one very long day",
       "Private/VIP format - smaller group than large shuttle-bus Hana tours"
@@ -2653,13 +2637,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-hawaii-half-day-vip-road-to-hana",
-    "title": "1/2 Day VIP Private Road to Hana Tour with Pick Up",
+    "name": "1/2 Day VIP Private Road to Hana Tour with Pick Up",
     "company": "Experience Hawaii",
-    "fareharborShortname": "experiencemauitours",
     "island": "Maui",
     "city": "Kahului",
     "tourType": "Private/VIP Van Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "experiencemauitours",
     "highlights": [
       "Shorter, half-day version of the Road to Hana drive",
       "Private/VIP format with hotel pickup included"
@@ -2697,13 +2681,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-hawaii-vip-kona-coast-tour",
-    "title": "VIP Kona Coast Private Tour with Pickup",
+    "name": "VIP Kona Coast Private Tour with Pickup",
     "company": "Experience Hawaii",
-    "fareharborShortname": "experiencemauitours",
     "island": "Big Island",
     "city": "Kona area (booked through a Maui-based operator)",
     "tourType": "Private/VIP Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "experiencemauitours",
     "highlights": [
       "Private/VIP touring format on the Big Island's Kona Coast"
     ],
@@ -2739,13 +2723,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dive-maui-lanai-cathedral-2-tank",
-    "title": "2 Tank Lanai Cathedral Dive by Boat",
+    "name": "2 Tank Lanai Cathedral Dive by Boat",
     "company": "Dive Maui",
-    "fareharborShortname": "goscubadivemaui",
     "island": "Maui",
     "city": "Lahaina",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "goscubadivemaui",
     "highlights": [
       "Boat trip to Lanai's famous 'Cathedrals' dive sites - large underwater lava tube caverns with dramatic light beams",
       "One of Maui-area diving's most distinctive, photogenic sites"
@@ -2784,13 +2768,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "dive-maui-shark-turtle-shore-dive",
-    "title": "Shark and Turtle Dive for Certified Divers from Shore",
+    "name": "Shark and Turtle Dive for Certified Divers from Shore",
     "company": "Dive Maui",
-    "fareharborShortname": "goscubadivemaui",
     "island": "Maui",
     "city": "Lahaina",
     "tourType": "Certified Diver - Shore Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "goscubadivemaui",
     "highlights": [
       "Shore-access dive (no boat fee) with regular shark and turtle sightings",
       "Lower cost alternative to boat charters for certified divers"
@@ -2828,13 +2812,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hana-and-beyond-tour",
-    "title": "Hana & Beyond Tour",
+    "name": "Hana & Beyond Tour",
     "company": "Hana and Beyond",
-    "fareharborShortname": "hanaandbeyond",
     "island": "Maui",
     "city": "Paia",
     "tourType": "Guided Road to Hana Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hanaandbeyond",
     "highlights": [
       "Full Road to Hana route departing from Paia, the traditional gateway town",
       "Shared or fully private group options",
@@ -2874,13 +2858,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hana-tours-of-maui-private-deluxe",
-    "title": "Private Deluxe Hana Tour",
+    "name": "Private Deluxe Hana Tour",
     "company": "Hana Tours of Maui",
-    "fareharborShortname": "hanatoursofmaui",
     "island": "Maui",
     "city": "Kula",
     "tourType": "Private Deluxe Road to Hana Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hanatoursofmaui",
     "highlights": [
       "Private, deluxe-tier Road to Hana experience",
       "Departing from Upcountry Maui (Kula)"
@@ -2917,13 +2901,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-by-storm-hana-back-luxury",
-    "title": "Hana & Back Adventure Tour: Luxury Expedition",
+    "name": "Hana & Back Adventure Tour: Luxury Expedition",
     "company": "Hawaii By Storm Tours, LLC",
-    "fareharborShortname": "hawaiibystorm",
     "island": "Maui",
     "city": "Kahului",
     "tourType": "Guided Road to Hana Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiibystorm",
     "highlights": [
       "Full round-trip Road to Hana route ('Hana & Back' - implies the full loop or return drive is included)",
       "'Luxury Expedition' branding suggests upgraded vehicle/amenities"
@@ -2960,13 +2944,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-by-storm-waimoku-falls-pipiwai",
-    "title": "Waimoku Falls at Pipiwai Trail Hiking Adventure",
+    "name": "Waimoku Falls at Pipiwai Trail Hiking Adventure",
     "company": "Hawaii By Storm Tours, LLC",
-    "fareharborShortname": "hawaiibystorm",
     "island": "Maui",
     "city": "Kahului",
     "tourType": "Guided Hike (Pipiwai Trail, Kipahulu)",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiibystorm",
     "highlights": [
       "Guided hike through the Pipiwai Trail's bamboo forest to 400-foot Waimoku Falls",
       "Located in the Kipahulu District, past Hana town - one of Maui's most rewarding trails"
@@ -3005,13 +2989,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-by-storm-pipiwai-haleakala-deluxe",
-    "title": "Pipiwai Trail & Haleakala Summit Deluxe Tour",
+    "name": "Pipiwai Trail & Haleakala Summit Deluxe Tour",
     "company": "Hawaii By Storm Tours, LLC",
-    "fareharborShortname": "hawaiibystorm",
     "island": "Maui",
     "city": "Kahului",
     "tourType": "Guided Hike + Summit Tour Combo",
-    "duration": "Full Day (very long)",
+    "durationLabel": "Full Day (very long)",
+    "fareharborShortname": "hawaiibystorm",
     "highlights": [
       "Combines the Pipiwai Trail hike with a Haleakala summit visit in one day",
       "Covers two of Maui's most demanding, high-value destinations in a single booking"
@@ -3049,13 +3033,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-by-storm-haleakala-summit-day-sunset",
-    "title": "Haleakala Summit Day/Sunset Hiking Adventure",
+    "name": "Haleakala Summit Day/Sunset Hiking Adventure",
     "company": "Hawaii By Storm Tours, LLC",
-    "fareharborShortname": "hawaiibystorm",
     "island": "Maui",
     "city": "Kahului",
     "tourType": "Guided Summit Hike",
-    "duration": "Full Day or Evening",
+    "durationLabel": "Full Day or Evening",
+    "fareharborShortname": "hawaiibystorm",
     "highlights": [
       "Haleakala summit hiking, available in day or sunset timing",
       "Above-the-clouds crater views at over 10,000 feet elevation"
@@ -3094,13 +3078,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "enoa-pearl-harbor-tour",
-    "title": "Pearl Harbor Tour by E Noa",
+    "name": "Pearl Harbor Tour by E Noa",
     "company": "E Noa Corporation",
-    "fareharborShortname": "enoatours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Historical Bus Tour",
-    "duration": "5-7 Hours depending on package",
+    "durationLabel": "5-7 Hours depending on package",
+    "fareharborShortname": "enoatours",
     "highlights": [
       "Long-established, well-known Oahu Pearl Harbor tour operator (also runs the Waikiki Trolley)",
       "USS Arizona Memorial entry included in every package",
@@ -3144,13 +3128,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "enoa-majestic-circle-island-tour",
-    "title": "Majestic Circle Island Tour",
+    "name": "Majestic Circle Island Tour",
     "company": "E Noa Corporation",
-    "fareharborShortname": "enoatours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Van/Bus Circle Island Tour",
-    "duration": "~7-8 Hours",
+    "durationLabel": "~7-8 Hours",
+    "fareharborShortname": "enoatours",
     "highlights": [
       "Full-day circle-island route from an established, well-known Oahu operator",
       "Departs Waikiki, covering North Shore and Windward Coast scenic points"
@@ -3187,13 +3171,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-aloha-luxury-beach-picnic",
-    "title": "Luxury Beach Picnic: Two Guests",
+    "name": "Luxury Beach Picnic: Two Guests",
     "company": "Experience Aloha Co",
-    "fareharborShortname": "experiencealoha",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Styled Beach Picnic Setup",
-    "duration": "~2 Hours setup/session",
+    "durationLabel": "~2 Hours setup/session",
+    "fareharborShortname": "experiencealoha",
     "highlights": [
       "Fully set-up, styled beach picnic for two - decor, seating, food arranged",
       "Popular for anniversaries, proposals, or a special date on the beach"
@@ -3232,13 +3216,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-aloha-wedding-photography",
-    "title": "Wedding Photography",
+    "name": "Wedding Photography",
     "company": "Experience Aloha Co",
-    "fareharborShortname": "experiencealoha",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Photography Service",
-    "duration": "Session-based",
+    "durationLabel": "Session-based",
+    "fareharborShortname": "experiencealoha",
     "highlights": [
       "Professional wedding photography service on Oahu"
     ],
@@ -3274,13 +3258,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-aloha-engagement-photography",
-    "title": "Engagement Photography Session",
+    "name": "Engagement Photography Session",
     "company": "Experience Aloha Co",
-    "fareharborShortname": "experiencealoha",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Photography Service",
-    "duration": "Session-based (~1-2 Hours)",
+    "durationLabel": "Session-based (~1-2 Hours)",
+    "fareharborShortname": "experiencealoha",
     "highlights": [
       "Engagement photo session at scenic Oahu locations"
     ],
@@ -3316,13 +3300,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "experience-aloha-custom-floral-proposal",
-    "title": "Custom Floral Proposal",
+    "name": "Custom Floral Proposal",
     "company": "Experience Aloha Co",
-    "fareharborShortname": "experiencealoha",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Proposal Styling Service",
-    "duration": "Setup + session",
+    "durationLabel": "Setup + session",
+    "fareharborShortname": "experiencealoha",
     "highlights": [
       "Custom floral arch/setup for a proposal moment, typically paired with photography"
     ],
@@ -3359,13 +3343,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-adventure-pelagic-cageless-shark-dive",
-    "title": "Pelagic (Cageless) Shark Dive",
+    "name": "Pelagic (Cageless) Shark Dive",
     "company": "Go Adventure Hawaii",
-    "fareharborShortname": "goadventurehawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Cageless Shark Snorkel",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "goadventurehawaii",
     "highlights": [
       "Departs from Haleiwa Small Boat Harbor - the North Shore's established shark-tour hub",
       "Snorkel in open water alongside a safety diver, no cage",
@@ -3407,13 +3391,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-adventure-custom-day-trip",
-    "title": "Custom Day Trip",
+    "name": "Custom Day Trip",
     "company": "Go Adventure Hawaii",
-    "fareharborShortname": "goadventurehawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Custom Private Charter",
-    "duration": "Full Day (flexible)",
+    "durationLabel": "Full Day (flexible)",
+    "fareharborShortname": "goadventurehawaii",
     "highlights": [
       "Fully custom boat day - fishing, snorkeling, sightseeing, or a mix, set by your group",
       "Private charter format"
@@ -3451,13 +3435,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "go-adventure-fishing-charter",
-    "title": "Fishing Charter",
+    "name": "Fishing Charter",
     "company": "Go Adventure Hawaii",
-    "fareharborShortname": "goadventurehawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Fishing Charter",
-    "duration": "Half or Full Day",
+    "durationLabel": "Half or Full Day",
+    "fareharborShortname": "goadventurehawaii",
     "highlights": [
       "Standard fishing charter out of Haleiwa Harbor on Oahu's North Shore"
     ],
@@ -3493,13 +3477,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ocean-outfitters-marine-life-tour",
-    "title": "Marine Life Tour",
+    "name": "Marine Life Tour",
     "company": "Ocean Outfitters Hawaii",
-    "fareharborShortname": "hawaiiglassbottomboats-slt",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Glass-Bottom / Wildlife Viewing Boat",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "hawaiiglassbottomboats-slt",
     "highlights": [
       "North Shore boat trip focused on general marine life viewing",
       "Shorter, more affordable format than a full snorkel charter"
@@ -3538,13 +3522,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ocean-outfitters-cage-free-shark-tour",
-    "title": "Cage-free Shark Tour",
+    "name": "Cage-free Shark Tour",
     "company": "Ocean Outfitters Hawaii",
-    "fareharborShortname": "hawaiiglassbottomboats-slt",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Cageless Shark Snorkel",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "hawaiiglassbottomboats-slt",
     "highlights": [
       "Another North Shore cageless shark snorkel option (see Go Adventure Hawaii's Pelagic Shark Dive for detailed category context)",
       "Departs from the North Shore harbor area"
@@ -3581,13 +3565,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-nautical-oahu-west-oahu-heritage-sail",
-    "title": "West Oahu Heritage Snorkel Sail",
+    "name": "West Oahu Heritage Snorkel Sail",
     "company": "Hawaii Nautical - Oahu",
-    "fareharborShortname": "hawaiinautical",
     "island": "Oahu",
     "city": "Waianae",
     "tourType": "Sailing Snorkel Cruise",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hawaiinautical",
     "highlights": [
       "Sails the Leeward (West) Coast, generally calmer and less touristed than Waikiki",
       "'Heritage' framing suggests some cultural/historical narration included"
@@ -3625,13 +3609,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-nautical-oahu-kaula-kai-sunset-ko-olina",
-    "title": "Kaula Kai Sunset Sail at Ko Olina",
+    "name": "Kaula Kai Sunset Sail at Ko Olina",
     "company": "Hawaii Nautical - Oahu",
-    "fareharborShortname": "hawaiinautical",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Sunset Sail",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "hawaiinautical",
     "highlights": [
       "Departs from Ko Olina's protected lagoons on the West Coast",
       "Sunset timing over calm resort-area water"
@@ -3669,13 +3653,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-ocean-charters-keanuenue",
-    "title": "Private Catamaran Cruise & Snorkeling \"Keanuenue\"",
+    "name": "Private Catamaran Cruise & Snorkeling \"Keanuenue\"",
     "company": "Hawaii Ocean Charters",
-    "fareharborShortname": "hawaiioceancharters",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Catamaran Charter",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "hawaiioceancharters",
     "highlights": [
       "Fully private catamaran named 'Keanuenue' - exclusive to your group",
       "Day option includes snorkeling; sunset option is swim-and-sail focused"
@@ -3714,13 +3698,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-oahu-circle-island-tour",
-    "title": "Oahu Circle Island Tour",
+    "name": "Oahu Circle Island Tour",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Shared Circle Island Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "Full-day circle-island route covering North Shore beaches and scenic Oahu stops",
       "Available in English and German-language guided formats",
@@ -3762,13 +3746,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-private-custom-tour",
-    "title": "Private Custom Oahu Tour",
+    "name": "Private Custom Oahu Tour",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Custom Van Tour",
-    "duration": "Full Day (flexible)",
+    "durationLabel": "Full Day (flexible)",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "Fully private, flexible itinerary set by your group",
       "Available in English or German"
@@ -3807,13 +3791,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-fully-customized-tour-event",
-    "title": "Fully Customized Tour or Event",
+    "name": "Fully Customized Tour or Event",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Custom Event/Transportation Booking",
-    "duration": "Varies",
+    "durationLabel": "Varies",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "Broader booking category than the private tour listing - appears to cover events (weddings, corporate, etc.) as well as custom sightseeing"
     ],
@@ -3849,13 +3833,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-luau-transportation",
-    "title": "Luau Transportation Private Group Oahu",
+    "name": "Luau Transportation Private Group Oahu",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Transportation Service",
-    "duration": "Round-trip transport",
+    "durationLabel": "Round-trip transport",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "Private round-trip transportation specifically for luau attendance",
       "Useful if your hotel isn't on a standard luau shuttle route"
@@ -3893,13 +3877,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-chauffeur-transportation",
-    "title": "Chauffeur & Transportation Service (Servicing all of Oahu)",
+    "name": "Chauffeur & Transportation Service (Servicing all of Oahu)",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "General Private Chauffeur Service",
-    "duration": "As booked",
+    "durationLabel": "As booked",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "General private driver/chauffeur service covering all of Oahu",
       "By far the highest availability count in this dataset - suggests this is a high-frequency, everyday service rather than a scheduled tour"
@@ -3938,13 +3922,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-pearl-harbor-downtown-honolulu",
-    "title": "Pearl Harbor & USS Arizona with Downtown Honolulu",
+    "name": "Pearl Harbor & USS Arizona with Downtown Honolulu",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Historical Bus Tour",
-    "duration": "~5-6 Hours",
+    "durationLabel": "~5-6 Hours",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "Pearl Harbor and USS Arizona Memorial tour with downtown Honolulu drive-by included",
       "Available in this operator's English/German-serving format"
@@ -3982,13 +3966,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "danielshawaii-circle-island-helicopter-combo",
-    "title": "Private Oahu Circle Island Tour & Helicopter Flight",
+    "name": "Private Oahu Circle Island Tour & Helicopter Flight",
     "company": "DanielsHawaii",
-    "fareharborShortname": "hawaiireisetipps",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Combo: Private Van Tour + Helicopter",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiireisetipps",
     "highlights": [
       "Combines a private circle-island ground tour with an aerial helicopter flight",
       "A premium, high-budget combo product"
@@ -4026,13 +4010,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-turtle-tours-northshore-circle-island",
-    "title": "Northshore Circle Island Adventure",
+    "name": "Northshore Circle Island Adventure",
     "company": "Hawaii Turtle Tours",
-    "fareharborShortname": "hawaiiturtletours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Shared Circle Island Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiiturtletours",
     "highlights": [
       "Standard North Shore/circle-island route",
       "23 photos on file - well-documented listing"
@@ -4069,13 +4053,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-turtle-tours-private-spanish-tour",
-    "title": "Full Day Isla Oahu Con Experiencia Personalizada - Tour Privado En Español",
+    "name": "Full Day Isla Oahu Con Experiencia Personalizada - Tour Privado En Español",
     "company": "Hawaii Turtle Tours",
-    "fareharborShortname": "hawaiiturtletours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Custom Tour (Spanish-Guided)",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hawaiiturtletours",
     "highlights": [
       "Fully private, Spanish-language guided Oahu tour",
       "Personalized itinerary rather than a fixed route"
@@ -4113,13 +4097,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hans-hedemann-surf-lessons",
-    "title": "Surf Lessons",
+    "name": "Surf Lessons",
     "company": "Hans Hedemann South Shore (Queen Kapiolani)",
-    "fareharborShortname": "hhsurf",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Surf Instruction",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "hhsurf",
     "highlights": [
       "South Shore (Waikiki-area) surf lessons, run by a named professional surf school",
       "Beginner-friendly, gentle wave location"
@@ -4157,13 +4141,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-polo-trail-rides-oceanfront-horseback",
-    "title": "Oceanfront Horseback Ride",
+    "name": "Oceanfront Horseback Ride",
     "company": "Hawaii Polo Trail Rides",
-    "fareharborShortname": "hipolotrailrides",
     "island": "Oahu",
     "city": "Waialua",
     "tourType": "Horseback Riding",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "hipolotrailrides",
     "highlights": [
       "Oceanfront horseback riding on Oahu's North Shore near Waialua",
       "Group or fully private options, daytime or sunset timing"
@@ -4204,13 +4188,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hi-private-tours-east-oahu-kailua",
-    "title": "East Oahu Lookouts & Kailua Day",
+    "name": "East Oahu Lookouts & Kailua Day",
     "company": "HI Private Tours",
-    "fareharborShortname": "hiprivatetours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hiprivatetours",
     "highlights": [
       "Private tour covering East Oahu's scenic lookouts (Makapu'u, Lanikai, etc.) plus Kailua town/beach time"
     ],
@@ -4247,13 +4231,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hi-private-tours-north-shore-adventure",
-    "title": "North Shore Adventure Tour",
+    "name": "North Shore Adventure Tour",
     "company": "HI Private Tours",
-    "fareharborShortname": "hiprivatetours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hiprivatetours",
     "highlights": [
       "Private tour focused on Oahu's North Shore - surf beaches, shrimp trucks, Haleiwa town"
     ],
@@ -4290,13 +4274,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hi-private-tours-full-day-circle-island",
-    "title": "Full Day Circle Island Tour - See it All",
+    "name": "Full Day Circle Island Tour - See it All",
     "company": "HI Private Tours",
-    "fareharborShortname": "hiprivatetours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "hiprivatetours",
     "highlights": [
       "This operator's full circle-island option, combining what the East Oahu and North Shore tours cover separately"
     ],
@@ -4332,13 +4316,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hi-private-tours-tantalus-dinner-japanese",
-    "title": "Tantalus Lookout Dinner Plan (Japanese-Guided)",
+    "name": "Tantalus Lookout Dinner Plan (Japanese-Guided)",
     "company": "HI Private Tours",
-    "fareharborShortname": "hiprivatetours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Evening Tour + Dinner",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "hiprivatetours",
     "highlights": [
       "Evening trip to Tantalus Lookout, one of Honolulu's best nighttime city-light viewpoints",
       "Dinner included",
@@ -4377,13 +4361,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kailua-beach-adventures-2hr-guided-kayak",
-    "title": "2-Hour Guided Kayak + Beach Time",
+    "name": "2-Hour Guided Kayak + Beach Time",
     "company": "Kailua Beach Adventures",
-    "fareharborShortname": "kailuasailboards",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Guided Kayak Tour",
-    "duration": "2 Hours",
+    "durationLabel": "2 Hours",
+    "fareharborShortname": "kailuasailboards",
     "highlights": [
       "Shorter, guided kayak format with beach relaxation time built in",
       "Good for travelers who want a taste of kayaking without a full half-day commitment"
@@ -4421,13 +4405,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kailua-beach-adventures-self-guided-discovery",
-    "title": "Self-Guided Kayaking Discovery",
+    "name": "Self-Guided Kayaking Discovery",
     "company": "Kailua Beach Adventures",
-    "fareharborShortname": "kailuasailboards",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Self-Guided Kayak Rental",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "kailuasailboards",
     "highlights": [
       "Flexible, self-guided kayak rental in Kailua Bay",
       "Bookable in English or Japanese"
@@ -4466,13 +4450,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kailua-beach-adventures-twin-islands-guided",
-    "title": "Twin Islands Guided Kayak Tour",
+    "name": "Twin Islands Guided Kayak Tour",
     "company": "Kailua Beach Adventures",
-    "fareharborShortname": "kailuasailboards",
     "island": "Oahu",
     "city": "Kailua",
     "tourType": "Guided Kayak Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "kailuasailboards",
     "highlights": [
       "Guided crossing to the Mokulua ('Twin') Islands off Kailua Beach",
       "Comparable destination to Active Oahu Tours' Mokulua Islands tour, run by a different operator"
@@ -4509,13 +4493,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaimana-tours-hanauma-bay",
-    "title": "Hanauma Bay Snorkeling",
+    "name": "Hanauma Bay Snorkeling",
     "company": "Kaimana Tours",
-    "fareharborShortname": "kaimanatours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel Tour + Transport",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "kaimanatours",
     "highlights": [
       "Transport and logistics support for Hanauma Bay, Oahu's most famous protected snorkel bay",
       "Useful for travelers without a car, since Hanauma Bay requires advance reservation and has limited parking"
@@ -4554,13 +4538,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaimana-tours-makapuu-halona",
-    "title": "Makapu'u Point Lighthouse Trail Hike & Halona Blowhole",
+    "name": "Makapu'u Point Lighthouse Trail Hike & Halona Blowhole",
     "company": "Kaimana Tours",
-    "fareharborShortname": "kaimanatours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Guided Hike + Sightseeing",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "kaimanatours",
     "highlights": [
       "Paved, moderate lighthouse trail hike with strong whale-watching potential in season (roughly Dec-April)",
       "Halona Blowhole stop included",
@@ -4600,13 +4584,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaimana-tours-manoa-falls",
-    "title": "Manoa Falls Rainforest & Self-Guided Hike",
+    "name": "Manoa Falls Rainforest & Self-Guided Hike",
     "company": "Kaimana Tours",
-    "fareharborShortname": "kaimanatours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Transport + Self-Guided Hike",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "kaimanatours",
     "highlights": [
       "Transport/logistics to Manoa Falls, a rainforest waterfall hike close to Honolulu",
       "Self-guided once at the trailhead"
@@ -4644,13 +4628,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaimana-tours-snorkel-gear-rental",
-    "title": "Snorkel Gear and Beach Rental",
+    "name": "Snorkel Gear and Beach Rental",
     "company": "Kaimana Tours",
-    "fareharborShortname": "kaimanatours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Equipment Rental",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "kaimanatours",
     "highlights": [
       "Basic snorkel and beach equipment rental",
       "Flexible, no fixed schedule"
@@ -4687,13 +4671,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "catamaran-kepoikai-day-sail",
-    "title": "Day Sail",
+    "name": "Day Sail",
     "company": "Catamaran Kepoikai II",
-    "fareharborShortname": "kepoikai",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Shared Catamaran Sail",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "kepoikai",
     "highlights": [
       "Shared (non-private) daytime catamaran sail off Waikiki - a more affordable format than private charters",
       "Named vessel with an established local presence"
@@ -4731,13 +4715,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ko-hana-rum-distillery-tour",
-    "title": "Ko Hana Hawaiian Agricole Rum Distillery Tour",
+    "name": "Ko Hana Hawaiian Agricole Rum Distillery Tour",
     "company": "Ko Hana Distillers",
-    "fareharborShortname": "kohanarum",
     "island": "Oahu",
     "city": "Kunia Camp",
     "tourType": "Distillery Tour + Tasting",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "kohanarum",
     "highlights": [
       "Tour of a working sugarcane farm and agricole-style rum distillery in Central Oahu",
       "Tasting included - a distinctive Hawaii-grown spirit category",
@@ -4777,13 +4761,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-island-ocean-tours-whale-dolphin-kealakekua-speedboat",
-    "title": "Whale/Dolphin Watch, Sea Cave & Captain Cook Kealakekua Bay Reef Snorkel Speed Boat Adventure",
+    "name": "Whale/Dolphin Watch, Sea Cave & Captain Cook Kealakekua Bay Reef Snorkel Speed Boat Adventure",
     "company": "Hawaii Island & Ocean Tours",
-    "fareharborShortname": "hawaiiislandandoceantours",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Speedboat Multi-Activity Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hawaiiislandandoceantours",
     "highlights": [
       "Combines whale/dolphin watching, a sea cave stop, and Kealakekua Bay snorkeling in one faster-format speedboat trip",
       "19 photos on file - well-documented listing",
@@ -4823,13 +4807,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-island-ocean-tours-manta-moonlight-keauhou",
-    "title": "Manta Ray Moonlight Snorkel in Keauhou - Kona",
+    "name": "Manta Ray Moonlight Snorkel in Keauhou - Kona",
     "company": "Hawaii Island & Ocean Tours",
-    "fareharborShortname": "hawaiiislandandoceantours",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "hawaiiislandandoceantours",
     "highlights": [
       "Manta ray night snorkel departing from Keauhou, a well-known manta feeding site south of central Kona",
       "See the Coral Reef Snorkel Adventures manta listing for general category context"
@@ -4866,13 +4850,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-island-holidays-mauna-kea-summit-sunset-stars",
-    "title": "Hawaii's GOAT Experience: Mauna Kea Summit, Sunset & Stars",
+    "name": "Hawaii's GOAT Experience: Mauna Kea Summit, Sunset & Stars",
     "company": "Hawaii Island Holidays",
-    "fareharborShortname": "hawaiiislandholidays",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Guided Summit + Stargazing Tour",
-    "duration": "Evening (long)",
+    "durationLabel": "Evening (long)",
+    "fareharborShortname": "hawaiiislandholidays",
     "highlights": [
       "Mauna Kea's summit sits above 13,700 feet - one of the best stargazing locations on Earth due to elevation and lack of light pollution",
       "Sunset viewing at the summit followed by guided stargazing on the descent",
@@ -4913,13 +4897,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-nautical-bigisland-waikoloa-snorkel-sail-lunch",
-    "title": "Waikoloa Snorkel Sail with Lunch",
+    "name": "Waikoloa Snorkel Sail with Lunch",
     "company": "Hawaii Nautical Big Island",
-    "fareharborShortname": "hawaiinautical-kona",
     "island": "Big Island",
     "city": "Waikoloa Village",
     "tourType": "Sailing Snorkel Cruise + Lunch",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hawaiinautical-kona",
     "highlights": [
       "Sailing snorkel trip departing from the Waikoloa resort area on the Kohala Coast",
       "Lunch included"
@@ -4956,13 +4940,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-nautical-bigisland-waikoloa-signature-sunset",
-    "title": "Waikoloa Signature Sunset Sail",
+    "name": "Waikoloa Signature Sunset Sail",
     "company": "Hawaii Nautical Big Island",
-    "fareharborShortname": "hawaiinautical-kona",
     "island": "Big Island",
     "city": "Waikoloa Village",
     "tourType": "Sunset Sail",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "hawaiinautical-kona",
     "highlights": [
       "Sunset sail from the Waikoloa/Kohala Coast area, the operator's flagship evening product"
     ],
@@ -4996,13 +4980,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-nautical-bigisland-kona-luxury-dolphin-snorkel",
-    "title": "Kona Luxury Dolphin Snorkel Sail",
+    "name": "Kona Luxury Dolphin Snorkel Sail",
     "company": "Hawaii Nautical Big Island",
-    "fareharborShortname": "hawaiinautical-kona",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Sailing Snorkel + Dolphin Watch",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hawaiinautical-kona",
     "highlights": [
       "Combines snorkeling with dolphin watching from central Kona, positioned as a 'luxury' higher-end sail"
     ],
@@ -5038,13 +5022,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-nautical-bigisland-kona-luxury-private-yacht",
-    "title": "Kona Luxury Private Yacht Charter",
+    "name": "Kona Luxury Private Yacht Charter",
     "company": "Hawaii Nautical Big Island",
-    "fareharborShortname": "hawaiinautical-kona",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Private Yacht Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "hawaiinautical-kona",
     "highlights": [
       "Fully private yacht charter, the top tier of this operator's Kona offerings",
       "Flexible itinerary set by your group"
@@ -5082,13 +5066,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-oceanic-kealakekua-bay-snorkel",
-    "title": "Kealakekua Bay (Captain Cook Monument) Snorkel",
+    "name": "Kealakekua Bay (Captain Cook Monument) Snorkel",
     "company": "Hawaii Oceanic",
-    "fareharborShortname": "hawaiioceanic",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hawaiioceanic",
     "highlights": [
       "Another operator running trips to Kealakekua Bay's protected, marine-life-rich waters",
       "High quality score (97) in this dataset"
@@ -5125,13 +5109,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-oceanic-manta-magic",
-    "title": "Manta Magic",
+    "name": "Manta Magic",
     "company": "Hawaii Oceanic",
-    "fareharborShortname": "hawaiioceanic",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "hawaiioceanic",
     "highlights": [
       "This operator's manta ray night snorkel product",
       "Quality score of 96 - among the higher-scoring manta listings in this dataset"
@@ -5168,13 +5152,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hang-loose-manta-ray-night",
-    "title": "Manta Ray Night Adventure",
+    "name": "Manta Ray Night Adventure",
     "company": "Hang Loose Boat Tours LLC",
-    "fareharborShortname": "hawaiitourboat",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "hawaiitourboat",
     "highlights": [
       "Another Kona manta ray night snorkel operator"
     ],
@@ -5210,13 +5194,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "heavenly-hawaiian-coffee-brewing-workshop",
-    "title": "\"Brew Your Best Cup\" Coffee Brewing Workshop",
+    "name": "\"Brew Your Best Cup\" Coffee Brewing Workshop",
     "company": "Heavenly Hawaiian Coffee Farm",
-    "fareharborShortname": "heavenlyhawaiian",
     "island": "Big Island",
     "city": "Holualoa",
     "tourType": "Coffee Workshop",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "heavenlyhawaiian",
     "highlights": [
       "Hands-on brewing techniques workshop at a South Kona coffee farm",
       "Learn multiple brewing methods rather than just tasting",
@@ -5255,13 +5239,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "heavenly-hawaiian-paniolo-roasting",
-    "title": "Paniolo Coffee Roasting Experience",
+    "name": "Paniolo Coffee Roasting Experience",
     "company": "Heavenly Hawaiian Coffee Farm",
-    "fareharborShortname": "heavenlyhawaiian",
     "island": "Big Island",
     "city": "Holualoa",
     "tourType": "Coffee Roasting Workshop",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "heavenlyhawaiian",
     "highlights": [
       "Hands-on roasting experience - a different production stage than the brewing workshop",
       "'Paniolo' (Hawaiian cowboy) branding ties in local ranching heritage"
@@ -5298,13 +5282,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "heavenly-hawaiian-paint-sip",
-    "title": "\"Paint & Sip\" Painting Class with Coffee & a View",
+    "name": "\"Paint & Sip\" Painting Class with Coffee & a View",
     "company": "Heavenly Hawaiian Coffee Farm",
-    "fareharborShortname": "heavenlyhawaiian",
     "island": "Big Island",
     "city": "Holualoa",
     "tourType": "Paint & Sip Class",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "heavenlyhawaiian",
     "highlights": [
       "Guided painting class paired with coffee, set at the farm's scenic viewpoint",
       "Highest quality score (98) among this operator's three listings"
@@ -5342,13 +5326,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hilo-ocean-adventures-discover-scuba",
-    "title": "Discover Scuba Diving",
+    "name": "Discover Scuba Diving",
     "company": "Hilo Ocean Adventures",
-    "fareharborShortname": "hilooceanadventures",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Beginner Scuba (No Certification Required)",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "hilooceanadventures",
     "highlights": [
       "Beginner scuba program on the Hilo (east) side of the Big Island - a much less-touristed dive scene than Kona",
       "No certification required"
@@ -5386,13 +5370,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hilo-ocean-adventures-turtle-lagoon-black-sand",
-    "title": "Beach Snorkel - Sea Turtle Lagoon and Black Sand Beach",
+    "name": "Beach Snorkel - Sea Turtle Lagoon and Black Sand Beach",
     "company": "Hilo Ocean Adventures",
-    "fareharborShortname": "hilooceanadventures",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Beach Snorkel Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hilooceanadventures",
     "highlights": [
       "Combines a sea turtle lagoon snorkel with a stop at one of the Big Island's black sand beaches",
       "Shore-based, lower cost than boat-based Kona snorkel trips"
@@ -5430,13 +5414,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hilo-ocean-adventures-waiolena-2tank-shore",
-    "title": "2 Tank Shore Dive - Wai'olena Beach",
+    "name": "2 Tank Shore Dive - Wai'olena Beach",
     "company": "Hilo Ocean Adventures",
-    "fareharborShortname": "hilooceanadventures",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Certified Diver - 2 Tank Shore Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "hilooceanadventures",
     "highlights": [
       "Shore-entry certified dive at Wai'olena Beach on the Hilo side",
       "No boat fee - a lower-cost alternative to Kona's boat charters"
@@ -5474,13 +5458,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kailani-tours-big-island-highlights-volcano",
-    "title": "Big Island Highlights Volcano Day Tour",
+    "name": "Big Island Highlights Volcano Day Tour",
     "company": "Kailani Tours Hawaii",
-    "fareharborShortname": "kailanitourshawaii",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Guided Van Tour to Volcanoes National Park",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "kailanitourshawaii",
     "highlights": [
       "Full-day guided trip to Hawaii Volcanoes National Park from Kona",
       "16 photos on file"
@@ -5517,13 +5501,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kohala-divers-two-site-dive-snorkel",
-    "title": "Two-Site Dive/Snorkel",
+    "name": "Two-Site Dive/Snorkel",
     "company": "Kohala Divers",
-    "fareharborShortname": "kohaladivers",
     "island": "Big Island",
     "city": "Waimea",
     "tourType": "Combo Dive/Snorkel Charter",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "kohaladivers",
     "highlights": [
       "Departs the Kohala Coast (North Kona/Kawaihae area), reaching sites less crowded than central Kona",
       "Combined format allows both divers and snorkelers in the same group"
@@ -5561,13 +5545,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-boys-kealakekua-kayak-snorkel",
-    "title": "Kealakekua Bay Kayak & Snorkel Tour",
+    "name": "Kealakekua Bay Kayak & Snorkel Tour",
     "company": "Kona Boys",
-    "fareharborShortname": "konaboys",
     "island": "Big Island",
     "city": "Kealakekua",
     "tourType": "Kayak + Snorkel Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "konaboys",
     "highlights": [
       "Kayak-and-snorkel access to Kealakekua Bay's protected reef and Captain Cook Monument area",
       "Morning or midday departure options",
@@ -5608,13 +5592,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-brewing-company-brewery-tour",
-    "title": "Brewery Tour",
+    "name": "Brewery Tour",
     "company": "Kona Brewing Company",
-    "fareharborShortname": "konabrewing",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Brewery Tour + Tasting",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "konabrewing",
     "highlights": [
       "Tour of Kona Brewing Company's original Big Island brewery - a nationally recognized Hawaii beer brand",
       "Tasting included"
@@ -5652,13 +5636,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-cloud-forest-sound-bath",
-    "title": "Sound Bath Meditation Journey",
+    "name": "Sound Bath Meditation Journey",
     "company": "Kona Cloud Forest Sanctuary",
-    "fareharborShortname": "konacloudforest",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Wellness / Meditation Experience",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "konacloudforest",
     "highlights": [
       "Sound bath meditation set within a cloud forest sanctuary above Kona",
       "Highest quality score (98) in this operator's lineup",
@@ -5697,13 +5681,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-cloud-forest-pantropical-trail",
-    "title": "Cloud Forest Tour - Pantropical Trail (1.5 hr)",
+    "name": "Cloud Forest Tour - Pantropical Trail (1.5 hr)",
     "company": "Kona Cloud Forest Sanctuary",
-    "fareharborShortname": "konacloudforest",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Guided Botanical Walking Tour",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "konacloudforest",
     "highlights": [
       "Guided walk through a diverse tropical/subtropical plant collection above Kona",
       "Educational, low-intensity activity"
@@ -5739,13 +5723,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-diving-2tank-morning",
-    "title": "2-tank Morning Charter",
+    "name": "2-tank Morning Charter",
     "company": "Kona Diving Company",
-    "fareharborShortname": "konadivingcompany",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "konadivingcompany",
     "highlights": [
       "Standard Kona two-tank morning boat dive"
     ],
@@ -5779,13 +5763,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-diving-manta-ray-night-charter",
-    "title": "2-tank Manta Ray Night Charter",
+    "name": "2-tank Manta Ray Night Charter",
     "company": "Kona Diving Company",
-    "fareharborShortname": "konadivingcompany",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - 2 Tank Night Manta Dive",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "konadivingcompany",
     "highlights": [
       "Certified-diver version of Kona's manta ray night experience (as opposed to the more common snorkel version)",
       "Two tanks - dive proper rather than surface snorkeling"
@@ -5822,13 +5806,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-2tank-morning",
-    "title": "2-Tank Local Morning Dive Charter",
+    "name": "2-Tank Local Morning Dive Charter",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "Standard local Kona 2-tank morning charter from an established dive shop"
     ],
@@ -5862,13 +5846,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-2tank-night-manta",
-    "title": "2 Tank Night Manta Dive Charter",
+    "name": "2 Tank Night Manta Dive Charter",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - 2 Tank Night Manta Dive",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "This shop's certified-diver manta ray night dive product"
     ],
@@ -5902,13 +5886,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-level1-freediver",
-    "title": "Level 1 Freediver Course",
+    "name": "Level 1 Freediver Course",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Freediving Certification Course",
-    "duration": "Multi-Day Course",
+    "durationLabel": "Multi-Day Course",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "Entry-level freediving certification course - breath-hold diving technique and safety, distinct from scuba"
     ],
@@ -5945,13 +5929,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-open-water-course",
-    "title": "Open Water Course",
+    "name": "Open Water Course",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Scuba Certification Course",
-    "duration": "Multi-Day Course",
+    "durationLabel": "Multi-Day Course",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "Full Open Water scuba certification - the entry-level credential for independent diving worldwide"
     ],
@@ -5988,13 +5972,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-blackwater-dive",
-    "title": "Blackwater Night Dive",
+    "name": "Blackwater Night Dive",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - Blackwater Dive",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "Blackwater diving - a specialized night dive over deep open ocean (not a reef), observing rarely-seen deep-sea pelagic creatures that rise toward the surface after dark",
       "Available as a shared or fully private charter"
@@ -6035,13 +6019,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-premium-advanced-long-range",
-    "title": "Premium Advanced 2 Tank Long Range Charter",
+    "name": "Premium Advanced 2 Tank Long Range Charter",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Certified Diver - Advanced 2 Tank Long Range Charter",
-    "duration": "Half Day (extended)",
+    "durationLabel": "Half Day (extended)",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "Reaches further offshore sites than the standard local charter",
       "For advanced/experienced divers specifically"
@@ -6078,13 +6062,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-honu-divers-private-charter-honu-lele",
-    "title": "Private Charter - Honu Lele",
+    "name": "Private Charter - Honu Lele",
     "company": "Kona Honu Divers",
-    "fareharborShortname": "konahonudivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Private Dive Boat Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "konahonudivers",
     "highlights": [
       "Fully private boat charter on the named vessel Honu Lele, for certified diving groups"
     ],
@@ -6121,13 +6105,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-ocean-adventures-kealakekua-captain-cook",
-    "title": "Kealakekua/Captain Cook Adventure",
+    "name": "Kealakekua/Captain Cook Adventure",
     "company": "Kona Ocean Adventures",
-    "fareharborShortname": "konaoceanadventures",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "konaoceanadventures",
     "highlights": [
       "Another operator running trips to the well-regarded Kealakekua Bay/Captain Cook Monument area"
     ],
@@ -6161,13 +6145,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-ocean-adventures-manta-scuba-combo",
-    "title": "Majestic Manta Rays Snorkel / 1-Tank Scuba Dive Adventure",
+    "name": "Majestic Manta Rays Snorkel / 1-Tank Scuba Dive Adventure",
     "company": "Kona Ocean Adventures",
-    "fareharborShortname": "konaoceanadventures",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Manta Snorkel or 1-Tank Dive (choice)",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "konaoceanadventures",
     "highlights": [
       "Lets guests choose between snorkeling or a 1-tank scuba dive to see the mantas - good for mixed-skill groups"
     ],
@@ -6203,13 +6187,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-ocean-adventures-private-charter",
-    "title": "Private Charter",
+    "name": "Private Charter",
     "company": "Kona Ocean Adventures",
-    "fareharborShortname": "konaoceanadventures",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Private Boat Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "konaoceanadventures",
     "highlights": [
       "Fully private, flexible-itinerary boat charter"
     ],
@@ -6245,13 +6229,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-sea-salt-mineral-foot-soak",
-    "title": "Deep Ocean Cold Water Mineral Foot Soak",
+    "name": "Deep Ocean Cold Water Mineral Foot Soak",
     "company": "Kona Sea Salt - The Farm",
-    "fareharborShortname": "konaseasalt",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Wellness Experience",
-    "duration": "~30-45 Minutes",
+    "durationLabel": "~30-45 Minutes",
+    "fareharborShortname": "konaseasalt",
     "highlights": [
       "A relaxation experience using Kona's deep ocean water technology (the same pumped cold seawater infrastructure used by the area's aquaculture farms)",
       "Highest availability count of any wellness listing in this dataset - a frequently offered, easy-to-book activity"
@@ -6289,13 +6273,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-shore-divers-influencer-photo-package",
-    "title": "Influencer Photo Package",
+    "name": "Influencer Photo Package",
     "company": "Kona Shore Divers",
-    "fareharborShortname": "konashoredivers",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Styled Photo/Content Package (Snorkel or Dive-based)",
-    "duration": "Varies",
+    "durationLabel": "Varies",
+    "fareharborShortname": "konashoredivers",
     "highlights": [
       "A content-creator-focused package, likely combining an underwater or beach activity with professional photography/videography",
       "Niche product distinct from a standard snorkel/dive trip"
@@ -6332,13 +6316,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-snorkel-trips-pawai-bay",
-    "title": "Kona Snorkeling in Pawai Bay",
+    "name": "Kona Snorkeling in Pawai Bay",
     "company": "Kona Snorkel Trips",
-    "fareharborShortname": "konasnorkeltrips",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "konasnorkeltrips",
     "highlights": [
       "Pawai Bay is a Marine Life Conservation District just north of Kailua-Kona town, known for healthy coral and easy boat access close to the harbor",
       "Shorter boat ride than the Kealakekua Bay trips further south"
@@ -6376,13 +6360,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kona-town-surf-adventures-lesson",
-    "title": "Surf Lesson",
+    "name": "Surf Lesson",
     "company": "Kona Town Surf Adventures",
-    "fareharborShortname": "konatownsurfadventures",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Surf Instruction",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "konatownsurfadventures",
     "highlights": [
       "Kailua-Kona surf lessons at three group-size tiers",
       "Higher instructor-to-student ratio and more individual attention as you move from Group to Semi-Private to Private"
@@ -6421,13 +6405,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "iruka-kona-manta-ray-night",
-    "title": "Manta Ray Night Snorkel",
+    "name": "Manta Ray Night Snorkel",
     "company": "Iruka Kona",
-    "fareharborShortname": "irukakona",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "irukakona",
     "highlights": [
       "Another well-photographed (13 images) Kona manta ray night snorkel operator"
     ],
@@ -6463,13 +6447,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "honolii-orchards-chocolate-experience",
-    "title": "Orchard Tour & Craft Chocolate Tasting",
+    "name": "Orchard Tour & Craft Chocolate Tasting",
     "company": "Honoli'i Orchards",
-    "fareharborShortname": "honoliiestate",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Farm Tour + Chocolate Tasting",
-    "duration": "~1-2 Hours (tour) or ~30-45 Min (tasting only)",
+    "durationLabel": "~1-2 Hours (tour) or ~30-45 Min (tasting only)",
+    "fareharborShortname": "honoliiestate",
     "highlights": [
       "Walk a working cacao orchard near Hilo and taste craft, bean-to-bar Hawaiian chocolate",
       "34 photos on file - the most photo-documented listing in this dataset",
@@ -6509,13 +6493,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "holo-holo-niihau-napali-snorkel-expedition",
-    "title": "The Ni'ihau & Napali Snorkel Expedition",
+    "name": "The Ni'ihau & Napali Snorkel Expedition",
     "company": "Holo Holo Charters",
-    "fareharborShortname": "holoholo",
     "island": "Kauai",
     "city": "Eleele",
     "tourType": "Boat Tour to Ni'ihau & Napali Coast",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "holoholo",
     "highlights": [
       "Rare boat access to waters near Ni'ihau, the private 'Forbidden Island' closed to independent visitors",
       "Combines with the dramatic Napali Coast cliffs in one long day trip",
@@ -6555,13 +6539,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "holo-holo-napali-coast-snorkel-excursion",
-    "title": "The Napali Coast Snorkel Excursion",
+    "name": "The Napali Coast Snorkel Excursion",
     "company": "Holo Holo Charters",
-    "fareharborShortname": "holoholo",
     "island": "Kauai",
     "city": "Eleele",
     "tourType": "Boat Tour + Snorkel to Napali Coast",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "holoholo",
     "highlights": [
       "Focused specifically on the Napali Coast (without the Ni'ihau add-on) with dedicated snorkel time",
       "A shorter, more snorkel-focused alternative to the combined Ni'ihau trip"
@@ -6598,13 +6582,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "holo-holo-kauai-sunset-tour",
-    "title": "Kaua'i Sunset Sail",
+    "name": "Kaua'i Sunset Sail",
     "company": "Holo Holo Charters",
-    "fareharborShortname": "holoholo",
     "island": "Kauai",
     "city": "Eleele",
     "tourType": "Sunset Sail",
-    "duration": "~2-3 Hours (Classic) or Longer (Extended)",
+    "durationLabel": "~2-3 Hours (Classic) or Longer (Extended)",
+    "fareharborShortname": "holoholo",
     "highlights": [
       "A shorter, more accessible evening alternative to this operator's full-day Napali routes",
       "Classic and Extended duration options"
@@ -6643,13 +6627,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "alii-air-private-kauai-helicopter-tour",
-    "title": "Private Kauai Helicopter Tour",
+    "name": "Private Kauai Helicopter Tour",
     "company": "Ali'i Air Tours & Charters",
-    "fareharborShortname": "iflykauai",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Scenic Helicopter Tour",
-    "duration": "~50-60 Minutes",
+    "durationLabel": "~50-60 Minutes",
+    "fareharborShortname": "iflykauai",
     "highlights": [
       "Aerial views of Kauai's Napali Coast, Waimea Canyon, and interior waterfalls - terrain largely inaccessible by road",
       "One of the highest availability counts in this dataset, suggesting frequent daily departures",
@@ -6689,13 +6673,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "alii-air-private-kauai-helicopter-charter",
-    "title": "Private Kauai Helicopter Charter",
+    "name": "Private Kauai Helicopter Charter",
     "company": "Ali'i Air Tours & Charters",
-    "fareharborShortname": "iflykauai",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Custom Private Helicopter Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "iflykauai",
     "highlights": [
       "Fully custom flight plan and timing, versus the fixed-route standard tour",
       "Good for special requests (specific photography needs, proposals, custom routing)"
@@ -6733,13 +6717,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "jack-harter-doors-off-md500",
-    "title": "Doors-Off MD500 Tour (60-65 Min)",
+    "name": "Doors-Off MD500 Tour (60-65 Min)",
     "company": "Jack Harter Helicopters",
-    "fareharborShortname": "jackharterheli",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Doors-Off Scenic Helicopter Tour",
-    "duration": "60-65 Minutes",
+    "durationLabel": "60-65 Minutes",
+    "fareharborShortname": "jackharterheli",
     "highlights": [
       "Jack Harter is one of Kauai's original, longest-established helicopter tour companies",
       "Doors-off format - unobstructed views and photography, no glass/door reflections",
@@ -6779,13 +6763,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "jack-harter-doors-off-heart-of-island",
-    "title": "Doors-Off Heart of the Island Kauai Tour",
+    "name": "Doors-Off Heart of the Island Kauai Tour",
     "company": "Jack Harter Helicopters",
-    "fareharborShortname": "jackharterheli",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Doors-Off Scenic Helicopter Tour",
-    "duration": "Varies",
+    "durationLabel": "Varies",
+    "fareharborShortname": "jackharterheli",
     "highlights": [
       "A route variation from the same operator, framed around Kauai's interior ('Heart of the Island')"
     ],
@@ -6821,13 +6805,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kipu-ranch-waterfall-trail-expedition",
-    "title": "Waterfall Trail Expedition",
+    "name": "Waterfall Trail Expedition",
     "company": "Kipu Ranch Adventures",
-    "fareharborShortname": "kiputours",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Guided ATV/UTV Tour",
-    "duration": "~2.5-3 Hours",
+    "durationLabel": "~2.5-3 Hours",
+    "fareharborShortname": "kiputours",
     "highlights": [
       "ATV/off-road tour across a working cattle ranch used as filming locations for movies like Jurassic Park and Raiders of the Lost Ark",
       "Waterfall stop with swimming opportunity included"
@@ -6867,13 +6851,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kipu-ranch-ultimate-ranch-tour",
-    "title": "Ultimate Ranch Tour",
+    "name": "Ultimate Ranch Tour",
     "company": "Kipu Ranch Adventures",
-    "fareharborShortname": "kiputours",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Guided ATV/UTV Tour",
-    "duration": "~3.5-4 Hours",
+    "durationLabel": "~3.5-4 Hours",
+    "fareharborShortname": "kiputours",
     "highlights": [
       "A longer, more comprehensive version of this operator's ranch ATV experience",
       "Covers more ground and likely more filming-location stops than the Waterfall Trail Expedition"
@@ -6911,13 +6895,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kauai-beach-boys-outrigger-canoe",
-    "title": "Outrigger Canoe Ride",
+    "name": "Outrigger Canoe Ride",
     "company": "Da Life Outdoors | Kauai Beach Boys",
-    "fareharborShortname": "kauaibeachboys",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Traditional Outrigger Canoe Paddle",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "kauaibeachboys",
     "highlights": [
       "Traditional Hawaiian outrigger canoe paddling with a local crew",
       "Cultural context on traditional Polynesian navigation and paddling technique"
@@ -6955,13 +6939,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kauai-beach-boys-waterfall-rappel",
-    "title": "Waterfall Rappel",
+    "name": "Waterfall Rappel",
     "company": "Da Life Outdoors | Kauai Beach Boys",
-    "fareharborShortname": "kauaibeachboys",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Guided Canyoneering/Rappel Adventure",
-    "duration": "~3-4 Hours",
+    "durationLabel": "~3-4 Hours",
+    "fareharborShortname": "kauaibeachboys",
     "highlights": [
       "Rappel down the face of a working waterfall - a more technical, adrenaline-focused activity than a standard hike",
       "Full harness and safety equipment provided with guide instruction"
@@ -7000,13 +6984,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kauai-beach-boys-waterfall-swim-hike",
-    "title": "Waterfall Swim and Hike",
+    "name": "Waterfall Swim and Hike",
     "company": "Da Life Outdoors | Kauai Beach Boys",
-    "fareharborShortname": "kauaibeachboys",
     "island": "Kauai",
     "city": "Lihue",
     "tourType": "Guided Hike + Waterfall Swim",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "kauaibeachboys",
     "highlights": [
       "A gentler, hiking-and-swimming counterpart to the operator's Waterfall Rappel",
       "Good for travelers wanting the waterfall payoff without the technical rappel component"
@@ -7044,13 +7028,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "jungle-zipline-8-line-tour",
-    "title": "8 Line Zipline Tour",
+    "name": "8 Line Zipline Tour",
     "company": "Jungle Zipline",
-    "fareharborShortname": "junglezip",
     "island": "Maui",
     "city": "Haiku",
     "tourType": "Zipline Course",
-    "duration": "~2.5-3 Hours",
+    "durationLabel": "~2.5-3 Hours",
+    "fareharborShortname": "junglezip",
     "highlights": [
       "8-line zipline course through Maui's lush Haiku rainforest on the North Shore",
       "Longer course (8 lines) than some shorter zipline offerings",
@@ -7090,13 +7074,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "kaanapali-morning-lanai-snorkel",
-    "title": "Morning Lana'i Snorkel Tour",
+    "name": "Morning Lana'i Snorkel Tour",
     "company": "Kaanapali Ocean Adventures",
-    "fareharborShortname": "kaanapalioceanadventures",
     "island": "Maui",
     "city": "Lahaina",
     "tourType": "Boat Tour to Lanai",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "kaanapalioceanadventures",
     "highlights": [
       "Boat crossing from Maui to Lanai for morning snorkeling",
       "Lanai's reefs are generally less crowded than Maui's popular Molokini Crater snorkel destination"
@@ -7135,13 +7119,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "liljestrand-architectural-tour",
-    "title": "90-Minute Architectural Group Tour",
+    "name": "90-Minute Architectural Group Tour",
     "company": "Liljestrand Foundation",
-    "fareharborShortname": "liljestrandhouse",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Architectural House Tour",
-    "duration": "90 Minutes",
+    "durationLabel": "90 Minutes",
+    "fareharborShortname": "liljestrandhouse",
     "highlights": [
       "Guided tour of the Liljestrand House, a celebrated mid-century modern residence by architect Vladimir Ossipoff",
       "A niche but highly regarded stop for architecture and design enthusiasts"
@@ -7179,13 +7163,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "living-ocean-waikiki-sunset-cruise-byob",
-    "title": "Waikiki Sunset Cruise BYOB",
+    "name": "Waikiki Sunset Cruise BYOB",
     "company": "Living Ocean Tours",
-    "fareharborShortname": "livingoceanscuba",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "BYOB Sunset Cruise",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "livingoceanscuba",
     "highlights": [
       "Casual, bring-your-own-drinks sunset cruise off Waikiki - see the Dive Oahu BYOB listing for general category context"
     ],
@@ -7221,13 +7205,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "living-ocean-deluxe-snorkel-wildlife-cruise",
-    "title": "Deluxe Snorkel and Wildlife Cruise",
+    "name": "Deluxe Snorkel and Wildlife Cruise",
     "company": "Living Ocean Tours",
-    "fareharborShortname": "livingoceanscuba",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel + Wildlife Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "livingoceanscuba",
     "highlights": [
       "Combines snorkeling with general wildlife spotting off Waikiki",
       "12 photos on file"
@@ -7262,13 +7246,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mahina-hawaii-full-day-private-adventure",
-    "title": "Full Day Private Adventure",
+    "name": "Full Day Private Adventure",
     "company": "Mahina Hawaii",
-    "fareharborShortname": "mahinahawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Private Multi-Activity Adventure",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "mahinahawaii",
     "highlights": [
       "Full-day, North Shore-based private adventure - likely combining multiple activities (confirm exact inclusions with operator)"
     ],
@@ -7304,13 +7288,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mahina-hawaii-half-day-surf-turf",
-    "title": "Half Day Adventure Retreat (Surf & Turf)",
+    "name": "Half Day Adventure Retreat (Surf & Turf)",
     "company": "Mahina Hawaii",
-    "fareharborShortname": "mahinahawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Multi-Activity Adventure (Ocean + Land)",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "mahinahawaii",
     "highlights": [
       "'Surf & Turf' naming suggests a combination of ocean and land-based activities in a shorter half-day format"
     ],
@@ -7346,13 +7330,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "leigreeting-oahu-honolulu-airport",
-    "title": "Airport Lei Greeting - Honolulu Airport (Oahu)",
+    "name": "Airport Lei Greeting - Honolulu Airport (Oahu)",
     "company": "LeiGreeting.com",
-    "fareharborShortname": "leigreeting",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Airport Arrival Greeting Service",
-    "duration": "~15-20 Minutes",
+    "durationLabel": "~15-20 Minutes",
+    "fareharborShortname": "leigreeting",
     "highlights": [
       "Traditional Hawaiian lei greeting waiting for you right at Honolulu Airport arrivals",
       "Package options for solo travelers, honeymooners, custom lei choice, or large groups"
@@ -7396,13 +7380,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-waikiki-private-charter",
-    "title": "Waikiki Private Charter",
+    "name": "Waikiki Private Charter",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Boat Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Fully private charter departing Waikiki, flexible itinerary"
     ],
@@ -7438,13 +7422,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-waikiki-exclusive-snorkel-lunch",
-    "title": "Waikiki Exclusive Snorkel + Lunch",
+    "name": "Waikiki Exclusive Snorkel + Lunch",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private/Exclusive Snorkel Charter + Lunch",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Exclusive-use snorkel charter with lunch included, departing Waikiki"
     ],
@@ -7478,13 +7462,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-waikiki-captains-sunset-tasting",
-    "title": "Waikiki Captain's Sunset + Tasting",
+    "name": "Waikiki Captain's Sunset + Tasting",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Sunset Sail + Tasting",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Sunset sail off Waikiki with a food/drink tasting component"
     ],
@@ -7520,13 +7504,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-ko-olina-four-seasons-snorkel",
-    "title": "Ko Olina Four Seasons Snorkel",
+    "name": "Ko Olina Four Seasons Snorkel",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Snorkel Charter",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Snorkel trip departing from the Ko Olina resort area, near the Four Seasons Oahu"
     ],
@@ -7562,13 +7546,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-ko-olina-nearshore-fishing",
-    "title": "Venture Ko Olina Nearshore Fishing",
+    "name": "Venture Ko Olina Nearshore Fishing",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Nearshore Fishing Charter",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Nearshore (closer to coast, calmer water) fishing charter from Ko Olina - a gentler option than deep sea fishing"
     ],
@@ -7605,13 +7589,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-ko-olina-wildlife-snorkel",
-    "title": "Venture Ko Olina Wildlife Snorkel",
+    "name": "Venture Ko Olina Wildlife Snorkel",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Snorkel + Wildlife Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Wildlife-focused snorkel trip from Ko Olina on the same 'Venture' branded boat as the nearshore fishing trip"
     ],
@@ -7645,13 +7629,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-ko-olina-exclusive-snorkel-lunch",
-    "title": "Ko Olina Exclusive Snorkel + Lunch",
+    "name": "Ko Olina Exclusive Snorkel + Lunch",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Exclusive Snorkel Charter + Lunch",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Exclusive-use snorkel charter with lunch, mirroring the Waikiki version but departing Ko Olina"
     ],
@@ -7685,13 +7669,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "mana-cruises-ko-olina-private-charter",
-    "title": "Ko Olina Private Charter",
+    "name": "Ko Olina Private Charter",
     "company": "MANA Cruises",
-    "fareharborShortname": "manacruises",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Private Boat Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "manacruises",
     "highlights": [
       "Fully private, flexible charter from Ko Olina - the West-side counterpart to the Waikiki Private Charter"
     ],
@@ -7725,13 +7709,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "north-shore-beach-bus-waimea-pali",
-    "title": "Tour of North Shore & Waimea Waterfall and Pali Lookout",
+    "name": "Tour of North Shore & Waimea Waterfall and Pali Lookout",
     "company": "North Shore Beach Bus",
-    "fareharborShortname": "northshorebeachbus",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Shared Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "northshorebeachbus",
     "highlights": [
       "North Shore beaches, Waimea Waterfall, and Pali Lookout in one shared shuttle tour"
     ],
@@ -7765,13 +7749,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "north-shore-beach-bus-pearl-harbor-kingdom-history",
-    "title": "Premier Pearl Harbor and Hawaiian Kingdom History Tour",
+    "name": "Premier Pearl Harbor and Hawaiian Kingdom History Tour",
     "company": "North Shore Beach Bus",
-    "fareharborShortname": "northshorebeachbus",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Historical Bus Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "northshorebeachbus",
     "highlights": [
       "Combines Pearl Harbor with broader Hawaiian Kingdom history stops - more historically comprehensive than a standard Pearl Harbor-only tour"
     ],
@@ -7807,13 +7791,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "north-shore-stables-beachfront-atv-farm",
-    "title": "Beachfront ATV, Farm Animals & Native Hawaiian Plant Experience",
+    "name": "Beachfront ATV, Farm Animals & Native Hawaiian Plant Experience",
     "company": "North Shore Stables",
-    "fareharborShortname": "northshorestables",
     "island": "Oahu",
     "city": "Waialua",
     "tourType": "ATV + Farm/Cultural Experience",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "northshorestables",
     "highlights": [
       "Combines beachfront ATV riding with farm animal interaction and native Hawaiian plant education",
       "25 photos on file - one of the most photo-documented listings in this dataset",
@@ -7852,13 +7836,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "north-shore-ohana-surf-lesson",
-    "title": "Surf Lesson",
+    "name": "Surf Lesson",
     "company": "North Shore Ohana School of Surfing",
-    "fareharborShortname": "nsohanasurfschool",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Surf Instruction",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "nsohanasurfschool",
     "highlights": [
       "North Shore surf lessons named after Hawaiian concepts - 'Ohana' (family/group) and 'Kapu' (sacred/exclusive) reflecting the group-size tiers",
       "Very high booking volume for the 1-on-1 Kapu option, suggesting strong demand for private instruction"
@@ -7896,13 +7880,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "oahu-boat-cruises-private-parties",
-    "title": "Private Parties",
+    "name": "Private Parties",
     "company": "Oahu Boat Cruises",
-    "fareharborShortname": "oahuboatcruises",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Event Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "oahuboatcruises",
     "highlights": [
       "Boat charter specifically positioned for private parties/events rather than standard sightseeing"
     ],
@@ -7938,13 +7922,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "oahu-photography-beautiful-colors-tour",
-    "title": "Beautiful Colors of Hawaii Photo Tour",
+    "name": "Beautiful Colors of Hawaii Photo Tour",
     "company": "Oahu Photography Tours",
-    "fareharborShortname": "oahuphotographytours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Guided Photo Tour",
-    "duration": "~3-4 Hours",
+    "durationLabel": "~3-4 Hours",
+    "fareharborShortname": "oahuphotographytours",
     "highlights": [
       "A guided photography tour to Oahu's most colorful/scenic spots, led by a photographer-guide",
       "Both group and private booking tiers"
@@ -7983,13 +7967,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "oahu-photography-complete-island-sunrise",
-    "title": "Complete Island Adventure with Sunrise",
+    "name": "Complete Island Adventure with Sunrise",
     "company": "Oahu Photography Tours",
-    "fareharborShortname": "oahuphotographytours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Guided Photo Tour",
-    "duration": "Full Day (early start)",
+    "durationLabel": "Full Day (early start)",
+    "fareharborShortname": "oahuphotographytours",
     "highlights": [
       "A full circle-island photo tour timed to catch sunrise at the first stop",
       "Group or private options"
@@ -8027,13 +8011,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "oahu-photography-complete-island-waterfall",
-    "title": "Complete Island Adventure with Waterfall",
+    "name": "Complete Island Adventure with Waterfall",
     "company": "Oahu Photography Tours",
-    "fareharborShortname": "oahuphotographytours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Guided Photo Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "oahuphotographytours",
     "highlights": [
       "A full-island photo tour with a waterfall stop instead of the sunrise-timed route"
     ],
@@ -8067,13 +8051,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "oahu-photography-seacliff-sunset",
-    "title": "PRIVATE Honolulu Sea-cliff Tour with Sunset",
+    "name": "PRIVATE Honolulu Sea-cliff Tour with Sunset",
     "company": "Oahu Photography Tours",
-    "fareharborShortname": "oahuphotographytours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Guided Photo Tour",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "oahuphotographytours",
     "highlights": [
       "Private sunset photo tour focused on Honolulu's dramatic sea cliff viewpoints (likely including spots like Diamond Head or the Koko Head area)"
     ],
@@ -8107,13 +8091,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "oahu-photography-sunset-light-painting",
-    "title": "Private Sunset & Light-Painting Experience",
+    "name": "Private Sunset & Light-Painting Experience",
     "company": "Oahu Photography Tours",
-    "fareharborShortname": "oahuphotographytours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Guided Photo Tour (Light Painting)",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "oahuphotographytours",
     "highlights": [
       "A technical, after-dark photography session using light-painting techniques - a distinctly different, more advanced photo product than this operator's daytime tours"
     ],
@@ -8149,13 +8133,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ohana-surf-project-surf-lessons",
-    "title": "Surf Lessons",
+    "name": "Surf Lessons",
     "company": "Ohana Surf Project",
-    "fareharborShortname": "ohanasurfproject",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Surf Instruction",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "ohanasurfproject",
     "highlights": [
       "Honolulu-area surf lessons with a near-perfect quality score (99) in this dataset - one of the highest-rated listings overall"
     ],
@@ -8190,13 +8174,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ohana-surf-project-sup-lessons",
-    "title": "SUP Lessons",
+    "name": "SUP Lessons",
     "company": "Ohana Surf Project",
-    "fareharborShortname": "ohanasurfproject",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "SUP Instruction",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "ohanasurfproject",
     "highlights": [
       "Perfect quality score (100) - the only listing in this entire dataset with a maximum score"
     ],
@@ -8230,13 +8214,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ohana-surf-project-bodyboarding-lessons",
-    "title": "Bodyboarding Lessons",
+    "name": "Bodyboarding Lessons",
     "company": "Ohana Surf Project",
-    "fareharborShortname": "ohanasurfproject",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Bodyboarding Instruction",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "ohanasurfproject",
     "highlights": [
       "A gentler, easier-to-learn alternative to standing surf lessons, from the same top-rated operator"
     ],
@@ -8271,13 +8255,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pacific-historic-parks-self-guided-multimedia-tour",
-    "title": "Pearl Harbor Self-Guided Multimedia Tour",
+    "name": "Pearl Harbor Self-Guided Multimedia Tour",
     "company": "Pacific Historic Parks",
-    "fareharborShortname": "phptours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Self-Guided Multimedia Tour",
-    "duration": "2-4 Hours depending on tier",
+    "durationLabel": "2-4 Hours depending on tier",
+    "fareharborShortname": "phptours",
     "highlights": [
       "Official Pacific Historic Parks self-guided audio/multimedia tour of Pearl Harbor sites",
       "Four tiers named after naval ranks, with the top tier adding a Virtual Reality component",
@@ -8320,13 +8304,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pacific-historic-parks-uss-arizona-narrated",
-    "title": "USS Arizona Narrated Tour",
+    "name": "USS Arizona Narrated Tour",
     "company": "Pacific Historic Parks",
-    "fareharborShortname": "phptours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Live-Narrated Tour",
-    "duration": "~1-1.5 Hours",
+    "durationLabel": "~1-1.5 Hours",
+    "fareharborShortname": "phptours",
     "highlights": [
       "Live guide narration rather than the self-guided multimedia format"
     ],
@@ -8360,13 +8344,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pacific-historic-parks-deluxe-combo-vr",
-    "title": "Official Pearl Harbor Deluxe Combo: Self-Guided Multimedia Tour & VR Experience",
+    "name": "Official Pearl Harbor Deluxe Combo: Self-Guided Multimedia Tour & VR Experience",
     "company": "Pacific Historic Parks",
-    "fareharborShortname": "phptours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Self-Guided Multimedia + VR Combo",
-    "duration": "3-4 Hours",
+    "durationLabel": "3-4 Hours",
+    "fareharborShortname": "phptours",
     "highlights": [
       "Bundles the multimedia tour with the separate VR experience at a combined price"
     ],
@@ -8400,13 +8384,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pacific-historic-parks-skies-over-pearl-vr",
-    "title": "Skies Over Pearl Virtual Reality Experience",
+    "name": "Skies Over Pearl Virtual Reality Experience",
     "company": "Pacific Historic Parks",
-    "fareharborShortname": "phptours",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Standalone VR Experience",
-    "duration": "~30-45 Minutes",
+    "durationLabel": "~30-45 Minutes",
+    "fareharborShortname": "phptours",
     "highlights": [
       "A standalone virtual reality recreation of the December 7, 1941 attack from an aerial perspective"
     ],
@@ -8440,13 +8424,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pink-sails-turtle-snorkeling-guaranteed",
-    "title": "Turtle Snorkeling Adventure + Guaranteed Sightings",
+    "name": "Turtle Snorkeling Adventure + Guaranteed Sightings",
     "company": "Pink Sails Waikiki",
-    "fareharborShortname": "pinksailswaikiki",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "pinksailswaikiki",
     "highlights": [
       "Explicitly markets a turtle-sighting guarantee - worth confirming the actual policy (rebooking vs. refund) if a sighting doesn't happen"
     ],
@@ -8482,13 +8466,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "pink-sails-sunset-splash",
-    "title": "Sunset Splash Adventure",
+    "name": "Sunset Splash Adventure",
     "company": "Pink Sails Waikiki",
-    "fareharborShortname": "pinksailswaikiki",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Sunset Sail + Swim",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "pinksailswaikiki",
     "highlights": [
       "Sunset sail with a swim component, from the same Waikiki operator as the turtle snorkel trip"
     ],
@@ -8522,13 +8506,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "polynesian-adventure-wwii-pearl-harbor-tour",
-    "title": "World War II Heroes Deluxe Pearl Harbor Tour with Lunch",
+    "name": "World War II Heroes Deluxe Pearl Harbor Tour with Lunch",
     "company": "Polynesian Adventure Activities",
-    "fareharborShortname": "polyad-activities",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Historical Bus Tour + Lunch",
-    "duration": "5-8 Hours depending on departure",
+    "durationLabel": "5-8 Hours depending on departure",
+    "fareharborShortname": "polyad-activities",
     "highlights": [
       "Full Pearl Harbor tour with lunch included",
       "Available with inter-island flight logistics bundled in for Kauai-based travelers"
@@ -8567,13 +8551,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "polynesian-adventure-oahu-grand-circle-waimea-dole",
-    "title": "Oahu Grand Circle Island Tour - Waimea Valley & Dole Plantation",
+    "name": "Oahu Grand Circle Island Tour - Waimea Valley & Dole Plantation",
     "company": "Polynesian Adventure Activities",
-    "fareharborShortname": "polyad-activities",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Shared Circle Island Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "polyad-activities",
     "highlights": [
       "Circle-island tour specifically including Waimea Valley (botanical garden + waterfall) and the Dole Plantation - two named, ticketed attractions rather than just drive-by scenic stops"
     ],
@@ -8609,13 +8593,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "queens-waikiki-luau",
-    "title": "Queen's Waikiki Luau",
+    "name": "Queen's Waikiki Luau",
     "company": "Queens Waikiki Luau",
-    "fareharborShortname": "queenswaikikiluau",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Luau (Hawaiian Feast + Show)",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "queenswaikikiluau",
     "highlights": [
       "Traditional Hawaiian luau in Waikiki with a stage show and buffet feast",
       "Three seating tiers by proximity to the stage - Front, Middle, and Back"
@@ -8655,13 +8639,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "rainbow-watersports-sup-group-lesson",
-    "title": "SUP Open Group Lesson",
+    "name": "SUP Open Group Lesson",
     "company": "Rainbow Watersports Adventure, LLC",
-    "fareharborShortname": "rainbowwatersportsadventure",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "SUP Instruction",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "rainbowwatersportsadventure",
     "highlights": [
       "North Shore SUP group lesson, calmer-water format"
     ],
@@ -8697,13 +8681,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "rainbow-watersports-rentals",
-    "title": "Rentals",
+    "name": "Rentals",
     "company": "Rainbow Watersports Adventure, LLC",
-    "fareharborShortname": "rainbowwatersportsadventure",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Equipment Rental",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "rainbowwatersportsadventure",
     "highlights": [
       "General water sports equipment rental on the North Shore"
     ],
@@ -8737,13 +8721,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "north-shore-catamaran-morning-sail-snorkel",
-    "title": "Morning Sail & Snorkel",
+    "name": "Morning Sail & Snorkel",
     "company": "North Shore Catamaran Charters",
-    "fareharborShortname": "sailingcat",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Sailing Snorkel Cruise",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "sailingcat",
     "highlights": [
       "North Shore-departure sail-and-snorkel trip - a less common departure point than the Waikiki/West Coast majority in this dataset"
     ],
@@ -8779,13 +8763,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "sea-board-sports-nature-turtle-tour",
-    "title": "Nature & Turtle Tour",
+    "name": "Nature & Turtle Tour",
     "company": "Sea & Board Sports Hawaii LLC",
-    "fareharborShortname": "sbshawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Nature/Wildlife Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "sbshawaii",
     "highlights": [
       "North Shore nature and turtle-viewing tour"
     ],
@@ -8819,13 +8803,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "scuba-lounge-hawaii-beginner-scuba",
-    "title": "Beginner Scuba Diving Tour With Free Video Package",
+    "name": "Beginner Scuba Diving Tour With Free Video Package",
     "company": "Scuba Lounge Hawaii",
-    "fareharborShortname": "scubaloungehawaii",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Beginner Scuba (No Certification Required)",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "scubaloungehawaii",
     "highlights": [
       "No certification required - includes a free video package as a keepsake"
     ],
@@ -8861,13 +8845,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "north-shore-shark-adventures-shark-dive",
-    "title": "Shark Dive",
+    "name": "Shark Dive",
     "company": "North Shore Shark Adventures / Whale Encounters / Turtle Encounters",
-    "fareharborShortname": "sharktourshawaii",
     "island": "Oahu",
     "city": "Haleiwa",
     "tourType": "Shark Snorkel/Cage Dive",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "sharktourshawaii",
     "highlights": [
       "Another well-established North Shore shark tour operator - the company name signals it also runs whale and turtle-focused trips seasonally"
     ],
@@ -8903,13 +8887,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "snorkel-with-turtles-honolulu",
-    "title": "Snorkel with Turtles",
+    "name": "Snorkel with Turtles",
     "company": "Snorkel With Turtles",
-    "fareharborShortname": "snorkelwithturtles",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "snorkelwithturtles",
     "highlights": [
       "A straightforwardly-named turtle-focused snorkel trip off Honolulu"
     ],
@@ -8943,13 +8927,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "stars-above-hawaii-ko-olina-star-show",
-    "title": "Star Tour Show at Ko Olina",
+    "name": "Star Tour Show at Ko Olina",
     "company": "Stars Above Hawaii",
-    "fareharborShortname": "starsabovehawaii",
     "island": "Oahu",
     "city": "Kapolei",
     "tourType": "Stargazing Show",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "starsabovehawaii",
     "highlights": [
       "Stargazing experience at Ko Olina on Oahu - a much lower-elevation, more accessible alternative to the Big Island's Mauna Kea tours",
       "Top quality score (99) in this dataset"
@@ -8987,13 +8971,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "adventure-boat-snorkel-adventure-tour",
-    "title": "Adventure / Snorkel Tour",
+    "name": "Adventure / Snorkel Tour",
     "company": "The Adventure Boat",
-    "fareharborShortname": "theadventureboat",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Multi-Activity Boat Tour",
-    "duration": "~4 Hours",
+    "durationLabel": "~4 Hours",
+    "fareharborShortname": "theadventureboat",
     "highlights": [
       "A flexible, multi-activity boat outing off Honolulu combining elements of snorkeling and general adventure"
     ],
@@ -9030,13 +9014,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "adventure-boat-sunset-cruise",
-    "title": "Tiki Escape Sunset Cruise",
+    "name": "Tiki Escape Sunset Cruise",
     "company": "The Adventure Boat",
-    "fareharborShortname": "theadventureboat",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Sunset Cruise (with optional swim)",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "theadventureboat",
     "highlights": [
       "Tiki-themed sunset cruise off Honolulu, with an option to add swim time"
     ],
@@ -9071,13 +9055,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "adventure-boat-semi-private-snorkel",
-    "title": "Semi-Private Snorkeling Adventure",
+    "name": "Semi-Private Snorkeling Adventure",
     "company": "The Adventure Boat",
-    "fareharborShortname": "theadventureboat",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Semi-Private Snorkel Boat",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "theadventureboat",
     "highlights": [
       "Smaller group snorkel format than this operator's general Adventure/Snorkel Tour"
     ],
@@ -9111,13 +9095,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "three-tikis-waikiki-sunset-sail",
-    "title": "Waikiki Sunset Sail",
+    "name": "Waikiki Sunset Sail",
     "company": "Three Tiki's Sailing",
-    "fareharborShortname": "threetikisailing",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Sunset Sail",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "threetikisailing",
     "highlights": [
       "Standard Waikiki sunset sail, tiki-themed branding"
     ],
@@ -9151,13 +9135,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "three-tikis-waikiki-turtle-snorkeling",
-    "title": "Waikiki Turtle Snorkeling",
+    "name": "Waikiki Turtle Snorkeling",
     "company": "Three Tiki's Sailing",
-    "fareharborShortname": "threetikisailing",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "threetikisailing",
     "highlights": [
       "Turtle-focused daytime snorkel trip from the same tiki-branded operator"
     ],
@@ -9191,13 +9175,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "tradewind-reef-fishing-snorkeling-charter",
-    "title": "Reef Fishing & Snorkeling Adventure Private Charter",
+    "name": "Reef Fishing & Snorkeling Adventure Private Charter",
     "company": "Tradewind Charters",
-    "fareharborShortname": "tradewindcharters",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Charter (Fishing + Snorkeling)",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "tradewindcharters",
     "highlights": [
       "Combines reef fishing and snorkeling in one private charter",
       "Available on either of two named catamarans"
@@ -9235,13 +9219,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "tradewind-friday-fireworks-cruise",
-    "title": "Waikiki Friday Fireworks Cruise Private Charter",
+    "name": "Waikiki Friday Fireworks Cruise Private Charter",
     "company": "Tradewind Charters",
-    "fareharborShortname": "tradewindcharters",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Charter - Fireworks Viewing",
-    "duration": "~2 Hours (Fridays only)",
+    "durationLabel": "~2 Hours (Fridays only)",
+    "fareharborShortname": "tradewindcharters",
     "highlights": [
       "Private charter timed to view Waikiki's weekly Friday night fireworks show from the water",
       "Only available on Fridays given the fixed fireworks schedule"
@@ -9279,13 +9263,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "try-scuba-honolulu-discover-scuba",
-    "title": "Try Scuba Diving Tour",
+    "name": "Try Scuba Diving Tour",
     "company": "Try Scuba Diving - Honolulu",
-    "fareharborShortname": "tryscuba-honolulu",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Beginner Scuba (No Certification Required)",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "tryscuba-honolulu",
     "highlights": [
       "No certification required - group option includes free video package",
       "Private option for more individual instructor attention"
@@ -9323,13 +9307,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "try-scuba-honolulu-guided-snorkel",
-    "title": "Guided Snorkel Tour + Free Videos",
+    "name": "Guided Snorkel Tour + Free Videos",
     "company": "Try Scuba Diving - Honolulu",
-    "fareharborShortname": "tryscuba-honolulu",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Guided Snorkel Tour",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "tryscuba-honolulu",
     "highlights": [
       "Snorkel-only option (no scuba) from the same operator, also with a free video package"
     ],
@@ -9363,13 +9347,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wai-kai-wave-sessions",
-    "title": "Wave Pool Sessions",
+    "name": "Wave Pool Sessions",
     "company": "Wai Kai",
-    "fareharborShortname": "waikai-atthelineup",
     "island": "Oahu",
     "city": "Ewa Beach",
     "tourType": "Man-Made Wave Pool Surfing",
-    "duration": "~1-2 Hours per session",
+    "durationLabel": "~1-2 Hours per session",
+    "fareharborShortname": "waikai-atthelineup",
     "highlights": [
       "Engineered, consistent wave pool surfing at Wai Kai's man-made lagoon - a genuinely different product from ocean surf lessons",
       "Two wave-size tiers to match skill level"
@@ -9408,13 +9392,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wai-kai-lagoon-sport-rentals",
-    "title": "Lagoon Sport Rentals",
+    "name": "Lagoon Sport Rentals",
     "company": "Wai Kai",
-    "fareharborShortname": "waikai-atthelineup",
     "island": "Oahu",
     "city": "Ewa Beach",
     "tourType": "Water Sport Equipment Rental",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "waikai-atthelineup",
     "highlights": [
       "Equipment rental for Wai Kai's calm, protected lagoon (separate from the wave pool)"
     ],
@@ -9448,13 +9432,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wai-kai-kekoa-cazimero-pro-surfer",
-    "title": "Kekoa Cazimero (Pro Surfer) Surf Experience",
+    "name": "Kekoa Cazimero (Pro Surfer) Surf Experience",
     "company": "Wai Kai",
-    "fareharborShortname": "waikai-atthelineup",
     "island": "Oahu",
     "city": "Ewa Beach",
     "tourType": "Pro-Instructed Wave Pool Session",
-    "duration": "Session-based",
+    "durationLabel": "Session-based",
+    "fareharborShortname": "waikai-atthelineup",
     "highlights": [
       "Coaching from a named professional surfer at the wave pool facility - a premium, name-brand instructional product"
     ],
@@ -9491,13 +9475,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wai-kai-ultimate-experience",
-    "title": "Wai Kai Ultimate Experience",
+    "name": "Wai Kai Ultimate Experience",
     "company": "Wai Kai",
-    "fareharborShortname": "waikai-atthelineup",
     "island": "Oahu",
     "city": "Ewa Beach",
     "tourType": "Multi-Activity Combo Pass",
-    "duration": "Full Day / Combo",
+    "durationLabel": "Full Day / Combo",
+    "fareharborShortname": "waikai-atthelineup",
     "highlights": [
       "This property's top-tier combo pass, likely bundling wave pool sessions, lagoon access, and other on-site amenities"
     ],
@@ -9534,13 +9518,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "waikiki-beach-services-surf-lesson",
-    "title": "One-on-One Individual Surf Lesson",
+    "name": "One-on-One Individual Surf Lesson",
     "company": "Waikiki Beach Services",
-    "fareharborShortname": "waikikibeachservices",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Surf Instruction",
-    "duration": "~1-1.5 Hours",
+    "durationLabel": "~1-1.5 Hours",
+    "fareharborShortname": "waikikibeachservices",
     "highlights": [
       "Fully private, one-on-one surf lesson directly on Waikiki Beach - one of the highest availability counts in this dataset"
     ],
@@ -9574,13 +9558,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "waikiki-beach-services-sup-lesson",
-    "title": "One-on-One Individual Stand-Up Paddle Lesson",
+    "name": "One-on-One Individual Stand-Up Paddle Lesson",
     "company": "Waikiki Beach Services",
-    "fareharborShortname": "waikikibeachservices",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private SUP Instruction",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "waikikibeachservices",
     "highlights": [
       "Private SUP lesson directly on Waikiki Beach from the same beach services operator"
     ],
@@ -9614,13 +9598,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "waikiki-beach-services-outrigger-surfing",
-    "title": "Outrigger Canoe Surfing",
+    "name": "Outrigger Canoe Surfing",
     "company": "Waikiki Beach Services",
-    "fareharborShortname": "waikikibeachservices",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Outrigger Canoe Wave Riding",
-    "duration": "~30-45 Minutes",
+    "durationLabel": "~30-45 Minutes",
+    "fareharborShortname": "waikikibeachservices",
     "highlights": [
       "A classic Waikiki activity - riding waves in a traditional outrigger canoe with a local crew steering",
       "One of the most iconic, historically-rooted Waikiki beach activities"
@@ -9658,13 +9642,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "waikiki-beach-services-outrigger-charter",
-    "title": "Outrigger Canoe Charter",
+    "name": "Outrigger Canoe Charter",
     "company": "Waikiki Beach Services",
-    "fareharborShortname": "waikikibeachservices",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Private Outrigger Canoe Charter",
-    "duration": "Flexible",
+    "durationLabel": "Flexible",
+    "fareharborShortname": "waikikibeachservices",
     "highlights": [
       "Fully private outrigger canoe booking, distinct from the standard shared wave-riding session"
     ],
@@ -9698,13 +9682,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "waikiki-dive-center-shipwreck-reef",
-    "title": "Magnificent 2 Tank Shipwreck and/or Reef Boat Dive",
+    "name": "Magnificent 2 Tank Shipwreck and/or Reef Boat Dive",
     "company": "Waikiki Dive Center",
-    "fareharborShortname": "waikikidivecenter",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "waikikidivecenter",
     "highlights": [
       "Oahu shipwreck and/or reef diving departing near Waikiki - convenient for Waikiki-based certified divers"
     ],
@@ -9738,13 +9722,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "holokai-catamaran-waikiki-afternoon-sail",
-    "title": "Waikiki Afternoon Sail",
+    "name": "Waikiki Afternoon Sail",
     "company": "Holokai Catamaran",
-    "fareharborShortname": "waikikirigger",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Daytime Catamaran Sail",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "waikikirigger",
     "highlights": [
       "Standard afternoon sail off Waikiki"
     ],
@@ -9778,13 +9762,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "holokai-catamaran-turtle-canyon-snorkel",
-    "title": "Turtle Canyon Snorkel",
+    "name": "Turtle Canyon Snorkel",
     "company": "Holokai Catamaran",
-    "fareharborShortname": "waikikirigger",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Snorkel Boat Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "waikikirigger",
     "highlights": [
       "Another operator running trips to Turtle Canyon off Waikiki - see Captain Max Boat Tours' listing for general destination context"
     ],
@@ -9818,13 +9802,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wildlife-hawaii-north-shore-shuttle",
-    "title": "Round Trip North Shore Haleiwa Shuttle",
+    "name": "Round Trip North Shore Haleiwa Shuttle",
     "company": "Wildlife Hawaii",
-    "fareharborShortname": "wildlifehawaii",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Shuttle Transportation",
-    "duration": "Round Trip",
+    "durationLabel": "Round Trip",
+    "fareharborShortname": "wildlifehawaii",
     "highlights": [
       "Transportation-only shuttle to and from Haleiwa/North Shore"
     ],
@@ -9860,13 +9844,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "xtreme-parasail-diamond-head",
-    "title": "Parasail",
+    "name": "Parasail",
     "company": "X-Treme Parasail & Diamond Head Parasail",
-    "fareharborShortname": "xtreme",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Parasailing",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "xtreme",
     "highlights": [
       "Another established Waikiki-area parasail operator with high booking volume",
       "Diamond Head views included in the flight"
@@ -9901,13 +9885,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "yoga-floats-sup-yoga",
-    "title": "SUP Yoga",
+    "name": "SUP Yoga",
     "company": "Yoga Floats",
-    "fareharborShortname": "yogafloats",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Paddleboard Yoga Class",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "yogafloats",
     "highlights": [
       "Yoga practiced on a stand-up paddleboard in calm water - a wellness-adventure hybrid activity"
     ],
@@ -9944,13 +9928,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "yoga-floats-light-up-the-night",
-    "title": "Light up the Night",
+    "name": "Light up the Night",
     "company": "Yoga Floats",
-    "fareharborShortname": "yogafloats",
     "island": "Oahu",
     "city": "Honolulu",
     "tourType": "Illuminated Evening Paddleboard Event",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "yogafloats",
     "highlights": [
       "An evening/night version of the paddleboard activity, likely using LED-lit boards or accessories for a visual event experience"
     ],
@@ -9986,13 +9970,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "lavaloha-tree-to-chocolate-tour",
-    "title": "Tree-to-Chocolate Tour",
+    "name": "Tree-to-Chocolate Tour",
     "company": "Lavaloha",
-    "fareharborShortname": "lavaloha",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Cacao Farm Tour + Chocolate Tasting",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "lavaloha",
     "highlights": [
       "Full seed-to-bar cacao farm tour near Hilo with tasting",
       "See the Honoli'i Orchards listing for general context on why Hawaii-grown chocolate is a genuinely rare category"
@@ -10027,13 +10011,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "malahini-tours-volcanoes-national-park",
-    "title": "Hawaii's Volcanoes National Park Tour",
+    "name": "Hawaii's Volcanoes National Park Tour",
     "company": "Malahini Tours",
-    "fareharborShortname": "malahinitours",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Guided Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "malahinitours",
     "highlights": [
       "A Hilo-departure version of the Volcanoes National Park tour - a significantly shorter drive than the Kona-departure versions elsewhere in this dataset"
     ],
@@ -10069,13 +10053,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "malahini-tours-majestic-waterfalls",
-    "title": "Majestic Waterfalls Tour",
+    "name": "Majestic Waterfalls Tour",
     "company": "Malahini Tours",
-    "fareharborShortname": "malahinitours",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Guided Waterfall Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "malahinitours",
     "highlights": [
       "Waterfall-focused tour on the lush, wetter Hilo side of the Big Island"
     ],
@@ -10109,13 +10093,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ohana-ranch-atv-tour",
-    "title": "Ohana Ranch ATV Tour",
+    "name": "Ohana Ranch ATV Tour",
     "company": "Ohana Ranch",
-    "fareharborShortname": "ohanaranch",
     "island": "Big Island",
     "city": "Mountain View",
     "tourType": "Guided ATV Tour",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "ohanaranch",
     "highlights": [
       "ATV riding across a working Big Island ranch property"
     ],
@@ -10149,13 +10133,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "ohana-ranch-petting-zoo-goats",
-    "title": "Petting Zoo + Cuddle Baby Goats",
+    "name": "Petting Zoo + Cuddle Baby Goats",
     "company": "Ohana Ranch",
-    "fareharborShortname": "ohanaranch",
     "island": "Big Island",
     "city": "Mountain View",
     "tourType": "Farm Animal Experience",
-    "duration": "~1 Hour",
+    "durationLabel": "~1 Hour",
+    "fareharborShortname": "ohanaranch",
     "highlights": [
       "Hands-on farm animal interaction, including baby goats - a gentle, family-friendly alternative to the ATV tour"
     ],
@@ -10189,13 +10173,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "shaka-braddah-big-island-day-tour",
-    "title": "Big Island Day Tour w/ Lunch",
+    "name": "Big Island Day Tour w/ Lunch",
     "company": "Shaka Braddah Tours",
-    "fareharborShortname": "shakabraddahtours",
     "island": "Big Island",
     "city": "Hilo",
     "tourType": "Guided Van Tour + Lunch",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "shakabraddahtours",
     "highlights": [
       "General Big Island sightseeing day tour with lunch included, departing Hilo"
     ],
@@ -10231,13 +10215,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "volcano-ohana-5hr-fat-tire-cruise-passengers",
-    "title": "5 Hour Fat Tire E-Bike Tour for Cruise Passengers - Volcanoes National Park",
+    "name": "5 Hour Fat Tire E-Bike Tour for Cruise Passengers - Volcanoes National Park",
     "company": "Volcano Ohana",
-    "fareharborShortname": "volcanoohana",
     "island": "Big Island",
     "city": "Keaau",
     "tourType": "Guided E-Bike Tour",
-    "duration": "5 Hours",
+    "durationLabel": "5 Hours",
+    "fareharborShortname": "volcanoohana",
     "highlights": [
       "E-bike tour of Hawaii Volcanoes National Park, specifically timed for cruise ship passengers with limited port time"
     ],
@@ -10273,13 +10257,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "volcano-ohana-kalapana-beach-road",
-    "title": "Fat Tire E-Bike Tour - Kalapana Beach Road and Volcanoes National Park",
+    "name": "Fat Tire E-Bike Tour - Kalapana Beach Road and Volcanoes National Park",
     "company": "Volcano Ohana",
-    "fareharborShortname": "volcanoohana",
     "island": "Big Island",
     "city": "Keaau",
     "tourType": "Guided E-Bike Tour",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "volcanoohana",
     "highlights": [
       "Covers Kalapana Beach Road - the area covered by relatively recent lava flows - in addition to the National Park",
       "Likely more flexible timing than the cruise-passenger-specific version"
@@ -10316,13 +10300,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wasabi-tours-big-island-grand-circle",
-    "title": "Big Island Grand Circle Island Tour",
+    "name": "Big Island Grand Circle Island Tour",
     "company": "Wasabi Tours Hawaii",
-    "fareharborShortname": "wasabi",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Guided Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "wasabi",
     "highlights": [
       "Full-day, full-island overview tour from Kona covering the Big Island's varied landscapes"
     ],
@@ -10358,13 +10342,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wasabi-tours-twilight-volcano-stargazing",
-    "title": "Twilight Volcano and Stargazing Tour",
+    "name": "Twilight Volcano and Stargazing Tour",
     "company": "Wasabi Tours Hawaii",
-    "fareharborShortname": "wasabi",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Guided Evening Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "wasabi",
     "highlights": [
       "Combines evening volcano viewing with stargazing - a lower-elevation alternative to a full Mauna Kea summit tour"
     ],
@@ -10400,13 +10384,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "wasabi-tours-waterfalls-adventure",
-    "title": "Big Island Waterfalls Adventure",
+    "name": "Big Island Waterfalls Adventure",
     "company": "Wasabi Tours Hawaii",
-    "fareharborShortname": "wasabi",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Guided Waterfall Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "wasabi",
     "highlights": [
       "A Kona-departure waterfall tour - a longer drive than the Hilo-side equivalent since waterfalls concentrate on the wetter side of the island"
     ],
@@ -10442,13 +10426,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "umauma-falls-private-waterfall-swim",
-    "title": "Private Waterfall and River Swim",
+    "name": "Private Waterfall and River Swim",
     "company": "Umauma Falls & ZipLine Experience",
-    "fareharborShortname": "ziplinehawaii",
     "island": "Big Island",
     "city": "Hakalau",
     "tourType": "Private Waterfall Swim",
-    "duration": "~1-1.5 Hours",
+    "durationLabel": "~1-1.5 Hours",
+    "fareharborShortname": "ziplinehawaii",
     "highlights": [
       "Private access to a waterfall and river swimming spot on the Hamakua Coast",
       "A gentler alternative to this operator's zipline products"
@@ -10484,13 +10468,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "umauma-falls-zip-n-dip-combo",
-    "title": "Zip N Dip Combo",
+    "name": "Zip N Dip Combo",
     "company": "Umauma Falls & ZipLine Experience",
-    "fareharborShortname": "ziplinehawaii",
     "island": "Big Island",
     "city": "Hakalau",
     "tourType": "Zipline + Waterfall Swim Combo",
-    "duration": "~2.5-3 Hours",
+    "durationLabel": "~2.5-3 Hours",
+    "fareharborShortname": "ziplinehawaii",
     "highlights": [
       "Combines this operator's zipline course with the waterfall swim in one booking"
     ],
@@ -10524,13 +10508,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "hawaii-zipline-tours-honomu",
-    "title": "Zipline Adventure",
+    "name": "Zipline Adventure",
     "company": "Hawaii Zipline Tours",
-    "fareharborShortname": "ziplinetourshawaii",
     "island": "Big Island",
     "city": "Honomu",
     "tourType": "Zipline Course",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "ziplinetourshawaii",
     "highlights": [
       "Another Hamakua Coast-area zipline operator, near Honomu (close to Akaka Falls)",
       "High availability count in this dataset, suggesting a well-established, frequently-run operation"
@@ -10565,13 +10549,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "sea-paradise-sailing-snorkeling",
-    "title": "Sailing & Snorkeling Tour",
+    "name": "Sailing & Snorkeling Tour",
     "company": "Sea Paradise",
-    "fareharborShortname": "seaparadise",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Sailing Snorkel Cruise",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "seaparadise",
     "highlights": [
       "Standard Kona sail-and-snorkel trip with morning or afternoon departure options"
     ],
@@ -10606,13 +10590,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "sea-paradise-manta-ray-night-snorkel",
-    "title": "Manta Ray Night Snorkeling Tour",
+    "name": "Manta Ray Night Snorkeling Tour",
     "company": "Sea Paradise",
-    "fareharborShortname": "seaparadise",
     "island": "Big Island",
     "city": "Kailua-Kona",
     "tourType": "Night Snorkel Tour",
-    "duration": "Evening",
+    "durationLabel": "Evening",
+    "fareharborShortname": "seaparadise",
     "highlights": [
       "This operator's manta ray night snorkel, offered across two nightly departure times to accommodate more guests"
     ],
@@ -10647,13 +10631,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-bombers-upcountry-food-cruise",
-    "title": "Upcountry Food Cruise",
+    "name": "Upcountry Food Cruise",
     "company": "Maui Bombers",
-    "fareharborShortname": "mauibombers",
     "island": "Maui",
     "city": "Wailea-Makena",
     "tourType": "Food Tour (Upcountry Maui)",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "mauibombers",
     "highlights": [
       "A food-focused tour of Maui's Upcountry region (Kula, Makawao area) - farms, local eateries, and agricultural producers"
     ],
@@ -10690,13 +10674,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-diamond-lanai-cathedrals",
-    "title": "Lanai Cathedrals (2-Tank Dive)",
+    "name": "Lanai Cathedrals (2-Tank Dive)",
     "company": "Maui Diamond Sea Sports",
-    "fareharborShortname": "mauidreamsdiveco",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "mauidreamsdiveco",
     "highlights": [
       "Another operator running the well-regarded Lanai Cathedrals dive site - see the Dive Maui listing for general destination context"
     ],
@@ -10730,13 +10714,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-diamond-molokini-2tank",
-    "title": "Molokini Crater 2-Tank Dive Charter",
+    "name": "Molokini Crater 2-Tank Dive Charter",
     "company": "Maui Diamond Sea Sports",
-    "fareharborShortname": "mauidreamsdiveco",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Certified Diver - 2 Tank Boat Dive",
-    "duration": "Half Day",
+    "durationLabel": "Half Day",
+    "fareharborShortname": "mauidreamsdiveco",
     "highlights": [
       "Molokini Crater is Maui's most famous marine site - a partially submerged volcanic crater forming a natural, protected reef",
       "Certified-diver version of a destination more commonly snorkeled"
@@ -10773,13 +10757,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-off-road-lahaina-adventure",
-    "title": "Lahaina Adventure",
+    "name": "Lahaina Adventure",
     "company": "Maui Off Road Adventures West Side",
-    "fareharborShortname": "mauioffroadadventureswestside",
     "island": "Maui",
     "city": "Lahaina",
     "tourType": "Guided Off-Road ATV/UTV Tour",
-    "duration": "~2-3 Hours",
+    "durationLabel": "~2-3 Hours",
+    "fareharborShortname": "mauioffroadadventureswestside",
     "highlights": [
       "Off-road adventure tour in the Lahaina area on Maui's West Side"
     ],
@@ -10813,13 +10797,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "makena-coast-molokini-turtle-town",
-    "title": "Molokini Crater & Turtle Town Snorkeling",
+    "name": "Molokini Crater & Turtle Town Snorkeling",
     "company": "Makena Coast Charters",
-    "fareharborShortname": "mauiunderwater",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Snorkel Boat Tour",
-    "duration": "~3 Hours",
+    "durationLabel": "~3 Hours",
+    "fareharborShortname": "mauiunderwater",
     "highlights": [
       "Combines Molokini Crater with Turtle Town, Maui's other signature snorkel destination, in one trip",
       "High quality score (97) in this dataset"
@@ -10857,13 +10841,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "glass-experience-maui-blowing",
-    "title": "Glass Blowing Experience",
+    "name": "Glass Blowing Experience",
     "company": "Glass Experience Maui",
-    "fareharborShortname": "makaiglass",
     "island": "Maui",
     "city": "Makawao",
     "tourType": "Hands-On Glass Blowing Class",
-    "duration": "~1-1.5 Hours",
+    "durationLabel": "~1-1.5 Hours",
+    "fareharborShortname": "makaiglass",
     "highlights": [
       "Hands-on glass blowing class in Upcountry Maui (Makawao)",
       "Guests create their own glass piece to take home"
@@ -10901,13 +10885,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-custom-charters-sunset",
-    "title": "Private Sunset Charter",
+    "name": "Private Sunset Charter",
     "company": "Maui Custom Charters",
-    "fareharborShortname": "sail-maui",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Private Sunset Charter",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "sail-maui",
     "highlights": [
       "Fully private sunset charter available on two different named vessels - a monohull sailboat or a catamaran"
     ],
@@ -10944,13 +10928,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-custom-charters-full-day-snorkel-sail",
-    "title": "Full Day Snorkel & Sail",
+    "name": "Full Day Snorkel & Sail",
     "company": "Maui Custom Charters",
-    "fareharborShortname": "sail-maui",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Private Charter - Snorkel & Sail",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "sail-maui",
     "highlights": [
       "Full-day private snorkel and sailing charter, available on either named vessel"
     ],
@@ -10985,13 +10969,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "maui-custom-charters-morning-snorkel-sail",
-    "title": "Catamaran Private Morning Snorkel & Sail",
+    "name": "Catamaran Private Morning Snorkel & Sail",
     "company": "Maui Custom Charters",
-    "fareharborShortname": "sail-maui",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Private Charter - Snorkel & Sail",
-    "duration": "Half Day (Morning)",
+    "durationLabel": "Half Day (Morning)",
+    "fareharborShortname": "sail-maui",
     "highlights": [
       "Shorter, morning-only version, catamaran only - good for travelers not wanting a full-day commitment"
     ],
@@ -11025,13 +11009,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "unicorn-tours-tiki-bar-sunset",
-    "title": "Sunset Sailing on a Floating Tiki Bar",
+    "name": "Sunset Sailing on a Floating Tiki Bar",
     "company": "Unicorn Tours of Hawaii Inc",
-    "fareharborShortname": "sailwinona",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Themed Sunset Sail",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "sailwinona",
     "highlights": [
       "Distinctively themed 'floating tiki bar' sunset sail - a more playful, social atmosphere than a standard sunset cruise"
     ],
@@ -11065,13 +11049,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "unicorn-tours-coral-garden-turtle-town",
-    "title": "Discover the Magic of Coral Garden's Turtle Town",
+    "name": "Discover the Magic of Coral Garden's Turtle Town",
     "company": "Unicorn Tours of Hawaii Inc",
-    "fareharborShortname": "sailwinona",
     "island": "Maui",
     "city": "Wailuku",
     "tourType": "Snorkel Boat Tour",
-    "duration": "3 Hours",
+    "durationLabel": "3 Hours",
+    "fareharborShortname": "sailwinona",
     "highlights": [
       "Another operator visiting Maui's well-known Turtle Town snorkel site"
     ],
@@ -11105,13 +11089,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "my-splash-non-swimmers-snorkel",
-    "title": "Snorkeling for Non-Swimmers with Photos",
+    "name": "Snorkeling for Non-Swimmers with Photos",
     "company": "My Splash LLC",
-    "fareharborShortname": "seascootersnorkeling",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Assisted Snorkel for Non-Swimmers",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "seascootersnorkeling",
     "highlights": [
       "Specifically designed for non-swimmers to safely experience snorkeling at Wailea Beach",
       "Photos included"
@@ -11149,13 +11133,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "my-splash-turtle-town-sea-scooter",
-    "title": "Turtle Town Sea Scooter Snorkeling Tour with Photos and Video",
+    "name": "Turtle Town Sea Scooter Snorkeling Tour with Photos and Video",
     "company": "My Splash LLC",
-    "fareharborShortname": "seascootersnorkeling",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Sea Scooter Snorkel Tour",
-    "duration": "~2 Hours",
+    "durationLabel": "~2 Hours",
+    "fareharborShortname": "seascootersnorkeling",
     "highlights": [
       "Uses motorized underwater sea scooters at Turtle Town rather than free swimming - covers more ground with less physical effort",
       "Photos and video included"
@@ -11193,13 +11177,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "my-splash-turtle-town-beginners",
-    "title": "Turtle Town Snorkel with Free Photo and Video - Beginners",
+    "name": "Turtle Town Snorkel with Free Photo and Video - Beginners",
     "company": "My Splash LLC",
-    "fareharborShortname": "seascootersnorkeling",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Beginner Snorkel Tour",
-    "duration": "~1.5 Hours",
+    "durationLabel": "~1.5 Hours",
+    "fareharborShortname": "seascootersnorkeling",
     "highlights": [
       "A plain-snorkel (no sea scooter) beginner-focused version of the Turtle Town trip, with photos/video included"
     ],
@@ -11233,13 +11217,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "local-pros-maui-surf-lessons",
-    "title": "Surf Lessons",
+    "name": "Surf Lessons",
     "company": "Local Pros Maui",
-    "fareharborShortname": "surflessonsinmauihi",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Surf Instruction",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "surflessonsinmauihi",
     "highlights": [
       "Maui surf lessons from an operator branded around local, professional instructors"
     ],
@@ -11273,13 +11257,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "surf-yoga-maui-lesson",
-    "title": "Surf Lesson",
+    "name": "Surf Lesson",
     "company": "Surf Yoga Maui",
-    "fareharborShortname": "surfyogamaui",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Surf Instruction",
-    "duration": "~1.5-2 Hours",
+    "durationLabel": "~1.5-2 Hours",
+    "fareharborShortname": "surfyogamaui",
     "highlights": [
       "Maui surf lessons from an operator that also offers yoga - suggesting a broader wellness-and-surf brand identity",
       "Private or Semi-Private group size options"
@@ -11315,13 +11299,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "unique-maui-tours-road-to-hana",
-    "title": "Unique Road to Hana",
+    "name": "Unique Road to Hana",
     "company": "Unique Maui Tours",
-    "fareharborShortname": "uniquehawaiiexperience",
     "island": "Maui",
     "city": "Kihei",
     "tourType": "Guided Road to Hana Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "uniquehawaiiexperience",
     "highlights": [
       "Another Road to Hana operator - see the Hana and Beyond and Hana Tours of Maui listings for general category context on this signature Maui drive"
     ],
@@ -11355,13 +11339,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "northshore-zipline-maui-tour",
-    "title": "NorthShore Zipline Tour",
+    "name": "NorthShore Zipline Tour",
     "company": "NorthShore Zipline Co.",
-    "fareharborShortname": "nszipline",
     "island": "Maui",
     "city": "Haiku-Pauwela",
     "tourType": "Zipline Course",
-    "duration": "~2.5-3 Hours",
+    "durationLabel": "~2.5-3 Hours",
+    "fareharborShortname": "nszipline",
     "highlights": [
       "Zipline course on Maui's North Shore near Haiku - see the Jungle Zipline listing (also Haiku-based) for general area context"
     ],
@@ -11395,13 +11379,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "na-pali-riders-sea-caves-raft-snorkel",
-    "title": "Na Pali Coast Sea Caves Raft Expedition + Snorkel",
+    "name": "Na Pali Coast Sea Caves Raft Expedition + Snorkel",
     "company": "Na Pali Riders",
-    "fareharborShortname": "napaliriders",
     "island": "Kauai",
     "city": "Kekaha",
     "tourType": "Rigid Inflatable Raft Tour + Snorkel",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "napaliriders",
     "highlights": [
       "Rigid inflatable raft format gets closer to sea caves along the Napali Coast than a larger catamaran can",
       "Includes snorkel time in addition to the coastal sightseeing",
@@ -11440,13 +11424,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "napali-hanalei-snorkel-adventure",
-    "title": "Napali Snorkel Adventure",
+    "name": "Napali Snorkel Adventure",
     "company": "Na Pali Coast Hanalei Tours",
-    "fareharborShortname": "napalitours",
     "island": "Kauai",
     "city": "Hanalei",
     "tourType": "Boat Tour + Snorkel",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "napalitours",
     "highlights": [
       "Napali Coast trip departing from Hanalei on Kauai's North Shore - a different, less common departure point than the Eleele/Port Allen departures used by most Napali operators in this dataset"
     ],
@@ -11482,13 +11466,13 @@ const ALL_TOURS_FALLBACK = [
   },
   {
     "slug": "polynesian-adventure-waimea-canyon-wailua-fern-grotto",
-    "title": "Waimea Canyon, Wailua River & Fern Grotto Tour",
+    "name": "Waimea Canyon, Wailua River & Fern Grotto Tour",
     "company": "Polynesian Adventure Activities",
-    "fareharborShortname": "polyad-activities",
     "island": "Kauai",
     "city": "Kauai (island-wide)",
     "tourType": "Shared Van Tour",
-    "duration": "Full Day",
+    "durationLabel": "Full Day",
+    "fareharborShortname": "polyad-activities",
     "highlights": [
       "Covers Waimea Canyon (the 'Grand Canyon of the Pacific'), the Wailua River, and the Fern Grotto in one guided day"
     ],
@@ -11520,4 +11504,4 @@ const ALL_TOURS_FALLBACK = [
       "star1": 1
     }
   }
-];
+]

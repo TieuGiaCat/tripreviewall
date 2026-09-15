@@ -4,10 +4,11 @@
    Uses ALL_TOURS (data/tours-full.js) as single source of truth.
    ============================================================ */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initHeaderScroll();
   initMobileDrawer();
   initTourTabs();
+  window.ALL_TOURS = await loadAllTours();
   renderFeaturedTours("top-rated");
 });
 

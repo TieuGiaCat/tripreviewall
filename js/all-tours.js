@@ -7,13 +7,13 @@
 const PAGE_SIZE = 24;
 let atState = { query: "", sort: "most-reviewed", page: 1 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof ALL_TOURS === "undefined") return;
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const q = params.get("q");
   if (q) { document.getElementById("at-search-input").value = q; atState.query = q; }
   initSearch();
   initSort();
+  window.ALL_TOURS = await loadAllTours();
   renderAllTours();
 });
 

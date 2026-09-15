@@ -85,6 +85,7 @@
 </footer>
 
 <script src="data/tours-full.js"></script>
+<script src="js/data-loader.js"></script>
 <script src="js/main.js"></script>
 <script>
 (function () {
@@ -94,10 +95,11 @@
     { name: "Kauai", slug: "kauai", gradient: "linear-gradient(135deg,#5C8A72,#26313A)" },
     { name: "Big Island", slug: "big-island", gradient: "linear-gradient(135deg,#26313A,#B85C4A)" }
   ];
-  document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", async function () {
     var grid = document.getElementById("dest-grid");
+    var tours = await loadAllTours();
     grid.innerHTML = islands.map(function (isl) {
-      var count = typeof ALL_TOURS !== "undefined" ? ALL_TOURS.filter(function (t) { return t.island === isl.name; }).length : "—";
+      var count = tours.filter(function (t) { return t.island === isl.name; }).length;
       return '<a class="dest-card" href="destinations/island.html?slug=' + isl.slug + '" style="background-image:' + isl.gradient + '">' +
         '<div class="dest-card-content"><h3 class="dest-card-name">' + isl.name + '</h3>' +
         '<div class="dest-card-count">' + count + ' tours tracked</div></div></a>';

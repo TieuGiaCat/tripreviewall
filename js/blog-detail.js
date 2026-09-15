@@ -8,15 +8,14 @@
 const FEATURED_TOUR_SLUG = "unique-maui-tours-road-to-hana";
 const CURRENT_ARTICLE_SLUG = "road-to-hana-self-drive-vs-guided";
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof ALL_TOURS !== "undefined") {
-    const tour = ALL_TOURS.find((t) => t.slug === FEATURED_TOUR_SLUG);
-    if (tour) {
-      renderInlineTourCard(tour);
-      renderSidebarCard(tour);
-      const link = document.getElementById("internal-tour-link");
-      if (link) link.href = `../tours/tour-detail.html?slug=${tour.slug}`;
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+  window.ALL_TOURS = await loadAllTours();
+  const tour = ALL_TOURS.find((t) => t.slug === FEATURED_TOUR_SLUG);
+  if (tour) {
+    renderInlineTourCard(tour);
+    renderSidebarCard(tour);
+    const link = document.getElementById("internal-tour-link");
+    if (link) link.href = `../tours/tour-detail.html?slug=${tour.slug}`;
   }
   if (typeof BLOG_POSTS !== "undefined") renderRelatedArticles();
 });

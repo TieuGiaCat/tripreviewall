@@ -15,14 +15,14 @@ const ISLANDS = [
     intro: "Big Island tours split between Kona-side snorkel and dive charters (including manta ray night snorkels), and volcano/waterfall tours based out of Hilo." }
 ];
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof ALL_TOURS === "undefined") return;
+document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug") || "oahu";
   const island = ISLANDS.find((i) => i.slug === slug) || ISLANDS[0];
 
   renderTabs(island);
   renderHero(island);
+  window.ALL_TOURS = await loadAllTours();
   renderTours(island);
   renderArticles(island);
 });
