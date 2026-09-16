@@ -1,0 +1,14 @@
+node_modules/
+admin/.env
+.DS_Store
+# Server-generated pages — created by admin/src/ssr/*, never hand-edited
+/index.html
+/tours.html
+/blog.html
+/destinations.html
+/tours/*.html
+!/tours/tour-detail.html
+/blog/*.html
+!/blog/post-detail.html
+/destinations/*.html
+!/destinations/island.html
