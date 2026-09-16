@@ -8,11 +8,11 @@ const NAV_ITEMS = [
   { key: "destinations", label: "Destinations", href: "/admin/destinations" },
   { key: "authors", label: "Authors", href: "/admin/authors" },
   { key: "settings", label: "Settings", href: "/admin/settings/email" },
+  { key: "media", label: "Media Library", href: "/admin/media" },
   // Future modules — routes not built yet in this core, listed here so the
   // sidebar shape matches master-technical-architecture.md §2 and doesn't
   // need restructuring later. Unbuilt links intentionally point to "#".
   { key: "analytics", label: "Analytics", href: "#" },
-  { key: "media", label: "Media Library", href: "#" },
   { key: "users", label: "Users", href: "#" },
 ];
 

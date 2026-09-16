@@ -16,6 +16,7 @@ const settingsRoutes = require("./routes/settingsRoutes");
 const publicLeadRoutes = require("./routes/publicLeadRoutes");
 const destinationsRoutes = require("./routes/destinationsRoutes");
 const authorsRoutes = require("./routes/authorsRoutes");
+const mediaRoutes = require("./routes/mediaRoutes");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -263,6 +264,17 @@ const server = http.createServer(async (req, res) => {
     const authorUploadMatch = pathname.match(/^\/admin\/authors\/([^/]+)\/upload-photo$/);
     if (authorUploadMatch && method === "POST") {
       return authorsRoutes.uploadAuthorPhoto(req, res, session, authorUploadMatch[1]);
+    }
+
+    // ---- Media Library ----
+    if (method === "GET" && pathname === "/admin/media") {
+      return mediaRoutes.listMedia(req, res, session, urlObj);
+    }
+    if (method === "POST" && pathname === "/admin/media/upload") {
+      return mediaRoutes.uploadGeneralImage(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/media/delete") {
+      return mediaRoutes.deleteMediaFile(req, res, session);
     }
 
     // ---- 404 ----

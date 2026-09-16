@@ -47,10 +47,10 @@ async function showDashboard(req, res, user) {
     <div class="form-card">
       <h2>What's built so far</h2>
       <p style="color:var(--color-text-muted);line-height:1.6;">
-        Tours, Blog Posts, Leads, Destinations and Authors all have full CRUD plus image upload
-        where relevant. Settings → Email is configured for lead notifications. Analytics,
-        Media Library and Users are scaffolded in the sidebar but not built yet — see
-        <code>master-technical-architecture.md</code> §12 for the intended build order.
+        Tours, Blog Posts, Leads, Destinations, Authors and Media Library all have full
+        CRUD/management plus image upload where relevant. Settings → Email is configured for
+        lead notifications. Analytics and Users are scaffolded in the sidebar but not built yet —
+        see <code>master-technical-architecture.md</code> §12 for the intended build order.
       </p>
     </div>
   `;
