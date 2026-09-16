@@ -114,12 +114,34 @@
 
 <script src="js/main.js"></script>
 <script>
-  document.getElementById("contact-form").addEventListener("submit", function (e) {
+  document.getElementById("contact-form").addEventListener("submit", async function (e) {
     e.preventDefault();
-    /* Static prototype: no backend wired yet. In production this posts to
-       /api/leads (source_type: "contact") per master-technical-architecture.md §8. */
-    this.style.display = "none";
-    document.getElementById("form-success").style.display = "block";
+    const form = this;
+    const btn = form.querySelector("button[type=submit]");
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "contact",
+          name: document.getElementById("cf-name").value,
+          email: document.getElementById("cf-email").value,
+          message: document.getElementById("cf-message").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong.");
+      form.style.display = "none";
+      document.getElementById("form-success").style.display = "block";
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      alert(err.message || "Something went wrong — please try again or email us directly.");
+    }
   });
 </script>
 </body>

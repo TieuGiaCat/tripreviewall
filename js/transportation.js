@@ -87,12 +87,39 @@ function renderFaq() {
 }
 
 function initForm() {
-  document.getElementById("tp-inquiry-form").addEventListener("submit", function (e) {
+  document.getElementById("tp-inquiry-form").addEventListener("submit", async function (e) {
     e.preventDefault();
-    /* Static prototype: no backend wired yet. In production this posts to
-       /api/leads (source_type: "transportation") per master-technical-architecture.md §8. */
-    this.style.display = "none";
-    document.getElementById("tp-form-success").style.display = "block";
+    const form = this;
+    const btn = form.querySelector("button[type=submit]");
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Sending...";
+
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "transportation",
+          name: document.getElementById("tp-name").value,
+          email: document.getElementById("tp-email").value,
+          phone: document.getElementById("tp-phone").value,
+          service: document.getElementById("tp-service").value,
+          date: document.getElementById("tp-date").value,
+          pickup: document.getElementById("tp-pickup").value,
+          passengers: document.getElementById("tp-passengers").value,
+          notes: document.getElementById("tp-notes").value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong.");
+      form.style.display = "none";
+      document.getElementById("tp-form-success").style.display = "block";
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      alert(err.message || "Something went wrong — please try again or call us directly.");
+    }
   });
 }
 

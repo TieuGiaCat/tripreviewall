@@ -56,6 +56,36 @@ function readFormBody(req) {
   });
 }
 
+/**
+ * Read and parse a JSON POST body. Used by public write endpoints (e.g.
+ * POST /api/leads) that the frontend calls via fetch() with a JSON payload,
+ * as opposed to the form-encoded POSTs used throughout Admin.
+ */
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let raw = "";
+    let size = 0;
+    const MAX_BYTES = 200 * 1024; // 200KB — generous for a contact form, small enough to block abuse
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > MAX_BYTES) {
+        reject(new Error("Request body too large"));
+        req.destroy();
+        return;
+      }
+      raw += chunk;
+    });
+    req.on("end", () => {
+      try {
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
 /** Parse the Cookie header into a plain object. */
 function parseCookies(req) {
   const header = req.headers.cookie;
@@ -71,4 +101,4 @@ function parseCookies(req) {
   return out;
 }
 
-module.exports = { slugify, esc, linesToArray, readFormBody, parseCookies };
+module.exports = { slugify, esc, linesToArray, readFormBody, readJsonBody, parseCookies };

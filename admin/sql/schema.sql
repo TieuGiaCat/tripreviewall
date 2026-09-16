@@ -1,9 +1,9 @@
 -- ============================================================
--- Tripreviewall.com — Admin Panel Core Schema (v0.1)
--- Covers: admin_users + tours (per master-technical-architecture.md §3.1, §3.4)
--- Other tables (posts, destinations, leads, click_logs, settings, media)
--- are NOT created here yet — add them as their admin modules are built,
--- following the same id + JSONB "data" pattern.
+-- Tripreviewall.com — Admin Panel Core Schema
+-- Covers: admin_users, tours, posts, settings, leads
+-- Other tables (destinations, click_logs, media) are NOT created
+-- here yet — add them as their admin modules are built, following
+-- the same id + JSONB "data" pattern.
 -- ============================================================
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto"; -- for gen_random_uuid()
@@ -84,3 +84,43 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
 CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category);
 CREATE INDEX IF NOT EXISTS idx_posts_updated_at ON posts(updated_at DESC);
+
+-- ---------------------------------------------------------------
+-- settings  (added for Leads + Settings→Email module)
+-- Generic key/value JSONB store — one row per named setting group.
+-- First consumer: key = 'email_smtp' (see admin/src/lib/mailer.js).
+-- The SMTP password is never stored in plaintext — see
+-- admin/src/lib/crypto-secret.js (AES-256-GCM, key from .env).
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key TEXT UNIQUE NOT NULL,
+  data JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  -- data shape for key='email_smtp':
+  -- { "host": "smtp.gmail.com", "port": 587, "secure": false,
+  --   "authUser": "you@gmail.com", "authPassEncrypted": "iv:tag:cipher",
+  --   "fromName": "Tripreviewall", "fromEmail": "you@gmail.com",
+  --   "notifyToEmail": "you@gmail.com" }
+);
+
+-- ---------------------------------------------------------------
+-- leads  (Contact + Transportation form submissions)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  source TEXT NOT NULL CHECK (source IN ('contact', 'transportation')),
+  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'closed')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  data JSONB NOT NULL DEFAULT '{}'::jsonb
+  -- data shape (fields vary slightly by source):
+  -- { "name": "...", "email": "...", "phone": "...", "message": "...",
+  --   "service": "...", "date": "...", "pickup": "...", "passengers": 2,
+  --   "notes": "...", "ipAddress": "...", "userAgent": "...",
+  --   "emailSentAt": "...", "emailError": null }
+);
+
+CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
+CREATE INDEX IF NOT EXISTS idx_leads_source ON leads(source);
+CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at DESC);

@@ -3,16 +3,16 @@ const { esc } = require("./utils");
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", href: "/admin/dashboard" },
   { key: "tours", label: "Tours", href: "/admin/tours" },
+  { key: "blog", label: "Blog Posts", href: "/admin/posts" },
+  { key: "leads", label: "Leads", href: "/admin/leads" },
+  { key: "settings", label: "Settings", href: "/admin/settings/email" },
   // Future modules — routes not built yet in this core, listed here so the
   // sidebar shape matches master-technical-architecture.md §2 and doesn't
   // need restructuring later. Unbuilt links intentionally point to "#".
-  { key: "blog", label: "Blog Posts", href: "/admin/posts" },
   { key: "destinations", label: "Destinations", href: "#" },
   { key: "authors", label: "Authors", href: "#" },
-  { key: "leads", label: "Leads", href: "#" },
   { key: "analytics", label: "Analytics", href: "#" },
   { key: "media", label: "Media Library", href: "#" },
-  { key: "settings", label: "Settings", href: "#" },
   { key: "users", label: "Users", href: "#" },
 ];
 

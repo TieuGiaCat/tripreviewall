@@ -11,6 +11,9 @@ const toursRoutes = require("./routes/toursRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const publicApi = require("./routes/publicApi");
 const sitemapRoute = require("./routes/sitemapRoute");
+const leadsRoutes = require("./routes/leadsRoutes");
+const settingsRoutes = require("./routes/settingsRoutes");
+const publicLeadRoutes = require("./routes/publicLeadRoutes");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -122,6 +125,13 @@ const server = http.createServer(async (req, res) => {
       return publicApi.getPublishedPostBySlug(req, res, apiPostMatch[1]);
     }
 
+    // ---- Public WRITE API (no session required) — form submissions from
+    // the public site (Contact + Transportation pages). Rate-limited and
+    // validated inside the handler; never trusts the client beyond that. ----
+    if (method === "POST" && pathname === "/api/leads") {
+      return publicLeadRoutes.createLead(req, res);
+    }
+
     // ---- Everything below requires a session ----
     const session = requireAuth(req, res);
     if (!session) return; // requireAuth already sent the redirect response
@@ -130,6 +140,7 @@ const server = http.createServer(async (req, res) => {
       return dashboardRoutes.showDashboard(req, res, session);
     }
 
+    // ---- Tours ----
     if (method === "GET" && pathname === "/admin/tours") {
       return toursRoutes.listTours(req, res, session, urlObj);
     }
@@ -139,20 +150,16 @@ const server = http.createServer(async (req, res) => {
     if (method === "POST" && pathname === "/admin/tours/new") {
       return toursRoutes.createTour(req, res, session);
     }
-
-    // Dynamic routes: /admin/tours/:id/edit , /admin/tours/:id/delete
     const editMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/edit$/);
     if (editMatch) {
       const id = editMatch[1];
       if (method === "GET") return toursRoutes.editTourForm(req, res, session, id);
       if (method === "POST") return toursRoutes.updateTour(req, res, session, id);
     }
-
     const deleteMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/delete$/);
     if (deleteMatch && method === "POST") {
       return toursRoutes.deleteTour(req, res, session, deleteMatch[1]);
     }
-
     const uploadMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/upload-image$/);
     if (uploadMatch && method === "POST") {
       return toursRoutes.uploadTourImage(req, res, session, uploadMatch[1]);
@@ -189,6 +196,31 @@ const server = http.createServer(async (req, res) => {
     const postInlineUploadMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/upload-inline-image$/);
     if (postInlineUploadMatch && method === "POST") {
       return blogRoutes.uploadInlineImage(req, res, session, postInlineUploadMatch[1]);
+    }
+
+    // ---- Leads ----
+    if (method === "GET" && pathname === "/admin/leads") {
+      return leadsRoutes.listLeads(req, res, session, urlObj);
+    }
+    const leadDetailMatch = pathname.match(/^\/admin\/leads\/([^/]+)$/);
+    if (method === "GET" && leadDetailMatch) {
+      return leadsRoutes.leadDetail(req, res, session, leadDetailMatch[1]);
+    }
+    const leadStatusMatch = pathname.match(/^\/admin\/leads\/([^/]+)\/status$/);
+    if (method === "POST" && leadStatusMatch) {
+      return leadsRoutes.updateLeadStatus(req, res, session, leadStatusMatch[1]);
+    }
+    const leadDeleteMatch = pathname.match(/^\/admin\/leads\/([^/]+)\/delete$/);
+    if (method === "POST" && leadDeleteMatch) {
+      return leadsRoutes.deleteLead(req, res, session, leadDeleteMatch[1]);
+    }
+
+    // ---- Settings → Email ----
+    if (method === "GET" && pathname === "/admin/settings/email") {
+      return settingsRoutes.showEmailSettings(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/settings/email") {
+      return settingsRoutes.saveEmailSettings(req, res, session);
     }
 
     // ---- 404 ----
