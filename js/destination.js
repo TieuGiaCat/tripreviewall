@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderHero(island);
   window.ALL_TOURS = await loadAllTours();
   renderTours(island);
+  window.BLOG_POSTS = await loadAllPosts();
   renderArticles(island);
 });
 
@@ -58,12 +59,12 @@ function renderArticles(island) {
   if (list.length === 0) { grid.innerHTML = ""; empty.style.display = "block"; return; }
   empty.style.display = "none";
   grid.innerHTML = list.map((p) => `
-    <a href="${p.hasDetailPage ? "../blog/" + p.slug + ".html" : "#"}" class="blog-card">
-      <div class="blog-card-image" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
+    <a href="../blog/post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+      <div class="blog-card-image" style="background:${p.featuredImage ? `url('${p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
-        <div class="blog-card-cat">${p.category}</div>
+        <div class="blog-card-cat">${p.category || ""}</div>
         <h3 class="blog-card-title">${p.title}</h3>
-        <div class="blog-card-meta">${p.updatedAt} · ${p.readTime} min read</div>
+        <div class="blog-card-meta">${p.updatedAt} · ${p.readTime || ""} min read</div>
       </div>
     </a>`).join("");
 }

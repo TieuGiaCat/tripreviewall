@@ -10,7 +10,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   initTourTabs();
   window.ALL_TOURS = await loadAllTours();
   renderFeaturedTours("top-rated");
+  if (document.getElementById("home-blog-grid")) {
+    window.BLOG_POSTS = await loadAllPosts();
+    renderHomeBlogPreview();
+  }
 });
+
+const HOME_CAT_GRADIENTS = {
+  "Comparison": "linear-gradient(135deg,#5C8A72,#0B3B4F)",
+  "Real Traveler Reviews & Data": "linear-gradient(135deg,#B85C4A,#0B3B4F)",
+  "Tour Reviews by Type": "linear-gradient(135deg,#D97B4F,#0B3B4F)",
+  "Island Guides": "linear-gradient(135deg,#0B3B4F,#5C8A72)",
+  "Booking & Practical Info": "linear-gradient(135deg,#26313A,#B8592F)",
+  "Planning & Comparisons": "linear-gradient(135deg,#5C8A72,#0B3B4F)"
+};
+
+function renderHomeBlogPreview() {
+  const grid = document.getElementById("home-blog-grid");
+  if (!grid || typeof BLOG_POSTS === "undefined") return;
+  const latest = [...BLOG_POSTS].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 3);
+  if (latest.length === 0) {
+    grid.parentElement.style.display = "none"; // whole "From the Editors" section hides if there's truly nothing yet
+    return;
+  }
+  grid.innerHTML = latest.map((p) => {
+    const bg = p.featuredImage ? `url('${p.featuredImage}')` : (HOME_CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
+    return `
+    <a href="blog/post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+      <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
+      <div class="blog-card-body">
+        <div class="blog-card-cat">${p.category || ""}</div>
+        <h3 class="blog-card-title">${p.title}</h3>
+        <div class="blog-card-meta">${new Date(p.updatedAt).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}${p.readTime ? " · " + p.readTime + " min read" : ""}</div>
+      </div>
+    </a>`;
+  }).join("");
+}
 
 /* ---- Sticky header shrink-on-scroll ---- */
 function initHeaderScroll() {
@@ -70,10 +105,11 @@ function tourCardTemplate(tour, basePath, imgPrefix) {
   const d = tour.ratingDistribution;
   const badge = tour.badge ? `<span class="tour-card-badge">${tour.badge}</span>` : "";
   const linkFile = basePath === "" ? "tour-detail.html" : basePath + "tour-detail.html";
+  const imgSrc = (tour.gallery && tour.gallery[0]) ? tour.gallery[0] : `${imgPrefix}${tour.slug}.webp`;
   return `
     <article class="tour-card">
       <div class="tour-card-image-wrap">
-        <img class="tour-photo" src="${imgPrefix}${tour.slug}.webp" alt="${tour.title} — ${tour.company}"
+        <img class="tour-photo" src="${imgSrc}" alt="${tour.title} — ${tour.company}"
              onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">
         ${badge}
       </div>

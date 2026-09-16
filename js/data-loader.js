@@ -34,3 +34,29 @@ async function loadOneTour(slug) {
     return list.find((t) => t.slug === slug) || null;
   }
 }
+
+async function loadAllPosts() {
+  try {
+    const res = await fetch("/api/posts", { cache: "no-store" });
+    if (!res.ok) throw new Error("API responded with " + res.status);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("API response was not an array");
+    if (data.length === 0) throw new Error("API returned zero posts");
+    return data;
+  } catch (err) {
+    console.warn("[data-loader] Live posts API unavailable, using bundled snapshot instead:", err.message);
+    return typeof BLOG_POSTS_FALLBACK !== "undefined" ? BLOG_POSTS_FALLBACK : [];
+  }
+}
+
+async function loadOnePost(slug) {
+  try {
+    const res = await fetch(`/api/posts/${encodeURIComponent(slug)}`, { cache: "no-store" });
+    if (!res.ok) throw new Error("API responded with " + res.status);
+    return await res.json();
+  } catch (err) {
+    console.warn("[data-loader] Live post API unavailable, checking bundled snapshot:", err.message);
+    const list = typeof BLOG_POSTS_FALLBACK !== "undefined" ? BLOG_POSTS_FALLBACK : [];
+    return list.find((p) => p.slug === slug) || null;
+  }
+}

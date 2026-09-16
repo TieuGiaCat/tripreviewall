@@ -1,12 +1,14 @@
 /* ============================================================
    tripreviewall.com — All Blog page logic
+   Loads posts live from /api/posts (falls back to the bundled
+   snapshot if the API is unreachable — see js/data-loader.js).
    ============================================================ */
 
 const LAYER1_CATEGORIES = ["All", "Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
 let blogState = { layer1: "All", island: "All", visibleCount: 6 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof BLOG_POSTS === "undefined") return;
+document.addEventListener("DOMContentLoaded", async () => {
+  window.BLOG_POSTS = await loadAllPosts();
   renderPillarStrip();
   renderLayer1Tabs();
   initLayer2();
@@ -18,16 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function renderPillarStrip() {
-  const pillars = BLOG_POSTS.filter((p) => p.featuredPillar).sort((a, b) => (a.pillarOrder || 99) - (b.pillarOrder || 99));
+  // No CMS-curated pillar flag exists in the DB schema yet (see
+  // tripreviewall-all-blog-brief.md §3.2) — hide the strip entirely
+  // rather than show something that isn't real, per the fallback
+  // rule in that brief ("if zero results, hide the whole band").
   const band = document.getElementById("pillar-band");
-  if (pillars.length === 0) { band.style.display = "none"; return; }
-  document.getElementById("pillar-row").innerHTML = pillars.map((p) => `
-    <a class="pillar-card" href="${p.hasDetailPage ? 'blog/' + p.slug + '.html' : '#'}">
-      <div class="pillar-card-img" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
-      <div class="pillar-card-title">${p.title}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </div>
-    </a>`).join("");
+  if (band) band.style.display = "none";
 }
 
 function renderLayer1Tabs() {
@@ -58,19 +56,26 @@ const CAT_GRADIENTS = {
   "Planning & Comparisons": "linear-gradient(135deg,#5C8A72,#0B3B4F)"
 };
 
+function fmtDate(d) {
+  if (!d) return "";
+  const date = new Date(d);
+  if (isNaN(date)) return String(d).slice(0, 10);
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
 function articleCard(p) {
-  const grad = CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)";
-  const href = p.hasDetailPage ? `blog/${p.slug}.html` : "#";
+  const grad = p.featuredImage ? null : (CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
+  const bg = p.featuredImage ? `url('${p.featuredImage}')` : grad;
   return `
-    <a href="${href}" class="blog-card">
-      <div class="blog-card-image" style="background:${grad};"></div>
+    <a href="blog/post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+      <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-tags">
-          <span class="blog-card-cat" style="margin-bottom:0;">${p.category}</span>
+          ${p.category ? `<span class="blog-card-cat" style="margin-bottom:0;">${p.category}</span>` : ""}
           ${p.island ? `<span class="blog-card-island"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>${p.island}</span>` : ""}
         </div>
         <h3 class="blog-card-title">${p.title}</h3>
-        <div class="blog-card-meta">${p.author} · Last updated ${p.updatedAt} · ${p.readTime} min read</div>
+        <div class="blog-card-meta">${p.author ? p.author + " · " : ""}Last updated ${fmtDate(p.updatedAt)}${p.readTime ? " · " + p.readTime + " min read" : ""}</div>
       </div>
     </a>`;
 }
