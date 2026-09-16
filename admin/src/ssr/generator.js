@@ -14,7 +14,7 @@ const POSTS_DIR = path.join(SITE_ROOT, "blog");
 // A generated file's name is `<slug>.html`. These two filenames are the
 // generic dynamic templates that already live in the same folders — never
 // let a tour/post slug collide with them.
-const RESERVED_SLUGS = new Set(["tour-detail", "post-detail"]);
+const RESERVED_SLUGS = new Set(["tour-detail", "post-detail", "island"]);
 
 function isReservedSlug(slug) {
   return RESERVED_SLUGS.has(slug);
