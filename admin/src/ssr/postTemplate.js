@@ -115,7 +115,7 @@ function jsonLd(post, relatedTour) {
  * `relatedTour` — the tour object for post.relatedTourSlug, or null.
  * `relatedPosts` — up to 3 other published posts, already fetched by the caller.
  */
-function renderPostPageHtml(post, relatedTour, relatedPosts) {
+function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
   const canonical = `${SITE_URL}/blog/${post.slug}.html`;
   const metaDesc = (post.excerpt || post.title).slice(0, 155);
 
@@ -241,15 +241,26 @@ ${jsonLd(post, relatedTour)}
 
         ${inlineTourCardHtml(relatedTour)}
 
-        ${(post.author || post.island || relatedTour) ? `
+        ${(author || post.author || post.island || relatedTour) ? `
         <div class="author-box">
+          ${author ? `
+          <div class="author-card">
+            <div class="author-photo"${author.photoUrl ? ` style="background-image:url('..${esc(author.photoUrl)}');background-size:cover;background-position:center;"` : ""}></div>
+            <div>
+              <p class="author-name">${esc(author.name)}</p>
+              ${author.roleTitle ? `<p class="author-role">${esc(author.roleTitle)}</p>` : ""}
+              ${author.experienceStatement ? `<p class="author-experience">${esc(author.experienceStatement)}</p>` : ""}
+              ${author.statsLine ? `<p class="author-stats">${esc(author.statsLine)}</p>` : ""}
+              ${author.profileLink ? `<a class="author-profile-link" href="${esc(author.profileLink)}">Full profile →</a>` : ""}
+            </div>
+          </div>` : `
           <div class="author-card"${post.author ? "" : ' style="display:none;"'}>
             <div class="author-photo"></div>
             <div>
               <p class="author-name">${esc(post.author || "")}</p>
               <p class="author-role">Tripreviewall Editorial Team</p>
             </div>
-          </div>
+          </div>`}
           ${internalLinks.length > 0 ? `<div class="internal-links-box">${internalLinks.join("")}</div>` : ""}
         </div>` : ""}
       </div>

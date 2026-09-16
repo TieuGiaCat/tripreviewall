@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const { pool, query } = require("./db");
 const { hashPassword } = require("./auth");
+const { ISLANDS } = require("./ssr/islands");
 
 async function runSchema() {
   const sql = fs.readFileSync(path.join(__dirname, "..", "sql", "schema.sql"), "utf8");
@@ -43,10 +44,29 @@ async function seedAdmin() {
   console.log("  IMPORTANT: change SEED_ADMIN_PASSWORD in .env now (or log in and note it's stored, this script never reads plaintext passwords back).");
 }
 
+/**
+ * Destinations are a fixed set of 4 rows (one per island) — never
+ * created/deleted from Admin, only edited. Seed them once here, using
+ * admin/src/ssr/islands.js's default intro text as the starting content.
+ * Idempotent: skips any island slug that already has a row.
+ */
+async function seedDestinations() {
+  for (const isl of ISLANDS) {
+    const existing = await query("SELECT id FROM destinations WHERE slug = $1", [isl.slug]);
+    if (existing.rows.length > 0) continue;
+    await query(
+      `INSERT INTO destinations (slug, status, data) VALUES ($1, 'published', $2)`,
+      [isl.slug, JSON.stringify({ islandName: isl.name, heroImage: null, introText: isl.intro, seo: {} })]
+    );
+    console.log(`✓ Seeded destination: ${isl.name}`);
+  }
+}
+
 async function main() {
   const shouldSeed = process.argv.includes("--seed-admin");
   try {
     await runSchema();
+    await seedDestinations();
     if (shouldSeed) await seedAdmin();
   } catch (err) {
     console.error("✗ Migration failed:", err.message);

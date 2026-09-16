@@ -2,6 +2,7 @@ const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout } = require("../render");
 const { generatePostFile, removePostFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
+const { listActiveAuthorsForDropdown } = require("./authorsRoutes");
 
 const CATEGORIES = ["Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
 const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
@@ -170,7 +171,7 @@ function quillAssets(postId, initialBodyHtml) {
   return { head, scripts };
 }
 
-function renderPostForm({ post = {}, errors = [], formAction, isEdit }) {
+function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [] }) {
   const d = post.data || {};
 
   const categoryOptions = CATEGORIES.map(
@@ -210,7 +211,17 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit }) {
           </div>
         </div>
         <div class="form-row">
-          <div class="form-field"><label>Author Name</label><input type="text" name="authorName" value="${esc(d.authorName || "")}"></div>
+          <div class="form-field">
+            <label>Author (optional — select to show a full credentialed Author Box on the page)</label>
+            <select name="authorSlug">
+              <option value="">— Plain name only (below) —</option>
+              ${(authorsList || []).map((a) => `<option value="${esc(a.slug)}" ${d.authorSlug === a.slug ? "selected" : ""}>${esc(a.name)}</option>`).join("")}
+            </select>
+            <div class="hint">Manage authors under Authors in the sidebar.</div>
+          </div>
+          <div class="form-field"><label>Author Name (used if no Author selected above)</label><input type="text" name="authorName" value="${esc(d.authorName || "")}"></div>
+        </div>
+        <div class="form-row">
           <div class="form-field"><label>Read Time (minutes)</label><input type="number" min="1" name="readTimeMinutes" value="${esc(d.readTimeMinutes != null ? d.readTimeMinutes : "")}"></div>
         </div>
       </div>
@@ -273,6 +284,7 @@ function bodyToPostData(body, existingData = {}) {
   return {
     title: (body.title || "").trim(),
     excerpt: (body.excerpt || "").trim(),
+    authorSlug: (body.authorSlug || "").trim() || null,
     authorName: (body.authorName || "").trim(),
     readTimeMinutes: body.readTimeMinutes !== "" ? Number(body.readTimeMinutes) : null,
     body: (body.body || "").trim(),
@@ -289,19 +301,21 @@ function bodyToPostData(body, existingData = {}) {
    New
    ============================================================ */
 async function newPostForm(req, res, user) {
+  const authorsList = await listActiveAuthorsForDropdown();
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   const qa = quillAssets(null, "");
-  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false }), extraHead: qa.head, extraScripts: qa.scripts }));
+  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, authorsList }), extraHead: qa.head, extraScripts: qa.scripts }));
 }
 
 async function createPost(req, res, user) {
+  const authorsList = await listActiveAuthorsForDropdown();
   let body;
   try {
     body = await readFormBody(req);
   } catch (err) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     const qa0 = quillAssets(null, "");
-    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."] }), extraHead: qa0.head, extraScripts: qa0.scripts }));
+    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."], authorsList }), extraHead: qa0.head, extraScripts: qa0.scripts }));
     return;
   }
 
@@ -325,7 +339,7 @@ async function createPost(req, res, user) {
         title: "New Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: "/admin/posts/new", isEdit: false }),
+        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: "/admin/posts/new", isEdit: false, authorsList }),
         extraHead: qa1.head,
         extraScripts: qa1.scripts,
       })
@@ -353,7 +367,7 @@ async function createPost(req, res, user) {
         title: "New Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: "/admin/posts/new", isEdit: false }),
+        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: "/admin/posts/new", isEdit: false, authorsList }),
         extraHead: qa2.head,
         extraScripts: qa2.scripts,
       })
@@ -383,12 +397,14 @@ async function editPostForm(req, res, user, id) {
     res.end(layout({ title: "Not found", activeNav: "blog", user, body: `<div class="alert alert-error">Post not found.</div><a href="/admin/posts" class="btn btn-secondary">Back to Posts</a>` }));
     return;
   }
+  const authorsList = await listActiveAuthorsForDropdown();
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   const qa3 = quillAssets(id, (post.data && post.data.body) || "");
-  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true }), extraHead: qa3.head, extraScripts: qa3.scripts }));
+  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList }), extraHead: qa3.head, extraScripts: qa3.scripts }));
 }
 
 async function updatePost(req, res, user, id) {
+  const authorsList = await listActiveAuthorsForDropdown();
   let body;
   try {
     body = await readFormBody(req);
@@ -433,7 +449,7 @@ async function updatePost(req, res, user, id) {
         title: "Edit Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: `/admin/posts/${id}/edit`, isEdit: true }),
+        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList }),
         extraHead: qa4.head,
         extraScripts: qa4.scripts,
       })
@@ -468,7 +484,7 @@ async function updatePost(req, res, user, id) {
         title: "Edit Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: `/admin/posts/${id}/edit`, isEdit: true }),
+        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList }),
         extraHead: qa5.head,
         extraScripts: qa5.scripts,
       })

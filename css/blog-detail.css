@@ -78,6 +78,10 @@
 .author-photo { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#0B3B4F,#5C8A72); flex-shrink: 0; }
 .author-name { font-weight: 700; font-size: var(--text-h4); margin: 0; }
 .author-role { font-size: var(--text-meta); color: var(--color-text-muted); margin: 2px 0 10px; }
+.author-experience { font-size: var(--text-body-sm); color: var(--color-text); line-height: 1.5; margin: 0 0 8px; }
+.author-stats { font-size: var(--text-meta); color: var(--color-text-muted); margin: 0 0 6px; }
+.author-profile-link { font-size: var(--text-meta); font-weight: 600; color: var(--color-primary); text-decoration: none; }
+.author-profile-link:hover { text-decoration: underline; }
 .author-experience { font-size: var(--text-body); margin: 0 0 8px; }
 .author-stats { font-size: var(--text-meta); color: var(--color-text-muted); }
 

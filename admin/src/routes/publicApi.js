@@ -87,6 +87,7 @@ function toPostPublicShape(row) {
     island: row.island_tag || null,
     contentFormat: row.content_format || "listicle",
     author: d.authorName || "",
+    authorSlug: d.authorSlug || null,
     excerpt: d.excerpt || "",
     body: d.body || "",
     readTime: d.readTimeMinutes || null,

@@ -87,6 +87,16 @@ async function generatePostFile(postRow) {
       }
     }
 
+    let author = null;
+    if (post.authorSlug) {
+      try {
+        const result = await query(`SELECT slug, data FROM authors WHERE slug = $1 LIMIT 1`, [post.authorSlug]);
+        if (result.rows[0]) author = { slug: result.rows[0].slug, ...(result.rows[0].data || {}) };
+      } catch (err) {
+        console.error("[ssr] Could not load author:", err.message);
+      }
+    }
+
     let relatedPosts = [];
     try {
       const result = await query(
@@ -99,7 +109,7 @@ async function generatePostFile(postRow) {
       console.error("[ssr] Could not load related posts:", err.message);
     }
 
-    const html = renderPostPageHtml(post, relatedTour, relatedPosts);
+    const html = renderPostPageHtml(post, relatedTour, relatedPosts, author);
     fs.writeFileSync(postFilePath(postRow.slug), html, "utf8");
   } catch (err) {
     console.error(`[ssr] Failed to generate post page for "${postRow.slug}":`, err.message);
@@ -145,6 +155,17 @@ async function regenerateListingPages() {
     const islandCounts = {};
     allTours.forEach((t) => { islandCounts[t.island] = (islandCounts[t.island] || 0) + 1; });
 
+    // Destinations admin content (intro text + hero photo) — falls back to
+    // the static defaults in ./islands.js for any island not yet edited
+    // (or if the "destinations" table doesn't exist yet on an older DB).
+    let destinationsBySlug = {};
+    try {
+      const destResult = await query(`SELECT slug, data FROM destinations`);
+      destResult.rows.forEach((row) => { destinationsBySlug[row.slug] = row.data || {}; });
+    } catch (err) {
+      console.error("[ssr] regenerateListingPages: could not load destinations (using defaults):", err.message);
+    }
+
     fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), renderToursIndexHtml(allTours), "utf8");
     fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), renderBlogIndexHtml(allPosts), "utf8");
     fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), renderDestinationsHubHtml(islandCounts), "utf8");
@@ -152,7 +173,7 @@ async function regenerateListingPages() {
     for (const isl of ISLANDS) {
       fs.writeFileSync(
         path.join(SITE_ROOT, "destinations", `${isl.slug}.html`),
-        renderIslandPageHtml(isl.slug, allTours, allPosts),
+        renderIslandPageHtml(isl.slug, allTours, allPosts, destinationsBySlug[isl.slug]),
         "utf8"
       );
     }
