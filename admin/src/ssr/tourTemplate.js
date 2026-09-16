@@ -169,6 +169,11 @@ function renderTourPageHtml(tour, similarTours) {
 <meta property="og:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta property="og:image" content="${SITE_URL}${heroImg}">` : ""}
 <meta property="og:url" content="${canonical}">
+<meta property="og:site_name" content="Tripreviewall">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(tour.title)} — Tripreviewall">
+<meta name="twitter:description" content="${esc(metaDesc)}">
+${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
 <script type="application/ld+json">${jsonLd(tour)}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">

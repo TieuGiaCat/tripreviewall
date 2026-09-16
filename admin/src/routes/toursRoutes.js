@@ -1,7 +1,7 @@
 const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout } = require("../render");
-const { generateTourFile, removeTourFile, isReservedSlug } = require("../ssr/generator");
+const { generateTourFile, removeTourFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 
 const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
 
@@ -370,6 +370,7 @@ async function createTour(req, res, user) {
     );
     if (status === "published") {
       await generateTourFile({ slug, status, island, price_from: priceFrom, data });
+      await regenerateListingPages();
     }
   } catch (err) {
     console.error("[tours] create failed:", err.message);
@@ -480,6 +481,7 @@ async function updateTour(req, res, user, id) {
     } else {
       removeTourFile(slug);
     }
+    await regenerateListingPages();
   } catch (err) {
     console.error("[tours] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another tour already uses this slug."] : [`Database error: ${err.message}`];
@@ -502,7 +504,7 @@ async function updateTour(req, res, user, id) {
 async function deleteTour(req, res, user, id) {
   try {
     const result = await query("DELETE FROM tours WHERE id = $1 RETURNING slug", [id]);
-    if (result.rows[0]) removeTourFile(result.rows[0].slug);
+    if (result.rows[0]) { removeTourFile(result.rows[0].slug); await regenerateListingPages(); }
   } catch (err) {
     console.error("[tours] delete failed:", err.message);
   }
@@ -548,6 +550,7 @@ async function uploadTourImage(req, res, user, id) {
     await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
     if (existing.status === "published") {
       await generateTourFile({ slug: existing.slug, status: existing.status, island: existing.island, price_from: existing.price_from, data });
+      await regenerateListingPages();
     }
   } catch (err) {
     console.error("[tours] saving uploaded image urls failed:", err.message);
@@ -589,6 +592,7 @@ async function removeTourImage(req, res, user, id) {
     await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
     if (existing.status === "published") {
       await generateTourFile({ slug: existing.slug, status: existing.status, island: existing.island, price_from: existing.price_from, data });
+      await regenerateListingPages();
     }
   } catch (err) {
     console.error("[tours] removing image failed:", err.message);

@@ -100,7 +100,7 @@
     var tours = await loadAllTours();
     grid.innerHTML = islands.map(function (isl) {
       var count = tours.filter(function (t) { return t.island === isl.name; }).length;
-      return '<a class="dest-card" href="destinations/island.html?slug=' + isl.slug + '" style="background-image:' + isl.gradient + '">' +
+      return '<a class="dest-card" href="destinations/' + isl.slug + '.html" style="background-image:' + isl.gradient + '">' +
         '<div class="dest-card-content"><h3 class="dest-card-name">' + isl.name + '</h3>' +
         '<div class="dest-card-count">' + count + ' tours tracked</div></div></a>';
     }).join("");

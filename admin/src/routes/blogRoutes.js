@@ -1,7 +1,7 @@
 const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout } = require("../render");
-const { generatePostFile, removePostFile, isReservedSlug } = require("../ssr/generator");
+const { generatePostFile, removePostFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 
 const CATEGORIES = ["Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
 const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
@@ -341,6 +341,7 @@ async function createPost(req, res, user) {
     );
     if (status === "published") {
       await generatePostFile({ slug, status, category, island_tag: islandTag, content_format: contentFormat, published_at: new Date(), updated_at: new Date(), data });
+      await regenerateListingPages();
     }
   } catch (err) {
     console.error("[posts] create failed:", err.message);
@@ -456,6 +457,7 @@ async function updatePost(req, res, user, id) {
     } else {
       removePostFile(slug);
     }
+    await regenerateListingPages();
   } catch (err) {
     console.error("[posts] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another post already uses this slug."] : [`Database error: ${err.message}`];
@@ -481,7 +483,7 @@ async function updatePost(req, res, user, id) {
 async function deletePost(req, res, user, id) {
   try {
     const result = await query("DELETE FROM posts WHERE id = $1 RETURNING slug", [id]);
-    if (result.rows[0]) removePostFile(result.rows[0].slug);
+    if (result.rows[0]) { removePostFile(result.rows[0].slug); await regenerateListingPages(); }
   } catch (err) {
     console.error("[posts] delete failed:", err.message);
   }
@@ -528,6 +530,7 @@ async function uploadPostImage(req, res, user, id) {
       if (existing.status === "published") {
         const fresh = await query("SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE id = $1", [id]);
         await generatePostFile(fresh.rows[0]);
+        await regenerateListingPages();
       }
     } catch (err) {
       console.error("[posts] saving featured image url failed:", err.message);

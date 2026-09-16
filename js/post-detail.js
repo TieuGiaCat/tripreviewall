@@ -98,7 +98,7 @@ function renderAuthorAndLinks(post) {
 
   const links = [];
   if (post.island) {
-    links.push(`<a href="../destinations/island.html?slug=${post.island.toLowerCase().replace(" ", "-")}">
+    links.push(`<a href="../destinations/${post.island.toLowerCase().replace(" ", "-")}.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       More ${post.island} guides</a>`);
   }

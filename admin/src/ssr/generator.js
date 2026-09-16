@@ -4,6 +4,8 @@ const { query } = require("../db");
 const { toPublicShape, toPostPublicShape } = require("../routes/publicApi");
 const { renderTourPageHtml } = require("./tourTemplate");
 const { renderPostPageHtml } = require("./postTemplate");
+const { renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS } = require("./listingTemplates");
+const { renderHomeHtml } = require("./homeTemplate");
 
 const SITE_ROOT = process.env.SITE_ROOT || path.join(__dirname, "..", "..", "..", "site-not-configured");
 const TOURS_DIR = path.join(SITE_ROOT, "tours");
@@ -113,4 +115,48 @@ function removePostFile(slug) {
   }
 }
 
-module.exports = { generateTourFile, removeTourFile, generatePostFile, removePostFile, isReservedSlug, SITE_ROOT };
+module.exports = { generateTourFile, removeTourFile, generatePostFile, removePostFile, isReservedSlug, regenerateListingPages, SITE_ROOT };
+
+/* ============================================================
+   Listing / hub pages — regenerated wholesale (queries are cheap
+   at this scale) any time a tour or post is published/unpublished.
+   ============================================================ */
+async function regenerateListingPages() {
+  try {
+    fs.mkdirSync(path.join(SITE_ROOT, "destinations"), { recursive: true });
+
+    let allTours = [];
+    let allPosts = [];
+    try {
+      const toursResult = await query(`SELECT slug, island, price_from, data FROM tours WHERE status = 'published'`);
+      allTours = toursResult.rows.map(toPublicShape);
+    } catch (err) {
+      console.error("[ssr] regenerateListingPages: could not load tours:", err.message);
+    }
+    try {
+      const postsResult = await query(
+        `SELECT slug, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE status = 'published'`
+      );
+      allPosts = postsResult.rows.map(toPostPublicShape);
+    } catch (err) {
+      console.error("[ssr] regenerateListingPages: could not load posts:", err.message);
+    }
+
+    const islandCounts = {};
+    allTours.forEach((t) => { islandCounts[t.island] = (islandCounts[t.island] || 0) + 1; });
+
+    fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), renderToursIndexHtml(allTours), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), renderBlogIndexHtml(allPosts), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), renderDestinationsHubHtml(islandCounts), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "index.html"), renderHomeHtml(allTours, allPosts, islandCounts), "utf8");
+    for (const isl of ISLANDS) {
+      fs.writeFileSync(
+        path.join(SITE_ROOT, "destinations", `${isl.slug}.html`),
+        renderIslandPageHtml(isl.slug, allTours, allPosts),
+        "utf8"
+      );
+    }
+  } catch (err) {
+    console.error("[ssr] regenerateListingPages failed:", err.message);
+  }
+}

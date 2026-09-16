@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const { pool, query } = require("./db");
-const { generateTourFile, generatePostFile, SITE_ROOT } = require("./ssr/generator");
+const { generateTourFile, generatePostFile, regenerateListingPages, SITE_ROOT } = require("./ssr/generator");
 
 async function main() {
   console.log(`Writing generated pages under: ${SITE_ROOT}`);
@@ -35,6 +35,11 @@ async function main() {
   }
 
   console.log(`\nDone. Tours: ${toursResult.rows.length - tourFail} OK, ${tourFail} failed. Posts: ${postsResult.rows.length - postFail} OK, ${postFail} failed.`);
+
+  console.log("Regenerating listing pages (tours.html, blog.html, destinations.html + 4 island pages)...");
+  await regenerateListingPages();
+  console.log("Done.");
+
   await pool.end();
 }
 

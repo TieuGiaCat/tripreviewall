@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function renderTabs(current) {
   document.getElementById("island-tabs").innerHTML = ISLANDS.map((i) =>
-    `<a class="dest-island-tab${i.slug === current.slug ? " active" : ""}" href="island.html?slug=${i.slug}">${i.name}</a>`).join("");
+    `<a class="dest-island-tab${i.slug === current.slug ? " active" : ""}" href="${i.slug}.html">${i.name}</a>`).join("");
 }
 
 function renderHero(island) {

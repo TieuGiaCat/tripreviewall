@@ -64,7 +64,7 @@ function relatedArticlesHtml(related) {
     </a>`).join("");
 }
 
-function jsonLd(post) {
+function jsonLd(post, relatedTour) {
   const article = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -83,7 +83,31 @@ function jsonLd(post) {
       { "@type": "ListItem", position: 3, name: post.title },
     ],
   };
-  return `<script type="application/ld+json">${JSON.stringify(article)}</script>\n<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
+  const scripts = [
+    `<script type="application/ld+json">${JSON.stringify(article)}</script>`,
+    `<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`,
+  ];
+
+  // Review schema — only when this is a deep-dive review of one specific
+  // tour, and we actually have that tour's aggregate rating to cite.
+  if (post.contentFormat === "deep_dive_review" && relatedTour && relatedTour.aggregatedRating) {
+    const review = {
+      "@context": "https://schema.org",
+      "@type": "Review",
+      itemReviewed: { "@type": "TouristTrip", name: relatedTour.title },
+      author: { "@type": "Person", name: post.author || "Tripreviewall Editorial Team" },
+      datePublished: post.publishedAt,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: String(relatedTour.aggregatedRating),
+        bestRating: "5",
+        worstRating: "1",
+      },
+    };
+    scripts.push(`<script type="application/ld+json">${JSON.stringify(review)}</script>`);
+  }
+
+  return scripts.join("\n");
 }
 
 /**
@@ -109,7 +133,7 @@ function renderPostPageHtml(post, relatedTour, relatedPosts) {
 
   const internalLinks = [];
   if (post.island) {
-    internalLinks.push(`<a href="../destinations/island.html?slug=${post.island.toLowerCase().replace(" ", "-")}">
+    internalLinks.push(`<a href="../destinations/${post.island.toLowerCase().replace(" ", "-")}.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       More ${esc(post.island)} guides</a>`);
   }
@@ -132,7 +156,15 @@ function renderPostPageHtml(post, relatedTour, relatedPosts) {
 <meta property="og:description" content="${esc(metaDesc)}">
 ${post.featuredImage ? `<meta property="og:image" content="${SITE_URL}${post.featuredImage}">` : ""}
 <meta property="og:url" content="${canonical}">
-${jsonLd(post)}
+<meta property="og:site_name" content="Tripreviewall">
+<meta property="article:published_time" content="${esc(String(post.publishedAt || ""))}">
+<meta property="article:modified_time" content="${esc(String(post.updatedAt || ""))}">
+${post.author ? `<meta property="article:author" content="${esc(post.author)}">` : ""}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(post.title)}">
+<meta name="twitter:description" content="${esc(metaDesc)}">
+${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${post.featuredImage}">` : ""}
+${jsonLd(post, relatedTour)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
