@@ -1,6 +1,6 @@
 const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
-const { layout } = require("../render");
+const { layout, paginationHtml } = require("../render");
 const { generateTourFile, removeTourFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 
 const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
@@ -11,6 +11,8 @@ const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
 async function listTours(req, res, user, urlObj) {
   const search = (urlObj.searchParams.get("q") || "").trim();
   const statusFilter = urlObj.searchParams.get("status") || "";
+  const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
+  const PAGE_SIZE = 10;
 
   const conditions = [];
   const params = [];
@@ -25,13 +27,17 @@ async function listTours(req, res, user, urlObj) {
   const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   let rows = [];
+  let totalCount = 0;
   let dbError = null;
   try {
+    const countResult = await query(`SELECT count(*)::int AS n FROM tours ${whereClause}`, params);
+    totalCount = countResult.rows[0].n;
+
     const result = await query(
       `SELECT id, slug, status, island, price_from, updated_at, data
        FROM tours ${whereClause}
        ORDER BY updated_at DESC
-       LIMIT 100`,
+       LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       params
     );
     rows = result.rows;
@@ -39,6 +45,7 @@ async function listTours(req, res, user, urlObj) {
     console.error("[tours] list query failed:", err.message);
     dbError = err.message;
   }
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const tableRows = rows
     .map((t) => {
@@ -65,7 +72,7 @@ async function listTours(req, res, user, urlObj) {
 
   const body = `
     <h1 class="page-title">Tours</h1>
-    <p class="page-sub">${rows.length} tour${rows.length === 1 ? "" : "s"} shown (max 100). Search and status filter run against the live database.</p>
+    <p class="page-sub">${totalCount} tour${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}. Search and status filter run against the live database.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Check DATABASE_URL and that migrations have run.</div>` : ""}
 
     <div class="toolbar">
@@ -85,6 +92,7 @@ async function listTours(req, res, user, urlObj) {
       <thead><tr><th>Name</th><th>Island</th><th>Status</th><th>Price</th><th>Rating</th><th>Updated</th><th>Actions</th></tr></thead>
       <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:32px;">No tours match this search yet.</td></tr>`}</tbody>
     </table>
+    ${paginationHtml(page, totalPages, "/admin/tours", { q: search, status: statusFilter })}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });

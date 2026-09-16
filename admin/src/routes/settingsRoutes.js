@@ -9,8 +9,19 @@ async function getSmtpSettings() {
   return result.rows[0] ? result.rows[0].data : {};
 }
 
+function settingsSubNav(active) {
+  return `
+    <div class="toolbar" style="border-bottom:1px solid var(--color-border);margin-bottom:24px;padding-bottom:0;">
+      <div style="display:flex;gap:4px;">
+        <a href="/admin/settings/email" style="padding:10px 16px;border-bottom:2px solid ${active === "email" ? "var(--color-primary)" : "transparent"};font-weight:600;color:${active === "email" ? "var(--color-primary)" : "var(--color-text-muted)"};">Email</a>
+        <a href="/admin/settings/tracking" style="padding:10px 16px;border-bottom:2px solid ${active === "tracking" ? "var(--color-primary)" : "transparent"};font-weight:600;color:${active === "tracking" ? "var(--color-primary)" : "var(--color-text-muted)"};">Tracking</a>
+      </div>
+    </div>`;
+}
+
 function renderForm({ s = {}, errors = [], notice = null }) {
   return `
+    ${settingsSubNav("email")}
     <h1 class="page-title">Settings — Email (SMTP)</h1>
     <p class="page-sub">Used to notify you by email whenever a Contact or Transportation form is submitted. Leads are always saved even if email sending fails.</p>
 
@@ -175,4 +186,122 @@ async function saveEmailSettings(req, res, user) {
   res.end(layout({ title: "Settings — Email", activeNav: "settings", user, body: renderForm({ s: data, notice: "Settings saved." }) }));
 }
 
-module.exports = { showEmailSettings, saveEmailSettings };
+module.exports = { showEmailSettings, saveEmailSettings, showTrackingSettings, saveTrackingSettings, getTrackingScripts };
+
+/* ============================================================
+   Settings → Tracking (Google Tag Manager, Facebook Pixel, or any
+   other third-party snippet the person pastes in).
+   ============================================================ */
+async function getTrackingSettings() {
+  const result = await query("SELECT data FROM settings WHERE key = 'tracking' LIMIT 1");
+  return result.rows[0] ? result.rows[0].data : {};
+}
+
+/**
+ * Used by the SSR generator to inject these scripts into every public page.
+ * Returns { headScripts, bodyScripts } — empty strings if nothing saved yet.
+ */
+async function getTrackingScripts() {
+  try {
+    const t = await getTrackingSettings();
+    return { headScripts: t.headScripts || "", bodyScripts: t.bodyScripts || "" };
+  } catch (err) {
+    console.error("[settings] getTrackingScripts failed:", err.message);
+    return { headScripts: "", bodyScripts: "" };
+  }
+}
+
+function renderTrackingForm({ t = {}, errors = [], notice = null }) {
+  return `
+    ${settingsSubNav("tracking")}
+    <h1 class="page-title">Settings — Tracking</h1>
+    <p class="page-sub">Paste tracking snippets (Google Tag Manager, Facebook Pixel, etc.) here — they're injected into every public page on the site. Saving regenerates all 265+ pages, so it takes a few seconds.</p>
+
+    ${errors.length ? `<div class="alert alert-error">${errors.map(esc).join("<br>")}</div>` : ""}
+    ${notice ? `<div class="alert alert-success">${esc(notice)}</div>` : ""}
+
+    <form method="POST" action="/admin/settings/tracking">
+      <div class="form-card">
+        <h2>Head Scripts</h2>
+        <p class="hint" style="margin-bottom:10px;">Inserted right after the opening &lt;head&gt; tag on every page — this is where Google Tag Manager's first snippet goes.</p>
+        <div class="form-field">
+          <textarea name="headScripts" style="min-height:140px;font-family:monospace;font-size:13px;" placeholder="<!-- Google Tag Manager -->&#10;<script>...</script>&#10;<!-- End Google Tag Manager -->">${esc(t.headScripts || "")}</textarea>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Body Scripts</h2>
+        <p class="hint" style="margin-bottom:10px;">Inserted right after the opening &lt;body&gt; tag on every page — this is where GTM's &lt;noscript&gt; fallback goes.</p>
+        <div class="form-field">
+          <textarea name="bodyScripts" style="min-height:140px;font-family:monospace;font-size:13px;" placeholder="<!-- Google Tag Manager (noscript) -->&#10;<noscript><iframe src=...></iframe></noscript>&#10;<!-- End Google Tag Manager (noscript) -->">${esc(t.bodyScripts || "")}</textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save &amp; Regenerate All Pages</button>
+      </div>
+    </form>
+  `;
+}
+
+async function showTrackingSettings(req, res, user) {
+  let t = {};
+  try {
+    t = await getTrackingSettings();
+  } catch (err) {
+    console.error("[settings] tracking load failed:", err.message);
+  }
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(layout({ title: "Settings — Tracking", activeNav: "settings", user, body: renderTrackingForm({ t }) }));
+}
+
+async function saveTrackingSettings(req, res, user) {
+  let body;
+  try {
+    body = await readFormBody(req);
+  } catch (err) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end("Malformed request.");
+    return;
+  }
+
+  const data = {
+    headScripts: (body.headScripts || "").trim(),
+    bodyScripts: (body.bodyScripts || "").trim(),
+  };
+
+  try {
+    await query(
+      `INSERT INTO settings (key, data, updated_at) VALUES ('tracking', $1, now())
+       ON CONFLICT (key) DO UPDATE SET data = $1, updated_at = now()`,
+      [JSON.stringify(data)]
+    );
+  } catch (err) {
+    console.error("[settings] tracking save failed:", err.message);
+    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Settings — Tracking", activeNav: "settings", user, body: renderTrackingForm({ t: data, errors: [`Database error: ${err.message}`] }) }));
+    return;
+  }
+
+  // Regenerate every public page now, so the new/changed snippet takes
+  // effect immediately rather than waiting for the next content edit.
+  try {
+    const { regenerateAllPages } = require("../ssr/generator");
+    await regenerateAllPages();
+  } catch (err) {
+    console.error("[settings] tracking regenerate-all failed:", err.message);
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(
+      layout({
+        title: "Settings — Tracking",
+        activeNav: "settings",
+        user,
+        body: renderTrackingForm({ t: data, errors: [`Saved, but regenerating pages failed: ${err.message}. Run "npm run regenerate-all" manually.`] }),
+      })
+    );
+    return;
+  }
+
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(layout({ title: "Settings — Tracking", activeNav: "settings", user, body: renderTrackingForm({ t: data, notice: "Saved — every page has been regenerated with the new tracking scripts." }) }));
+}

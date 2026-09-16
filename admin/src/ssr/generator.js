@@ -27,6 +27,25 @@ function postFilePath(slug) {
   return path.join(POSTS_DIR, `${slug}.html`);
 }
 
+/**
+ * Injects any saved Settings → Tracking snippets (Google Tag Manager,
+ * Facebook Pixel, etc.) right after the opening <head> and <body> tags.
+ * Fetches fresh from the DB every call — an extra cheap local query per
+ * page write, simplest way to guarantee every generated page stays in sync
+ * with whatever is currently saved.
+ */
+async function injectTracking(html) {
+  try {
+    const { getTrackingScripts } = require("../routes/settingsRoutes");
+    const { headScripts, bodyScripts } = await getTrackingScripts();
+    if (headScripts) html = html.replace("<head>", `<head>\n${headScripts}`);
+    if (bodyScripts) html = html.replace("<body>", `<body>\n${bodyScripts}`);
+  } catch (err) {
+    console.error("[ssr] injectTracking failed (page still written without tracking scripts):", err.message);
+  }
+  return html;
+}
+
 /** Writes/updates the static file for a published tour. No-ops silently if SITE_ROOT isn't configured yet. */
 async function generateTourFile(tourRow) {
   if (isReservedSlug(tourRow.slug)) {
@@ -48,7 +67,8 @@ async function generateTourFile(tourRow) {
       console.error("[ssr] Could not load similar tours:", err.message);
     }
 
-    const html = renderTourPageHtml(tour, similar);
+    let html = renderTourPageHtml(tour, similar);
+    html = await injectTracking(html);
     fs.writeFileSync(tourFilePath(tourRow.slug), html, "utf8");
   } catch (err) {
     console.error(`[ssr] Failed to generate tour page for "${tourRow.slug}":`, err.message);
@@ -109,7 +129,8 @@ async function generatePostFile(postRow) {
       console.error("[ssr] Could not load related posts:", err.message);
     }
 
-    const html = renderPostPageHtml(post, relatedTour, relatedPosts, author);
+    let html = renderPostPageHtml(post, relatedTour, relatedPosts, author);
+    html = await injectTracking(html);
     fs.writeFileSync(postFilePath(postRow.slug), html, "utf8");
   } catch (err) {
     console.error(`[ssr] Failed to generate post page for "${postRow.slug}":`, err.message);
@@ -124,8 +145,6 @@ function removePostFile(slug) {
     console.error(`[ssr] Failed to remove post page for "${slug}":`, err.message);
   }
 }
-
-module.exports = { generateTourFile, removeTourFile, generatePostFile, removePostFile, isReservedSlug, regenerateListingPages, SITE_ROOT };
 
 /* ============================================================
    Listing / hub pages — regenerated wholesale (queries are cheap
@@ -166,18 +185,40 @@ async function regenerateListingPages() {
       console.error("[ssr] regenerateListingPages: could not load destinations (using defaults):", err.message);
     }
 
-    fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), renderToursIndexHtml(allTours), "utf8");
-    fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), renderBlogIndexHtml(allPosts), "utf8");
-    fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), renderDestinationsHubHtml(islandCounts), "utf8");
-    fs.writeFileSync(path.join(SITE_ROOT, "index.html"), renderHomeHtml(allTours, allPosts, islandCounts), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), await injectTracking(renderToursIndexHtml(allTours)), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts)), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), await injectTracking(renderDestinationsHubHtml(islandCounts)), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "index.html"), await injectTracking(renderHomeHtml(allTours, allPosts, islandCounts)), "utf8");
     for (const isl of ISLANDS) {
-      fs.writeFileSync(
-        path.join(SITE_ROOT, "destinations", `${isl.slug}.html`),
-        renderIslandPageHtml(isl.slug, allTours, allPosts, destinationsBySlug[isl.slug]),
-        "utf8"
-      );
+      const html = await injectTracking(renderIslandPageHtml(isl.slug, allTours, allPosts, destinationsBySlug[isl.slug]));
+      fs.writeFileSync(path.join(SITE_ROOT, "destinations", `${isl.slug}.html`), html, "utf8");
     }
   } catch (err) {
     console.error("[ssr] regenerateListingPages failed:", err.message);
   }
 }
+
+/**
+ * Full site regeneration — every published tour + post + all listing pages.
+ * Same work as `npm run regenerate-all`, callable from within the running
+ * server (used by Settings → Tracking so a saved snippet applies everywhere
+ * immediately, without needing to SSH in and run the script by hand).
+ */
+async function regenerateAllPages() {
+  const toursResult = await query(`SELECT slug, status, island, price_from, data FROM tours WHERE status = 'published'`);
+  for (const row of toursResult.rows) {
+    await generateTourFile(row);
+  }
+  const postsResult = await query(
+    `SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE status = 'published'`
+  );
+  for (const row of postsResult.rows) {
+    await generatePostFile(row);
+  }
+  await regenerateListingPages();
+}
+
+module.exports = {
+  generateTourFile, removeTourFile, generatePostFile, removePostFile,
+  isReservedSlug, regenerateListingPages, regenerateAllPages, SITE_ROOT,
+};

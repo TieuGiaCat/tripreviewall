@@ -81,4 +81,18 @@ function loginPage({ error } = {}) {
 </html>`;
 }
 
-module.exports = { layout, loginPage };
+function paginationHtml(currentPage, totalPages, baseUrl, otherParams = {}) {
+  if (totalPages <= 1) return "";
+  const linkFor = (p) => {
+    const params = new URLSearchParams(otherParams);
+    params.set("page", p);
+    return `${baseUrl}?${params.toString()}`;
+  };
+  const parts = [];
+  if (currentPage > 1) parts.push(`<a href="${esc(linkFor(currentPage - 1))}" class="btn btn-secondary btn-sm">← Prev</a>`);
+  parts.push(`<span style="padding:0 12px;color:var(--color-text-muted);">Page ${currentPage} of ${totalPages}</span>`);
+  if (currentPage < totalPages) parts.push(`<a href="${esc(linkFor(currentPage + 1))}" class="btn btn-secondary btn-sm">Next →</a>`);
+  return `<div class="pagination-nav" style="display:flex;gap:6px;align-items:center;justify-content:center;margin:24px 0;">${parts.join("")}</div>`;
+}
+
+module.exports = { layout, loginPage, paginationHtml };

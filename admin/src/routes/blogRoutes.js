@@ -1,6 +1,6 @@
 const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
-const { layout } = require("../render");
+const { layout, paginationHtml } = require("../render");
 const { generatePostFile, removePostFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 const { listActiveAuthorsForDropdown } = require("./authorsRoutes");
 
@@ -14,6 +14,8 @@ const FORMATS = ["listicle", "comparison", "deep_dive_review", "honest_take"];
 async function listPosts(req, res, user, urlObj) {
   const search = (urlObj.searchParams.get("q") || "").trim();
   const statusFilter = urlObj.searchParams.get("status") || "";
+  const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
+  const PAGE_SIZE = 10;
 
   const conditions = [];
   const params = [];
@@ -28,13 +30,17 @@ async function listPosts(req, res, user, urlObj) {
   const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   let rows = [];
+  let totalCount = 0;
   let dbError = null;
   try {
+    const countResult = await query(`SELECT count(*)::int AS n FROM posts ${whereClause}`, params);
+    totalCount = countResult.rows[0].n;
+
     const result = await query(
       `SELECT id, slug, status, category, island_tag, updated_at, data
        FROM posts ${whereClause}
        ORDER BY updated_at DESC
-       LIMIT 100`,
+       LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       params
     );
     rows = result.rows;
@@ -42,6 +48,7 @@ async function listPosts(req, res, user, urlObj) {
     console.error("[posts] list query failed:", err.message);
     dbError = err.message;
   }
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
   const tableRows = rows
     .map((p) => {
@@ -67,7 +74,7 @@ async function listPosts(req, res, user, urlObj) {
 
   const body = `
     <h1 class="page-title">Blog Posts</h1>
-    <p class="page-sub">${rows.length} post${rows.length === 1 ? "" : "s"} shown (max 100).</p>
+    <p class="page-sub">${totalCount} post${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Run <code>npm run migrate</code> if the "posts" table doesn't exist yet.</div>` : ""}
 
     <div class="toolbar">
@@ -87,6 +94,7 @@ async function listPosts(req, res, user, urlObj) {
       <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
       <tbody>${tableRows || `<tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:32px;">No posts yet — click "+ New Post" to write your first one.</td></tr>`}</tbody>
     </table>
+    ${paginationHtml(page, totalPages, "/admin/posts", { q: search, status: statusFilter })}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });

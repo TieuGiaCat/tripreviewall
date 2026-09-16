@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { query } = require("../db");
 const { esc } = require("../utils");
-const { layout } = require("../render");
+const { layout, paginationHtml } = require("../render");
 const { UPLOAD_ROOT } = require("../upload");
 
 const KINDS = ["tours", "posts", "authors", "destinations", "media"];
@@ -61,6 +61,8 @@ function listFilesOnDisk() {
 async function listMedia(req, res, user, urlObj) {
   const kindFilter = urlObj.searchParams.get("kind") || "";
   const usageFilter = urlObj.searchParams.get("usage") || "";
+  const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
+  const PAGE_SIZE = 30;
 
   let files = [];
   let dbError = null;
@@ -82,7 +84,8 @@ async function listMedia(req, res, user, urlObj) {
   const totalKB = files.reduce((sum, f) => sum + f.sizeKB, 0);
   const unusedCount = files.filter((f) => f.used === false).length;
 
-  const shown = files.slice(0, 500);
+  const totalPages = Math.max(1, Math.ceil(files.length / PAGE_SIZE));
+  const shown = files.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const cards = shown
     .map((f) => {
@@ -121,7 +124,7 @@ async function listMedia(req, res, user, urlObj) {
   const body = `
     <h1 class="page-title">Media Library</h1>
     <p class="page-sub">
-      ${files.length} image${files.length === 1 ? "" : "s"} shown${files.length > 500 ? " (of " + files.length + " total — showing newest 500)" : ""},
+      ${files.length} image${files.length === 1 ? "" : "s"} match this filter — showing ${shown.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + shown.length},
       ${totalKB >= 1024 ? (totalKB / 1024).toFixed(1) + " MB" : totalKB + " KB"} total.
       ${unusedCount > 0 ? `<strong>${unusedCount} unused</strong> and safe to delete.` : "No unused files right now."}
     </p>
@@ -150,6 +153,7 @@ async function listMedia(req, res, user, urlObj) {
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:20px;">
       ${cards || `<p style="color:var(--color-text-muted);grid-column:1/-1;">No images match this filter.</p>`}
     </div>
+    ${paginationHtml(page, totalPages, "/admin/media", { kind: kindFilter, usage: usageFilter })}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });

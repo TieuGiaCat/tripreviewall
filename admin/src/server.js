@@ -226,6 +226,14 @@ const server = http.createServer(async (req, res) => {
       return settingsRoutes.saveEmailSettings(req, res, session);
     }
 
+    // ---- Settings → Tracking ----
+    if (method === "GET" && pathname === "/admin/settings/tracking") {
+      return settingsRoutes.showTrackingSettings(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/settings/tracking") {
+      return settingsRoutes.saveTrackingSettings(req, res, session);
+    }
+
     // ---- Destinations ----
     if (method === "GET" && pathname === "/admin/destinations") {
       return destinationsRoutes.listDestinations(req, res, session);
