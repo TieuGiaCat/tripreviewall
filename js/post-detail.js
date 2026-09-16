@@ -157,7 +157,7 @@ function renderRelatedArticles(post, allPosts) {
     .slice(0, 3);
   if (list.length === 0) { el.innerHTML = `<p style="color:var(--color-text-muted);">More articles coming soon.</p>`; return; }
   el.innerHTML = list.map((p) => `
-    <a href="post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+    <a href="${p.slug}.html" class="blog-card">
       <div class="blog-card-image" style="background:${p.featuredImage ? `url('${p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>

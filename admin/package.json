@@ -9,7 +9,8 @@
     "migrate": "node src/migrate.js",
     "import-tours": "node src/import-tours.js",
     "bulk-update-links": "node src/bulk-update-links.js",
-    "bulk-import-images": "node src/bulk-import-images.js"
+    "bulk-import-images": "node src/bulk-import-images.js",
+    "regenerate-all": "node src/regenerate-all.js"
   },
   "dependencies": {
     "pg": "^8.11.5",

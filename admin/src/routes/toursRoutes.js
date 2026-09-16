@@ -1,6 +1,7 @@
 const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout } = require("../render");
+const { generateTourFile, removeTourFile, isReservedSlug } = require("../ssr/generator");
 
 const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
 
@@ -336,6 +337,7 @@ async function createTour(req, res, user) {
 
   const slug = slugify(body.slug || body.name);
   if (!slug) errors.push("Could not generate a valid slug — please set one manually.");
+  if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
   if (errors.length) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
@@ -366,6 +368,9 @@ async function createTour(req, res, user) {
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [slug, status, island, priceFrom, status === "published" ? new Date() : null, user.userId, JSON.stringify(data)]
     );
+    if (status === "published") {
+      await generateTourFile({ slug, status, island, price_from: priceFrom, data });
+    }
   } catch (err) {
     console.error("[tours] create failed:", err.message);
     const dbErrors = err.code === "23505" ? ["A tour with this slug already exists."] : [`Database error: ${err.message}`];
@@ -421,7 +426,7 @@ async function updateTour(req, res, user, id) {
   // survive the save instead of being wiped out.
   let existing;
   try {
-    const existingResult = await query("SELECT data FROM tours WHERE id = $1", [id]);
+    const existingResult = await query("SELECT slug, status, data FROM tours WHERE id = $1", [id]);
     existing = existingResult.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -438,6 +443,7 @@ async function updateTour(req, res, user, id) {
   if (!body.name || !body.name.trim()) errors.push("Tour name is required.");
   const slug = slugify(body.slug || body.name);
   if (!slug) errors.push("Could not generate a valid slug.");
+  if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
   const data = bodyToTourData(body, existing.data || {});
   const status = body.status === "published" ? "published" : "draft";
@@ -465,6 +471,15 @@ async function updateTour(req, res, user, id) {
        WHERE id = $6`,
       [slug, status, island, priceFrom, JSON.stringify(data), id]
     );
+
+    // Keep the generated static file (used for SEO/crawlers) in sync.
+    // Slug can change on edit, so always clean up the old file first.
+    if (existing.slug !== slug) removeTourFile(existing.slug);
+    if (status === "published") {
+      await generateTourFile({ slug, status, island, price_from: priceFrom, data });
+    } else {
+      removeTourFile(slug);
+    }
   } catch (err) {
     console.error("[tours] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another tour already uses this slug."] : [`Database error: ${err.message}`];
@@ -486,7 +501,8 @@ async function updateTour(req, res, user, id) {
 
 async function deleteTour(req, res, user, id) {
   try {
-    await query("DELETE FROM tours WHERE id = $1", [id]);
+    const result = await query("DELETE FROM tours WHERE id = $1 RETURNING slug", [id]);
+    if (result.rows[0]) removeTourFile(result.rows[0].slug);
   } catch (err) {
     console.error("[tours] delete failed:", err.message);
   }
@@ -502,7 +518,7 @@ async function uploadTourImage(req, res, user, id) {
 
   let existing;
   try {
-    const result = await query("SELECT slug, data FROM tours WHERE id = $1", [id]);
+    const result = await query("SELECT slug, status, island, price_from, data FROM tours WHERE id = $1", [id]);
     existing = result.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -530,6 +546,9 @@ async function uploadTourImage(req, res, user, id) {
 
   try {
     await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+    if (existing.status === "published") {
+      await generateTourFile({ slug: existing.slug, status: existing.status, island: existing.island, price_from: existing.price_from, data });
+    }
   } catch (err) {
     console.error("[tours] saving uploaded image urls failed:", err.message);
   }
@@ -550,7 +569,7 @@ async function removeTourImage(req, res, user, id) {
 
   let existing;
   try {
-    const result = await query("SELECT data FROM tours WHERE id = $1", [id]);
+    const result = await query("SELECT slug, status, island, price_from, data FROM tours WHERE id = $1", [id]);
     existing = result.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -568,6 +587,9 @@ async function removeTourImage(req, res, user, id) {
 
   try {
     await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+    if (existing.status === "published") {
+      await generateTourFile({ slug: existing.slug, status: existing.status, island: existing.island, price_from: existing.price_from, data });
+    }
   } catch (err) {
     console.error("[tours] removing image failed:", err.message);
   }

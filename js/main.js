@@ -8,8 +8,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   initHeaderScroll();
   initMobileDrawer();
   initTourTabs();
-  window.ALL_TOURS = await loadAllTours();
-  renderFeaturedTours("top-rated");
+  if (document.getElementById("tour-grid")) {
+    window.ALL_TOURS = await loadAllTours();
+    renderFeaturedTours("top-rated");
+  }
   if (document.getElementById("home-blog-grid")) {
     window.BLOG_POSTS = await loadAllPosts();
     renderHomeBlogPreview();
@@ -36,7 +38,7 @@ function renderHomeBlogPreview() {
   grid.innerHTML = latest.map((p) => {
     const bg = p.featuredImage ? `url('${p.featuredImage}')` : (HOME_CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
     return `
-    <a href="blog/post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+    <a href="blog/${p.slug}.html" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>
@@ -104,7 +106,7 @@ function tourCardTemplate(tour, basePath, imgPrefix) {
   imgPrefix = imgPrefix === undefined ? "img/" : imgPrefix;
   const d = tour.ratingDistribution;
   const badge = tour.badge ? `<span class="tour-card-badge">${tour.badge}</span>` : "";
-  const linkFile = basePath === "" ? "tour-detail.html" : basePath + "tour-detail.html";
+  const linkFile = `${basePath}${tour.slug}.html`;
   const imgSrc = (tour.gallery && tour.gallery[0]) ? tour.gallery[0] : `${imgPrefix}${tour.slug}.webp`;
   return `
     <article class="tour-card">
@@ -133,7 +135,7 @@ function tourCardTemplate(tour, basePath, imgPrefix) {
             From <span class="tabular">$${tour.priceFrom}</span>
             <span class="via">via FareHarbor</span>
           </div>
-          <a href="${linkFile}?slug=${tour.slug}" class="btn btn-primary">View Tour</a>
+          <a href="${linkFile}" class="btn btn-primary">View Tour</a>
         </div>
       </div>
     </article>`;

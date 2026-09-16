@@ -67,7 +67,7 @@ function articleCard(p) {
   const grad = p.featuredImage ? null : (CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
   const bg = p.featuredImage ? `url('${p.featuredImage}')` : grad;
   return `
-    <a href="blog/post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+    <a href="blog/${p.slug}.html" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-tags">

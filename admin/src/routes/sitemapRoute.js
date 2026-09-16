@@ -43,8 +43,8 @@ async function generateSitemap(req, res) {
 
   const entries = [
     ...STATIC_PAGES.map((p) => urlEntry(`${SITE_URL}${p.path}`, null, p.priority)),
-    ...tourRows.map((t) => urlEntry(`${SITE_URL}/tours/tour-detail.html?slug=${t.slug}`, t.updated_at, "0.8")),
-    ...postRows.map((p) => urlEntry(`${SITE_URL}/blog/post-detail.html?slug=${p.slug}`, p.updated_at, "0.6")),
+    ...tourRows.map((t) => urlEntry(`${SITE_URL}/tours/${t.slug}.html`, t.updated_at, "0.8")),
+    ...postRows.map((p) => urlEntry(`${SITE_URL}/blog/${p.slug}.html`, p.updated_at, "0.6")),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

@@ -59,7 +59,7 @@ function renderArticles(island) {
   if (list.length === 0) { grid.innerHTML = ""; empty.style.display = "block"; return; }
   empty.style.display = "none";
   grid.innerHTML = list.map((p) => `
-    <a href="../blog/post-detail.html?slug=${encodeURIComponent(p.slug)}" class="blog-card">
+    <a href="../blog/${p.slug}.html" class="blog-card">
       <div class="blog-card-image" style="background:${p.featuredImage ? `url('${p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>

@@ -1,6 +1,7 @@
 const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout } = require("../render");
+const { generatePostFile, removePostFile, isReservedSlug } = require("../ssr/generator");
 
 const CATEGORIES = ["Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
 const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
@@ -308,6 +309,7 @@ async function createPost(req, res, user) {
   if (!body.title || !body.title.trim()) errors.push("Title is required.");
   const slug = slugify(body.slug || body.title);
   if (!slug) errors.push("Could not generate a valid slug — please set one manually.");
+  if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
   const data = bodyToPostData(body);
   const status = body.status === "published" ? "published" : "draft";
@@ -337,6 +339,9 @@ async function createPost(req, res, user) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [slug, status, category, islandTag, contentFormat, status === "published" ? new Date() : null, user.userId, JSON.stringify(data)]
     );
+    if (status === "published") {
+      await generatePostFile({ slug, status, category, island_tag: islandTag, content_format: contentFormat, published_at: new Date(), updated_at: new Date(), data });
+    }
   } catch (err) {
     console.error("[posts] create failed:", err.message);
     const dbErrors = err.code === "23505" ? ["A post with this slug already exists."] : [`Database error: ${err.message}`];
@@ -394,7 +399,7 @@ async function updatePost(req, res, user, id) {
 
   let existing;
   try {
-    const existingResult = await query("SELECT data FROM posts WHERE id = $1", [id]);
+    const existingResult = await query("SELECT slug, status, data FROM posts WHERE id = $1", [id]);
     existing = existingResult.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -411,6 +416,7 @@ async function updatePost(req, res, user, id) {
   if (!body.title || !body.title.trim()) errors.push("Title is required.");
   const slug = slugify(body.slug || body.title);
   if (!slug) errors.push("Could not generate a valid slug.");
+  if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
   const data = bodyToPostData(body, existing.data || {});
   const status = body.status === "published" ? "published" : "draft";
@@ -442,6 +448,14 @@ async function updatePost(req, res, user, id) {
        WHERE id = $7`,
       [slug, status, category, islandTag, contentFormat, JSON.stringify(data), id]
     );
+
+    if (existing.slug !== slug) removePostFile(existing.slug);
+    if (status === "published") {
+      const fresh = await query("SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE id = $1", [id]);
+      await generatePostFile(fresh.rows[0]);
+    } else {
+      removePostFile(slug);
+    }
   } catch (err) {
     console.error("[posts] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another post already uses this slug."] : [`Database error: ${err.message}`];
@@ -466,7 +480,8 @@ async function updatePost(req, res, user, id) {
 
 async function deletePost(req, res, user, id) {
   try {
-    await query("DELETE FROM posts WHERE id = $1", [id]);
+    const result = await query("DELETE FROM posts WHERE id = $1 RETURNING slug", [id]);
+    if (result.rows[0]) removePostFile(result.rows[0].slug);
   } catch (err) {
     console.error("[posts] delete failed:", err.message);
   }
@@ -482,7 +497,7 @@ async function uploadPostImage(req, res, user, id) {
 
   let existing;
   try {
-    const result = await query("SELECT slug, data FROM posts WHERE id = $1", [id]);
+    const result = await query("SELECT slug, status, category, island_tag, content_format, data FROM posts WHERE id = $1", [id]);
     existing = result.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -510,6 +525,10 @@ async function uploadPostImage(req, res, user, id) {
     data.featuredImage = uploadResult.urls[0]; // single featured image — replaces any previous one
     try {
       await query("UPDATE posts SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+      if (existing.status === "published") {
+        const fresh = await query("SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE id = $1", [id]);
+        await generatePostFile(fresh.rows[0]);
+      }
     } catch (err) {
       console.error("[posts] saving featured image url failed:", err.message);
     }

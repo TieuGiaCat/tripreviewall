@@ -143,4 +143,4 @@ async function getPublishedPostBySlug(req, res, slug) {
   }
 }
 
-module.exports = { listPublishedTours, getPublishedTourBySlug, listPublishedPosts, getPublishedPostBySlug };
+module.exports = { listPublishedTours, getPublishedTourBySlug, listPublishedPosts, getPublishedPostBySlug, toPublicShape, toPostPublicShape };
