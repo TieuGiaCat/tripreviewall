@@ -38,7 +38,7 @@ function renderHomeBlogPreview() {
   grid.innerHTML = latest.map((p) => {
     const bg = p.featuredImage ? `url('${p.featuredImage}')` : (HOME_CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
     return `
-    <a href="blog/${p.slug}.html" class="blog-card">
+    <a href="/blog/${p.slug}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>
@@ -106,7 +106,7 @@ function tourCardTemplate(tour, basePath, imgPrefix) {
   imgPrefix = imgPrefix === undefined ? "img/" : imgPrefix;
   const d = tour.ratingDistribution;
   const badge = tour.badge ? `<span class="tour-card-badge">${tour.badge}</span>` : "";
-  const linkFile = `${basePath}${tour.slug}.html`;
+  const linkFile = `/tours/${tour.slug}`;
   const imgSrc = (tour.gallery && tour.gallery[0]) ? tour.gallery[0] : `${imgPrefix}${tour.slug}.webp`;
   return `
     <article class="tour-card">

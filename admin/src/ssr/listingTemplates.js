@@ -9,13 +9,13 @@ const HEADER = (depth) => {
   return `
 <header class="site-header">
   <div class="container header-inner">
-    <a href="${p}index.html" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
+    <a href="/" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
     <nav class="main-nav" aria-label="Primary">
-      <a href="${p}tours.html">Tours</a>
-      <a href="${p}destinations.html">Destinations</a>
-      <a href="${p}blog.html">Blog</a>
-      <a href="${p}about.html">About</a>
-      <a href="${p}contact.html">Contact</a>
+      <a href="/tours">Tours</a>
+      <a href="/destinations">Destinations</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
     </nav>
     <div class="header-actions">
       <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
@@ -35,11 +35,11 @@ const HEADER = (depth) => {
       </button>
     </div>
     <nav>
-      <a href="${p}tours.html" class="mobile-nav-link">Tours</a>
-      <a href="${p}destinations.html" class="mobile-nav-link">Destinations</a>
-      <a href="${p}blog.html" class="mobile-nav-link">Blog</a>
-      <a href="${p}about.html" class="mobile-nav-link">About</a>
-      <a href="${p}contact.html" class="mobile-nav-link">Contact</a>
+      <a href="/tours" class="mobile-nav-link">Tours</a>
+      <a href="/destinations" class="mobile-nav-link">Destinations</a>
+      <a href="/blog" class="mobile-nav-link">Blog</a>
+      <a href="/about" class="mobile-nav-link">About</a>
+      <a href="/contact" class="mobile-nav-link">Contact</a>
     </nav>
   </div>
 </div>`;
@@ -55,8 +55,8 @@ const FOOTER = (depth) => {
         <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
         <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
       </div>
-      <div class="footer-col"><h4>Explore</h4><a href="${p}tours.html">Tours</a><a href="${p}destinations.html">Destinations</a><a href="${p}blog.html">Blog</a><a href="${p}transportation.html">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="${p}about.html">About</a><a href="${p}contact.html">Contact</a><a href="${p}affiliate-disclosure.html">Affiliate Disclosure</a><a href="${p}privacy-policy.html">Privacy Policy</a></div>
+      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
       <div class="footer-col"><h4>Contact Us</h4>
         <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
@@ -69,7 +69,7 @@ const FOOTER = (depth) => {
 };
 
 /* ============================================================
-   /tours.html
+   /tours
    ============================================================ */
 function renderToursIndexHtml(tours) {
   const sorted = [...tours].sort((a, b) => b.reviewCountTotal - a.reviewCountTotal);
@@ -84,12 +84,12 @@ function renderToursIndexHtml(tours) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>All Hawaii Tours — Tripreviewall</title>
 <meta name="description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide — ranked by real, honest data, updated continuously.">
-<link rel="canonical" href="${SITE_URL}/tours.html">
+<link rel="canonical" href="${SITE_URL}/tours">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="All Hawaii Tours — Tripreviewall">
 <meta property="og:description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide.">
-<meta property="og:url" content="${SITE_URL}/tours.html">
+<meta property="og:url" content="${SITE_URL}/tours">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="All Hawaii Tours — Tripreviewall">
 <meta name="twitter:description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide.">
@@ -105,7 +105,7 @@ ${HEADER(0)}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="index.html">Home</a><span class="sep">/</span>
+      <a href="/">Home</a><span class="sep">/</span>
       <span class="current">All Hawaii Tours</span>
     </nav>
     <div class="page-header-block">
@@ -151,7 +151,7 @@ ${FOOTER(0)}
 }
 
 /* ============================================================
-   /blog.html
+   /blog
    ============================================================ */
 function blogCardHtml(p, prefix) {
   const gradients = {
@@ -163,7 +163,7 @@ function blogCardHtml(p, prefix) {
   };
   const bg = p.featuredImage ? `url('${esc(p.featuredImage)}')` : (gradients[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
   return `
-    <a href="${prefix}blog/${esc(p.slug)}.html" class="blog-card">
+    <a href="/blog/${esc(p.slug)}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-tags">
@@ -186,12 +186,12 @@ function renderBlogIndexHtml(posts) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>All Articles — Tripreviewall Hawaii Travel Guide</title>
 <meta name="description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
-<link rel="canonical" href="${SITE_URL}/blog.html">
+<link rel="canonical" href="${SITE_URL}/blog">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="All Articles — Tripreviewall Hawaii Travel Guide">
 <meta property="og:description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
-<meta property="og:url" content="${SITE_URL}/blog.html">
+<meta property="og:url" content="${SITE_URL}/blog">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="All Articles — Tripreviewall">
 <meta name="twitter:description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
@@ -207,7 +207,7 @@ ${HEADER(0)}
 <main id="main">
   <div class="container blog-page-header">
     <nav class="breadcrumb" aria-label="Breadcrumb" style="padding:0 0 12px;">
-      <a href="index.html">Home</a><span class="sep">/</span><span class="current">All Articles</span>
+      <a href="/">Home</a><span class="sep">/</span><span class="current">All Articles</span>
     </nav>
     <p class="hero-eyebrow" style="color:var(--color-primary);">Travel Guide</p>
     <h1 class="page-h1">All Articles</h1>
@@ -247,7 +247,7 @@ ${FOOTER(0)}
 }
 
 /* ============================================================
-   /destinations.html
+   /destinations
    ============================================================ */
 function renderDestinationsHubHtml(islandCounts) {
   return `<!DOCTYPE html>
@@ -257,12 +257,12 @@ function renderDestinationsHubHtml(islandCounts) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Explore Hawaii by Island — Tripreviewall</title>
 <meta name="description" content="Browse honest, aggregated Hawaii tour reviews by island — Oahu, Maui, Kauai and Big Island.">
-<link rel="canonical" href="${SITE_URL}/destinations.html">
+<link rel="canonical" href="${SITE_URL}/destinations">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="Explore Hawaii by Island — Tripreviewall">
 <meta property="og:description" content="Browse honest, aggregated Hawaii tour reviews by island.">
-<meta property="og:url" content="${SITE_URL}/destinations.html">
+<meta property="og:url" content="${SITE_URL}/destinations">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/tokens.css">
@@ -275,7 +275,7 @@ ${HEADER(0)}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="index.html">Home</a><span class="sep">/</span><span class="current">Destinations</span>
+      <a href="/">Home</a><span class="sep">/</span><span class="current">Destinations</span>
     </nav>
     <div class="page-header-block">
       <h1 class="page-h1">Explore Hawaii by Island</h1>
@@ -283,7 +283,7 @@ ${HEADER(0)}
     </div>
     <div class="dest-grid" style="margin-bottom:96px;">
       ${ISLANDS.map((isl) => `
-      <a class="dest-card" href="destinations/${isl.slug}.html" style="background-image:${isl.gradient}">
+      <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${isl.gradient}">
         <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
         <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
       </a>`).join("")}
@@ -297,7 +297,7 @@ ${FOOTER(0)}
 }
 
 /* ============================================================
-   /destinations/<island>.html
+   /destinations/<island>
    ============================================================ */
 function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
   const island = ISLANDS.find((i) => i.slug === islandSlug);
@@ -319,13 +319,13 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(metaTitle)}</title>
 <meta name="description" content="${esc(metaDescription)}">
-<link rel="canonical" href="${SITE_URL}/destinations/${island.slug}.html">
+<link rel="canonical" href="${SITE_URL}/destinations/${island.slug}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="${esc(metaTitle)}">
 <meta property="og:description" content="${esc(metaDescription)}">
 ${heroImage ? `<meta property="og:image" content="${SITE_URL}${heroImage}">` : ""}
-<meta property="og:url" content="${SITE_URL}/destinations/${island.slug}.html">
+<meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">
@@ -338,13 +338,13 @@ ${HEADER(1)}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="../index.html">Home</a><span class="sep">/</span>
-      <a href="../destinations.html">Destinations</a><span class="sep">/</span>
+      <a href="/">Home</a><span class="sep">/</span>
+      <a href="/destinations">Destinations</a><span class="sep">/</span>
       <span class="current">${island.name}</span>
     </nav>
 
     <div class="dest-island-tabs">
-      ${ISLANDS.map((i) => `<a class="dest-island-tab${i.slug === island.slug ? " active" : ""}" href="${i.slug}.html">${i.name}</a>`).join("")}
+      ${ISLANDS.map((i) => `<a class="dest-island-tab${i.slug === island.slug ? " active" : ""}" href="/destinations/${i.slug}">${i.name}</a>`).join("")}
     </div>
 
     <div class="dest-hero" style="background-image:${heroImage ? `url('${esc(heroImage)}')` : island.gradient}; background-size:cover; background-position:center;">
@@ -357,7 +357,7 @@ ${HEADER(1)}
 
     <div class="section-header-row"><h2 class="section-title">Tours on ${island.name}</h2></div>
     <div class="tour-grid">${islandTours.slice(0, 8).map((t) => tourCardHtml(t, "../", "")).join("") || `<p style="color:var(--color-text-muted);">No tours tracked yet.</p>`}</div>
-    <div class="view-all-wrap"><a href="../tours.html?q=${encodeURIComponent(island.name)}" class="btn btn-secondary">View All Tours on This Island</a></div>
+    <div class="view-all-wrap"><a href="/tours?q=${encodeURIComponent(island.name)}" class="btn btn-secondary">View All Tours on This Island</a></div>
 
     <section class="section">
       <div class="section-header-row"><h2 class="section-title">Articles About ${island.name}</h2></div>

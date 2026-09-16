@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function renderTabs(current) {
   document.getElementById("island-tabs").innerHTML = ISLANDS.map((i) =>
-    `<a class="dest-island-tab${i.slug === current.slug ? " active" : ""}" href="${i.slug}.html">${i.name}</a>`).join("");
+    `<a class="dest-island-tab${i.slug === current.slug ? " active" : ""}" href="/destinations/${i.slug}">${i.name}</a>`).join("");
 }
 
 function renderHero(island) {
@@ -35,7 +35,7 @@ function renderHero(island) {
   document.getElementById("dest-intro").textContent = island.intro;
   document.getElementById("tours-heading-island").textContent = island.name;
   document.getElementById("articles-heading-island").textContent = island.name;
-  document.getElementById("view-all-link").href = `../tours.html?q=${encodeURIComponent(island.name)}`;
+  document.getElementById("view-all-link").href = `/tours?q=${encodeURIComponent(island.name)}`;
 }
 
 function renderTours(island) {
@@ -52,7 +52,7 @@ function renderArticles(island) {
   if (list.length === 0) { grid.innerHTML = ""; empty.style.display = "block"; return; }
   empty.style.display = "none";
   grid.innerHTML = list.map((p) => `
-    <a href="../blog/${p.slug}.html" class="blog-card">
+    <a href="/blog/${p.slug}" class="blog-card">
       <div class="blog-card-image" style="background:${p.featuredImage ? `url('${p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>

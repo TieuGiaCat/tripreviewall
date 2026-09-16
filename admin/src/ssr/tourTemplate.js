@@ -152,7 +152,7 @@ function jsonLd(tour) {
  * fetched by the caller (see ssr/generator.js) from the same island.
  */
 function renderTourPageHtml(tour, similarTours) {
-  const canonical = `${SITE_URL}/tours/${tour.slug}.html`;
+  const canonical = `${SITE_URL}/tours/${tour.slug}`;
   const metaDesc = (tour.fullDescription || `Honest review of ${tour.title}.`).slice(0, 155);
   const heroImg = tour.gallery && tour.gallery[0];
 
@@ -187,13 +187,13 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="../index.html" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
+    <a href="/" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
     <nav class="main-nav" aria-label="Primary">
-      <a href="../tours.html">Tours</a>
-      <a href="../destinations.html">Destinations</a>
-      <a href="../blog.html">Blog</a>
-      <a href="../about.html">About</a>
-      <a href="../contact.html">Contact</a>
+      <a href="/tours">Tours</a>
+      <a href="/destinations">Destinations</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
     </nav>
     <div class="header-actions">
       <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
@@ -213,11 +213,11 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
       </button>
     </div>
     <nav>
-      <a href="../tours.html" class="mobile-nav-link">Tours</a>
-      <a href="../destinations.html" class="mobile-nav-link">Destinations</a>
-      <a href="../blog.html" class="mobile-nav-link">Blog</a>
-      <a href="../about.html" class="mobile-nav-link">About</a>
-      <a href="../contact.html" class="mobile-nav-link">Contact</a>
+      <a href="/tours" class="mobile-nav-link">Tours</a>
+      <a href="/destinations" class="mobile-nav-link">Destinations</a>
+      <a href="/blog" class="mobile-nav-link">Blog</a>
+      <a href="/about" class="mobile-nav-link">About</a>
+      <a href="/contact" class="mobile-nav-link">Contact</a>
     </nav>
   </div>
 </div>
@@ -225,8 +225,8 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="../index.html">Home</a><span class="sep">/</span>
-      <a href="../tours.html">Hawaii Tours</a><span class="sep">/</span>
+      <a href="/">Home</a><span class="sep">/</span>
+      <a href="/tours">Hawaii Tours</a><span class="sep">/</span>
       <span class="current">${esc(tour.title)}</span>
     </nav>
 
@@ -305,8 +305,8 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
         <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
         <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
       </div>
-      <div class="footer-col"><h4>Explore</h4><a href="../tours.html">Tours</a><a href="../destinations.html">Destinations</a><a href="../blog.html">Blog</a><a href="../transportation.html">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="../about.html">About</a><a href="../contact.html">Contact</a><a href="../affiliate-disclosure.html">Affiliate Disclosure</a><a href="../privacy-policy.html">Privacy Policy</a></div>
+      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
       <div class="footer-col"><h4>Contact Us</h4>
         <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>

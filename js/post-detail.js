@@ -98,12 +98,12 @@ function renderAuthorAndLinks(post) {
 
   const links = [];
   if (post.island) {
-    links.push(`<a href="../destinations/${post.island.toLowerCase().replace(" ", "-")}.html">
+    links.push(`<a href="/destinations/${post.island.toLowerCase().replace(" ", "-")}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       More ${post.island} guides</a>`);
   }
   if (post.relatedTourSlug) {
-    links.push(`<a href="../tours/tour-detail.html?slug=${post.relatedTourSlug}">
+    links.push(`<a href="/tours/${post.relatedTourSlug}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       See tour details & availability</a>`);
   }
@@ -123,7 +123,7 @@ function renderInlineTourCard(tour) {
         <div class="inline-tour-diff">${tour.company} — ${tour.duration}, ${(tour.tourType || "").toLowerCase()}.</div>
         <div class="inline-tour-footer">
           <span class="inline-tour-price">From $${tour.priceFrom}</span>
-          <a href="../tours/tour-detail.html?slug=${tour.slug}" class="btn btn-primary">Check Availability</a>
+          <a href="/tours/${tour.slug}" class="btn btn-primary">Check Availability</a>
         </div>
         <p class="inline-tour-disclosure">This is an affiliate link. If you book, Tripreviewall may earn a commission at no extra cost to you.</p>
       </div>
@@ -144,7 +144,7 @@ function renderSidebarCard(tour) {
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${tour.island}</li>
       </ul>
       <div class="sidebar-affiliate-price">From $${tour.priceFrom}/person</div>
-      <a href="../tours/tour-detail.html?slug=${tour.slug}" class="btn btn-primary btn-full">Check Availability</a>
+      <a href="/tours/${tour.slug}" class="btn btn-primary btn-full">Check Availability</a>
       <p class="inline-tour-disclosure">Tripreviewall may earn a commission if you book through this link, at no extra cost to you.</p>
     </div>`;
 }
@@ -157,7 +157,7 @@ function renderRelatedArticles(post, allPosts) {
     .slice(0, 3);
   if (list.length === 0) { el.innerHTML = `<p style="color:var(--color-text-muted);">More articles coming soon.</p>`; return; }
   el.innerHTML = list.map((p) => `
-    <a href="${p.slug}.html" class="blog-card">
+    <a href="/blog/${p.slug}" class="blog-card">
       <div class="blog-card-image" style="background:${p.featuredImage ? `url('${p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>

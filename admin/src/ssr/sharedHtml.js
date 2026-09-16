@@ -43,7 +43,7 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
         <div class="tour-card-divider"></div>
         <div class="tour-card-footer">
           <div class="tour-card-price">From <span class="tabular">$${tour.priceFrom}</span><span class="via">via FareHarbor</span></div>
-          <a href="${linkPrefix}tours/${esc(tour.slug)}.html" class="btn btn-primary">View Tour</a>
+          <a href="/tours/${esc(tour.slug)}" class="btn btn-primary">View Tour</a>
         </div>
       </div>
     </article>`;

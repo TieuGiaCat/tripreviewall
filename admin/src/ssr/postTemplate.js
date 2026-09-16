@@ -22,7 +22,7 @@ function inlineTourCardHtml(tour) {
         <div class="inline-tour-diff">${esc(tour.company)} — ${esc(tour.duration)}, ${esc((tour.tourType || "").toLowerCase())}.</div>
         <div class="inline-tour-footer">
           <span class="inline-tour-price">From $${tour.priceFrom}</span>
-          <a href="../tours/${esc(tour.slug)}.html" class="btn btn-primary">Check Availability</a>
+          <a href="/tours/${esc(tour.slug)}" class="btn btn-primary">Check Availability</a>
         </div>
         <p class="inline-tour-disclosure">This is an affiliate link. If you book, Tripreviewall may earn a commission at no extra cost to you.</p>
       </div>
@@ -45,7 +45,7 @@ function sidebarTourCardHtml(tour) {
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(tour.island)}</li>
         </ul>
         <div class="sidebar-affiliate-price">From $${tour.priceFrom}/person</div>
-        <a href="../tours/${esc(tour.slug)}.html" class="btn btn-primary btn-full">Check Availability</a>
+        <a href="/tours/${esc(tour.slug)}" class="btn btn-primary btn-full">Check Availability</a>
         <p class="inline-tour-disclosure">Tripreviewall may earn a commission if you book through this link, at no extra cost to you.</p>
       </div>
     </aside>`;
@@ -54,7 +54,7 @@ function sidebarTourCardHtml(tour) {
 function relatedArticlesHtml(related) {
   if (related.length === 0) return `<p style="color:var(--color-text-muted);">More articles coming soon.</p>`;
   return related.map((p) => `
-    <a href="${esc(p.slug)}.html" class="blog-card">
+    <a href="/blog/${esc(p.slug)}" class="blog-card">
       <div class="blog-card-image" style="${p.featuredImage ? `background:url('${esc(p.featuredImage)}')` : "background:linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${esc(p.category || "")}</div>
@@ -78,8 +78,8 @@ function jsonLd(post, relatedTour) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/index.html` },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog.html` },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
       { "@type": "ListItem", position: 3, name: post.title },
     ],
   };
@@ -116,7 +116,7 @@ function jsonLd(post, relatedTour) {
  * `relatedPosts` — up to 3 other published posts, already fetched by the caller.
  */
 function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
-  const canonical = `${SITE_URL}/blog/${post.slug}.html`;
+  const canonical = `${SITE_URL}/blog/${post.slug}`;
   const metaDesc = (post.excerpt || post.title).slice(0, 155);
 
   const tags = [];
@@ -133,12 +133,12 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
 
   const internalLinks = [];
   if (post.island) {
-    internalLinks.push(`<a href="../destinations/${post.island.toLowerCase().replace(" ", "-")}.html">
+    internalLinks.push(`<a href="/destinations/${post.island.toLowerCase().replace(" ", "-")}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       More ${esc(post.island)} guides</a>`);
   }
   if (relatedTour) {
-    internalLinks.push(`<a href="../tours/${esc(relatedTour.slug)}.html">
+    internalLinks.push(`<a href="/tours/${esc(relatedTour.slug)}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       See tour details & availability</a>`);
   }
@@ -177,13 +177,13 @@ ${jsonLd(post, relatedTour)}
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="../index.html" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
+    <a href="/" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
     <nav class="main-nav" aria-label="Primary">
-      <a href="../tours.html">Tours</a>
-      <a href="../destinations.html">Destinations</a>
-      <a href="../blog.html">Blog</a>
-      <a href="../about.html">About</a>
-      <a href="../contact.html">Contact</a>
+      <a href="/tours">Tours</a>
+      <a href="/destinations">Destinations</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
     </nav>
     <div class="header-actions">
       <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
@@ -203,11 +203,11 @@ ${jsonLd(post, relatedTour)}
       </button>
     </div>
     <nav>
-      <a href="../tours.html" class="mobile-nav-link">Tours</a>
-      <a href="../destinations.html" class="mobile-nav-link">Destinations</a>
-      <a href="../blog.html" class="mobile-nav-link">Blog</a>
-      <a href="../about.html" class="mobile-nav-link">About</a>
-      <a href="../contact.html" class="mobile-nav-link">Contact</a>
+      <a href="/tours" class="mobile-nav-link">Tours</a>
+      <a href="/destinations" class="mobile-nav-link">Destinations</a>
+      <a href="/blog" class="mobile-nav-link">Blog</a>
+      <a href="/about" class="mobile-nav-link">About</a>
+      <a href="/contact" class="mobile-nav-link">Contact</a>
     </nav>
   </div>
 </div>
@@ -215,8 +215,8 @@ ${jsonLd(post, relatedTour)}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="../index.html">Home</a><span class="sep">/</span>
-      <a href="../blog.html">Blog</a><span class="sep">/</span>
+      <a href="/">Home</a><span class="sep">/</span>
+      <a href="/blog">Blog</a><span class="sep">/</span>
       <span class="current">${esc(post.title)}</span>
     </nav>
 
@@ -282,8 +282,8 @@ ${jsonLd(post, relatedTour)}
         <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
         <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
       </div>
-      <div class="footer-col"><h4>Explore</h4><a href="../tours.html">Tours</a><a href="../destinations.html">Destinations</a><a href="../blog.html">Blog</a><a href="../transportation.html">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="../about.html">About</a><a href="../contact.html">Contact</a><a href="../affiliate-disclosure.html">Affiliate Disclosure</a><a href="../privacy-policy.html">Privacy Policy</a></div>
+      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
       <div class="footer-col"><h4>Contact Us</h4>
         <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>

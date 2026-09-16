@@ -16,7 +16,7 @@ const CAT_GRADIENTS = {
 function blogCardHtml(p) {
   const bg = p.featuredImage ? `url('${esc(p.featuredImage)}')` : (CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
   return `
-    <a href="blog/${esc(p.slug)}.html" class="blog-card">
+    <a href="/blog/${esc(p.slug)}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${esc(p.category || "")}</div>
@@ -40,12 +40,12 @@ function renderHomeHtml(tours, posts, islandCounts) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tripreviewall — Honest Hawaii Tour Reviews</title>
 <meta name="description" content="We aggregate real Hawaii tour reviews from TripAdvisor, GetYourGuide and verified bookings — then show you the full picture, 5-star and 1-star alike.">
-<link rel="canonical" href="${SITE_URL}/index.html">
+<link rel="canonical" href="${SITE_URL}/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="Tripreviewall — Honest Hawaii Tour Reviews">
 <meta property="og:description" content="We aggregate real Hawaii tour reviews — then show you the full picture, 5-star and 1-star alike.">
-<meta property="og:url" content="${SITE_URL}/index.html">
+<meta property="og:url" content="${SITE_URL}/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tripreviewall — Honest Hawaii Tour Reviews">
 <meta name="twitter:description" content="We aggregate real Hawaii tour reviews — then show you the full picture, 5-star and 1-star alike.">
@@ -60,15 +60,15 @@ function renderHomeHtml(tours, posts, islandCounts) {
 
 <header class="site-header">
   <div class="container header-inner">
-    <a href="index.html" class="logo" aria-label="Tripreviewall home">
+    <a href="/" class="logo" aria-label="Tripreviewall home">
       <span class="part-1">Tripreview</span><span class="part-2">all</span>
     </a>
     <nav class="main-nav" aria-label="Primary">
-      <a href="tours.html">Tours</a>
-      <a href="destinations.html">Destinations</a>
-      <a href="blog.html">Blog</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+      <a href="/tours">Tours</a>
+      <a href="/destinations">Destinations</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
     </nav>
     <div class="header-actions">
       <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
@@ -88,13 +88,13 @@ function renderHomeHtml(tours, posts, islandCounts) {
       </button>
     </div>
     <nav>
-      <a href="tours.html" class="mobile-nav-link">Tours</a>
-      <a href="destinations.html" class="mobile-nav-link">Destinations</a>
-      <a href="blog.html" class="mobile-nav-link">Blog</a>
-      <a href="about.html" class="mobile-nav-link">About</a>
-      <a href="contact.html" class="mobile-nav-link">Contact</a>
+      <a href="/tours" class="mobile-nav-link">Tours</a>
+      <a href="/destinations" class="mobile-nav-link">Destinations</a>
+      <a href="/blog" class="mobile-nav-link">Blog</a>
+      <a href="/about" class="mobile-nav-link">About</a>
+      <a href="/contact" class="mobile-nav-link">Contact</a>
     </nav>
-    <a href="tours.html" class="btn btn-secondary btn-full" style="margin-top:16px;">Browse Tours</a>
+    <a href="/tours" class="btn btn-secondary btn-full" style="margin-top:16px;">Browse Tours</a>
     <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--color-border);font-size:14px;color:var(--color-text-muted);">
       <div><a href="tel:+18082261884" style="color:inherit;">+1 (808) 226-1884</a></div>
       <div style="margin-top:4px;">Mon–Fri 8:30–20:00 · Sat–Sun 9:30–21:30 (HST)</div>
@@ -133,7 +133,7 @@ function renderHomeHtml(tours, posts, islandCounts) {
           Search Tours
         </button>
       </form>
-      <p class="hero-quicklinks">Popular: <a href="tours.html?q=Snorkel">Snorkel tours</a> · <a href="tours.html?q=Luau">Maui luau</a> · <a href="tours.html?q=Helicopter">Kauai helicopter</a></p>
+      <p class="hero-quicklinks">Popular: <a href="/tours?q=Snorkel">Snorkel tours</a> · <a href="/tours?q=Luau">Maui luau</a> · <a href="/tours?q=Helicopter">Kauai helicopter</a></p>
     </div>
   </section>
 
@@ -169,7 +169,7 @@ function renderHomeHtml(tours, posts, islandCounts) {
         <button class="tab-btn" data-tab="most-reviewed">Most Reviewed</button>
       </div>
       <div class="tour-grid" id="tour-grid">${featured.map((t) => tourCardHtml(t, "", "")).join("")}</div>
-      <div class="view-all-wrap"><a href="tours.html" class="btn btn-secondary">View All Tours</a></div>
+      <div class="view-all-wrap"><a href="/tours" class="btn btn-secondary">View All Tours</a></div>
     </div>
   </section>
 
@@ -201,7 +201,7 @@ function renderHomeHtml(tours, posts, islandCounts) {
       <div class="section-header"><h2 class="section-title">Explore by Island</h2></div>
       <div class="dest-grid">
         ${ISLANDS.map((isl) => `
-        <a class="dest-card" href="destinations/${isl.slug}.html" style="background-image:${isl.gradient}">
+        <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${isl.gradient}">
           <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
           <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
         </a>`).join("")}
@@ -213,7 +213,7 @@ function renderHomeHtml(tours, posts, islandCounts) {
     <div class="container">
       <div class="section-header-row"><h2 class="section-title" style="margin-bottom:0;">From the Editors</h2></div>
       <div class="blog-grid" id="home-blog-grid">${latestPosts.length ? latestPosts.map(blogCardHtml).join("") : `<p style="color:var(--color-text-muted);">New articles are on their way.</p>`}</div>
-      <div class="read-all-wrap"><a href="blog.html" class="btn btn-tertiary">Read All Articles →</a></div>
+      <div class="read-all-wrap"><a href="/blog" class="btn btn-tertiary">Read All Articles →</a></div>
     </div>
   </section>
 
@@ -226,8 +226,8 @@ function renderHomeHtml(tours, posts, islandCounts) {
         <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
         <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
       </div>
-      <div class="footer-col"><h4>Explore</h4><a href="tours.html">Tours</a><a href="destinations.html">Destinations</a><a href="blog.html">Blog</a><a href="transportation.html">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="about.html">About</a><a href="contact.html">Contact</a><a href="affiliate-disclosure.html">Affiliate Disclosure</a><a href="privacy-policy.html">Privacy Policy</a></div>
+      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
+      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
       <div class="footer-col"><h4>Contact Us</h4>
         <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>

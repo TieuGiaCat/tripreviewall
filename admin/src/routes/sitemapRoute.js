@@ -4,19 +4,19 @@ const SITE_URL = "https://tripreviewall.com";
 
 // Static pages that always exist, independent of DB content.
 const STATIC_PAGES = [
-  { path: "/index.html", priority: "1.0" },
-  { path: "/tours.html", priority: "0.9" },
-  { path: "/blog.html", priority: "0.9" },
-  { path: "/destinations.html", priority: "0.8" },
-  { path: "/destinations/oahu.html", priority: "0.7" },
-  { path: "/destinations/maui.html", priority: "0.7" },
-  { path: "/destinations/kauai.html", priority: "0.7" },
-  { path: "/destinations/big-island.html", priority: "0.7" },
-  { path: "/transportation.html", priority: "0.6" },
-  { path: "/about.html", priority: "0.4" },
-  { path: "/contact.html", priority: "0.4" },
-  { path: "/affiliate-disclosure.html", priority: "0.3" },
-  { path: "/privacy-policy.html", priority: "0.3" },
+  { path: "/", priority: "1.0" },
+  { path: "/tours", priority: "0.9" },
+  { path: "/blog", priority: "0.9" },
+  { path: "/destinations", priority: "0.8" },
+  { path: "/destinations/oahu", priority: "0.7" },
+  { path: "/destinations/maui", priority: "0.7" },
+  { path: "/destinations/kauai", priority: "0.7" },
+  { path: "/destinations/big-island", priority: "0.7" },
+  { path: "/transportation", priority: "0.6" },
+  { path: "/about", priority: "0.4" },
+  { path: "/contact", priority: "0.4" },
+  { path: "/affiliate-disclosure", priority: "0.3" },
+  { path: "/privacy-policy", priority: "0.3" },
 ];
 
 function urlEntry(loc, lastmod, priority) {
@@ -43,8 +43,8 @@ async function generateSitemap(req, res) {
 
   const entries = [
     ...STATIC_PAGES.map((p) => urlEntry(`${SITE_URL}${p.path}`, null, p.priority)),
-    ...tourRows.map((t) => urlEntry(`${SITE_URL}/tours/${t.slug}.html`, t.updated_at, "0.8")),
-    ...postRows.map((p) => urlEntry(`${SITE_URL}/blog/${p.slug}.html`, p.updated_at, "0.6")),
+    ...tourRows.map((t) => urlEntry(`${SITE_URL}/tours/${t.slug}`, t.updated_at, "0.8")),
+    ...postRows.map((p) => urlEntry(`${SITE_URL}/blog/${p.slug}`, p.updated_at, "0.6")),
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
