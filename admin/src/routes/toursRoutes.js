@@ -517,7 +517,7 @@ async function uploadTourImage(req, res, user, id) {
 
   let uploadResult;
   try {
-    uploadResult = await parseImageUpload(req, existing.slug);
+    uploadResult = await parseImageUpload(req, "tours", existing.slug);
   } catch (err) {
     console.error("[tours] image upload parse failed:", err.message);
     res.writeHead(302, { Location: `/admin/tours/${id}/edit` });

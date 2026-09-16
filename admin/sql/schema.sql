@@ -55,3 +55,32 @@ CREATE TABLE IF NOT EXISTS tours (
 CREATE INDEX IF NOT EXISTS idx_tours_status ON tours(status);
 CREATE INDEX IF NOT EXISTS idx_tours_island ON tours(island);
 CREATE INDEX IF NOT EXISTS idx_tours_updated_at ON tours(updated_at DESC);
+
+-- ---------------------------------------------------------------
+-- posts (Blog)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
+  category TEXT,
+  island_tag TEXT,
+  content_format TEXT NOT NULL DEFAULT 'listicle' CHECK (content_format IN ('listicle', 'comparison', 'deep_dive_review', 'honest_take')),
+  published_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_by UUID REFERENCES admin_users(id),
+  data JSONB NOT NULL DEFAULT '{}'::jsonb
+  -- data shape (MVP subset — see tripreviewall-blog-details-brief.md §5 for
+  -- the full future shape, e.g. TOC entries, inline tour embeds):
+  -- {
+  --   "title": "...", "excerpt": "...", "authorName": "...",
+  --   "featuredImage": "/uploads/posts/....jpg",
+  --   "body": "...", "disclosureText": "...", "readTimeMinutes": 7,
+  --   "tags": ["..."], "pillarPageDestinationSlug": "maui"
+  -- }
+);
+
+CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
+CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category);
+CREATE INDEX IF NOT EXISTS idx_posts_updated_at ON posts(updated_at DESC);

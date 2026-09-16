@@ -6,7 +6,7 @@ const NAV_ITEMS = [
   // Future modules — routes not built yet in this core, listed here so the
   // sidebar shape matches master-technical-architecture.md §2 and doesn't
   // need restructuring later. Unbuilt links intentionally point to "#".
-  { key: "blog", label: "Blog Posts", href: "#" },
+  { key: "blog", label: "Blog Posts", href: "/admin/posts" },
   { key: "destinations", label: "Destinations", href: "#" },
   { key: "authors", label: "Authors", href: "#" },
   { key: "leads", label: "Leads", href: "#" },

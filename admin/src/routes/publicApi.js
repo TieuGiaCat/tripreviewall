@@ -75,4 +75,72 @@ async function getPublishedTourBySlug(req, res, slug) {
   }
 }
 
-module.exports = { listPublishedTours, getPublishedTourBySlug };
+/* ============================================================
+   Blog Posts
+   ============================================================ */
+function toPostPublicShape(row) {
+  const d = row.data || {};
+  return {
+    slug: row.slug,
+    title: d.title || row.slug,
+    category: row.category || "",
+    island: row.island_tag || null,
+    contentFormat: row.content_format || "listicle",
+    author: d.authorName || "",
+    excerpt: d.excerpt || "",
+    body: d.body || "",
+    readTime: d.readTimeMinutes || null,
+    tags: d.tags || [],
+    disclosureText: d.disclosureText || "",
+    relatedTourSlug: d.relatedTourSlug || null,
+    featuredImage: d.featuredImage || null,
+    publishedAt: row.published_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function listPublishedPosts(req, res) {
+  try {
+    const result = await query(
+      `SELECT slug, category, island_tag, content_format, published_at, updated_at, data
+       FROM posts WHERE status = 'published' ORDER BY updated_at DESC`
+    );
+    res.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=60",
+      "Access-Control-Allow-Origin": "*",
+    });
+    res.end(JSON.stringify(result.rows.map(toPostPublicShape)));
+  } catch (err) {
+    console.error("[public-api] listPublishedPosts failed:", err.message);
+    res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: "Could not load posts." }));
+  }
+}
+
+async function getPublishedPostBySlug(req, res, slug) {
+  try {
+    const result = await query(
+      `SELECT slug, category, island_tag, content_format, published_at, updated_at, data
+       FROM posts WHERE status = 'published' AND slug = $1 LIMIT 1`,
+      [slug]
+    );
+    if (result.rows.length === 0) {
+      res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ error: "Not found." }));
+      return;
+    }
+    res.writeHead(200, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, max-age=60",
+      "Access-Control-Allow-Origin": "*",
+    });
+    res.end(JSON.stringify(toPostPublicShape(result.rows[0])));
+  } catch (err) {
+    console.error("[public-api] getPublishedPostBySlug failed:", err.message);
+    res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: "Could not load post." }));
+  }
+}
+
+module.exports = { listPublishedTours, getPublishedTourBySlug, listPublishedPosts, getPublishedPostBySlug };

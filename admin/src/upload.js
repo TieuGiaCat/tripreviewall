@@ -3,24 +3,26 @@ const fs = require("fs");
 const crypto = require("crypto");
 const formidable = require("formidable");
 
-const UPLOAD_DIR = path.join(__dirname, "..", "public", "uploads", "tours");
+const UPLOAD_ROOT = path.join(__dirname, "..", "public", "uploads");
 const ALLOWED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8MB per image
 
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
 /**
  * Parses a multipart/form-data POST request containing one or more files
- * under the field name "images". Returns { urls: string[] } — public URLs
- * (relative to site root) for whatever was successfully saved.
- * Rejects (throws) on parse errors; individual bad files are just skipped.
+ * under the field name "images". `kind` picks the subfolder — "tours" or
+ * "posts" — so each module's uploads stay organized on disk.
+ * Returns { urls: string[] } — public URLs (relative to site root) for
+ * whatever was successfully saved.
  */
-function parseImageUpload(req, tourSlug) {
+function parseImageUpload(req, kind, itemSlug) {
+  const uploadDir = path.join(UPLOAD_ROOT, kind);
+  fs.mkdirSync(uploadDir, { recursive: true });
+
   return new Promise((resolve, reject) => {
     const form = formidable({
       multiples: true,
       maxFileSize: MAX_FILE_BYTES,
-      uploadDir: UPLOAD_DIR,
+      uploadDir,
       keepExtensions: true,
     });
 
@@ -30,7 +32,6 @@ function parseImageUpload(req, tourSlug) {
         return;
       }
 
-      // formidable v3 always gives arrays when `multiples: true`
       let list = files.images;
       if (!list) list = [];
       else if (!Array.isArray(list)) list = [list];
@@ -43,11 +44,11 @@ function parseImageUpload(req, tourSlug) {
           fs.unlink(file.filepath, () => {});
           continue;
         }
-        const safeName = `${slugSafe(tourSlug)}-${Date.now()}-${crypto.randomBytes(4).toString("hex")}${originalExt}`;
-        const finalPath = path.join(UPLOAD_DIR, safeName);
+        const safeName = `${slugSafe(itemSlug)}-${Date.now()}-${crypto.randomBytes(4).toString("hex")}${originalExt}`;
+        const finalPath = path.join(uploadDir, safeName);
         try {
           fs.renameSync(file.filepath, finalPath);
-          urls.push(`/uploads/tours/${safeName}`);
+          urls.push(`/uploads/${kind}/${safeName}`);
         } catch (renameErr) {
           console.error("[upload] could not move uploaded file:", renameErr.message);
         }
@@ -58,7 +59,7 @@ function parseImageUpload(req, tourSlug) {
 }
 
 function slugSafe(s) {
-  return String(s || "tour").replace(/[^a-z0-9-]/gi, "").slice(0, 60);
+  return String(s || "item").replace(/[^a-z0-9-]/gi, "").slice(0, 60);
 }
 
-module.exports = { parseImageUpload, UPLOAD_DIR };
+module.exports = { parseImageUpload, UPLOAD_ROOT };

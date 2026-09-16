@@ -8,6 +8,7 @@ const { requireAuth } = require("./middleware");
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const toursRoutes = require("./routes/toursRoutes");
+const blogRoutes = require("./routes/blogRoutes");
 const publicApi = require("./routes/publicApi");
 
 const PORT = process.env.PORT || 4000;
@@ -109,6 +110,13 @@ const server = http.createServer(async (req, res) => {
     if (method === "GET" && apiTourMatch) {
       return publicApi.getPublishedTourBySlug(req, res, apiTourMatch[1]);
     }
+    if (method === "GET" && pathname === "/api/posts") {
+      return publicApi.listPublishedPosts(req, res);
+    }
+    const apiPostMatch = pathname.match(/^\/api\/posts\/([^/]+)$/);
+    if (method === "GET" && apiPostMatch) {
+      return publicApi.getPublishedPostBySlug(req, res, apiPostMatch[1]);
+    }
 
     // ---- Everything below requires a session ----
     const session = requireAuth(req, res);
@@ -148,6 +156,31 @@ const server = http.createServer(async (req, res) => {
     const removeImageMatch = pathname.match(/^\/admin\/tours\/([^/]+)\/remove-image$/);
     if (removeImageMatch && method === "POST") {
       return toursRoutes.removeTourImage(req, res, session, removeImageMatch[1]);
+    }
+
+    // ---- Blog Posts ----
+    if (method === "GET" && pathname === "/admin/posts") {
+      return blogRoutes.listPosts(req, res, session, urlObj);
+    }
+    if (method === "GET" && pathname === "/admin/posts/new") {
+      return blogRoutes.newPostForm(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/posts/new") {
+      return blogRoutes.createPost(req, res, session);
+    }
+    const postEditMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/edit$/);
+    if (postEditMatch) {
+      const id = postEditMatch[1];
+      if (method === "GET") return blogRoutes.editPostForm(req, res, session, id);
+      if (method === "POST") return blogRoutes.updatePost(req, res, session, id);
+    }
+    const postDeleteMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/delete$/);
+    if (postDeleteMatch && method === "POST") {
+      return blogRoutes.deletePost(req, res, session, postDeleteMatch[1]);
+    }
+    const postUploadMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/upload-image$/);
+    if (postUploadMatch && method === "POST") {
+      return blogRoutes.uploadPostImage(req, res, session, postUploadMatch[1]);
     }
 
     // ---- 404 ----
