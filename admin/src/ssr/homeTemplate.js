@@ -1,15 +1,9 @@
 const { esc } = require("../utils");
 const { tourCardHtml } = require("./sharedHtml");
+const { ISLANDS } = require("./islands");
 
 const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
 const EDITORS_PICK_SLUGS = ["ohana-surf-project-sup-lessons"];
-
-const ISLAND_META = [
-  { slug: "oahu", name: "Oahu", gradient: "linear-gradient(135deg,#0B3B4F,#5C8A72)" },
-  { slug: "maui", name: "Maui", gradient: "linear-gradient(135deg,#B8592F,#0B3B4F)" },
-  { slug: "kauai", name: "Kauai", gradient: "linear-gradient(135deg,#5C8A72,#26313A)" },
-  { slug: "big-island", name: "Big Island", gradient: "linear-gradient(135deg,#26313A,#B85C4A)" },
-];
 
 const CAT_GRADIENTS = {
   "Real Traveler Reviews & Data": "linear-gradient(135deg,#B85C4A,#0B3B4F)",
@@ -206,7 +200,7 @@ function renderHomeHtml(tours, posts, islandCounts) {
     <div class="container">
       <div class="section-header"><h2 class="section-title">Explore by Island</h2></div>
       <div class="dest-grid">
-        ${ISLAND_META.map((isl) => `
+        ${ISLANDS.map((isl) => `
         <a class="dest-card" href="destinations/${isl.slug}.html" style="background-image:${isl.gradient}">
           <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
           <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
