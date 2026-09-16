@@ -16,7 +16,7 @@ const NAV_ITEMS = [
   { key: "users", label: "Users", href: "#" },
 ];
 
-function layout({ title, activeNav, user, body }) {
+function layout({ title, activeNav, user, body, extraHead, extraScripts }) {
   const nav = NAV_ITEMS.map(
     (item) =>
       `<a href="${item.href}" class="${item.key === activeNav ? "active" : ""}">${esc(item.label)}</a>`
@@ -29,6 +29,7 @@ function layout({ title, activeNav, user, body }) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)} — Tripreviewall Admin</title>
 <link rel="stylesheet" href="/admin/public/admin.css">
+${extraHead || ""}
 </head>
 <body>
 <div class="app-shell">
@@ -44,6 +45,7 @@ function layout({ title, activeNav, user, body }) {
     ${body}
   </main>
 </div>
+${extraScripts || ""}
 </body>
 </html>`;
 }

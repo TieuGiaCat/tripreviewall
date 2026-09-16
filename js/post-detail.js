@@ -79,8 +79,10 @@ function renderHero(post) {
 }
 
 function renderBody(post) {
-  const paragraphs = (post.body || "").split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
-  document.getElementById("article-body").innerHTML = paragraphs.map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+  // Body is rich HTML authored via the Quill editor in Admin — render as-is.
+  // (Older plain-text posts created before this upgrade will show as one
+  // unbroken block; re-saving them in Admin fixes that going forward.)
+  document.getElementById("article-body").innerHTML = post.body || "";
 }
 
 function renderAuthorAndLinks(post) {

@@ -10,6 +10,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const toursRoutes = require("./routes/toursRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const publicApi = require("./routes/publicApi");
+const sitemapRoute = require("./routes/sitemapRoute");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -103,6 +104,9 @@ const server = http.createServer(async (req, res) => {
 
     // ---- Public read-only API (no session required) — the public website
     // fetches from these to render tours live from the database. ----
+    if (method === "GET" && pathname === "/sitemap.xml") {
+      return sitemapRoute.generateSitemap(req, res);
+    }
     if (method === "GET" && pathname === "/api/tours") {
       return publicApi.listPublishedTours(req, res);
     }
@@ -181,6 +185,10 @@ const server = http.createServer(async (req, res) => {
     const postUploadMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/upload-image$/);
     if (postUploadMatch && method === "POST") {
       return blogRoutes.uploadPostImage(req, res, session, postUploadMatch[1]);
+    }
+    const postInlineUploadMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/upload-inline-image$/);
+    if (postInlineUploadMatch && method === "POST") {
+      return blogRoutes.uploadInlineImage(req, res, session, postInlineUploadMatch[1]);
     }
 
     // ---- 404 ----

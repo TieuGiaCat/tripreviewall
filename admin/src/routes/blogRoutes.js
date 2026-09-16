@@ -94,6 +94,81 @@ async function listPosts(req, res, user, urlObj) {
 /* ============================================================
    Form (shared between New and Edit)
    ============================================================ */
+const QUILL_CDN_CSS = '<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">';
+const QUILL_CDN_JS = "https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js";
+
+/**
+ * Builds the <head> link + end-of-body <script> needed for the Quill
+ * rich-text editor on a post form. `postId` is null on the New Post form
+ * (image insertion is disabled there — a post needs an id to upload to).
+ */
+function quillAssets(postId, initialBodyHtml) {
+  const b64 = Buffer.from(initialBodyHtml || "", "utf8").toString("base64");
+  const head = QUILL_CDN_CSS;
+  const scripts = `
+<script src="${QUILL_CDN_JS}"></script>
+<script>
+(function () {
+  function b64DecodeUnicode(str) {
+    return decodeURIComponent(Array.prototype.map.call(atob(str), function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+  var quill = new Quill('#quill-editor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline'],
+        ['blockquote'],
+        [{ header: [2, 3, false] }],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'image'],
+        ['clean']
+      ]
+    }
+  });
+  var initialHtml = "${b64}" ? b64DecodeUnicode("${b64}") : "";
+  if (initialHtml) quill.root.innerHTML = initialHtml;
+
+  var postId = ${postId ? `"${postId}"` : "null"};
+  quill.getModule('toolbar').addHandler('image', function () {
+    if (!postId) {
+      alert('Save this post first, then come back to insert images.');
+      return;
+    }
+    var input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', '.jpg,.jpeg,.png,.webp');
+    input.click();
+    input.onchange = function () {
+      var file = input.files[0];
+      if (!file) return;
+      var formData = new FormData();
+      formData.append('images', file);
+      fetch('/admin/posts/' + postId + '/upload-inline-image', { method: 'POST', body: formData })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.url) {
+            var range = quill.getSelection(true) || { index: quill.getLength() };
+            quill.insertEmbed(range.index, 'image', data.url);
+            quill.setSelection(range.index + 1);
+          } else {
+            alert('Upload failed: ' + (data.error || 'unknown error'));
+          }
+        })
+        .catch(function () { alert('Upload failed — check your connection and try again.'); });
+    };
+  });
+
+  var form = document.getElementById('quill-editor').closest('form');
+  form.addEventListener('submit', function () {
+    document.getElementById('body-hidden-input').value = quill.root.innerHTML;
+  });
+})();
+</script>`;
+  return { head, scripts };
+}
+
 function renderPostForm({ post = {}, errors = [], formAction, isEdit }) {
   const d = post.data || {};
 
@@ -145,7 +220,12 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit }) {
           <div class="form-field"><label>Excerpt (shown on the article grid card)</label><textarea name="excerpt" style="min-height:70px;">${esc(d.excerpt || "")}</textarea></div>
         </div>
         <div class="form-row full">
-          <div class="form-field"><label>Body</label><textarea name="body" style="min-height:320px;">${esc(d.body || "")}</textarea><div class="hint">Plain text — line breaks become paragraphs. A rich-text editor is a future upgrade, not built yet.</div></div>
+          <div class="form-field">
+            <label>Body</label>
+            <div id="quill-editor" style="background:#fff;height:400px;margin-bottom:42px;"></div>
+            <textarea name="body" id="body-hidden-input" style="display:none;"></textarea>
+            <div class="hint">${isEdit ? "Use the toolbar to insert images anywhere in the article." : "Image insertion is available after you save this post the first time."}</div>
+          </div>
         </div>
         <div class="form-row full">
           <div class="form-field"><label>Tags (comma-separated)</label><input type="text" name="tags" value="${esc((d.tags || []).join(", "))}"></div>
@@ -209,7 +289,8 @@ function bodyToPostData(body, existingData = {}) {
    ============================================================ */
 async function newPostForm(req, res, user) {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false }) }));
+  const qa = quillAssets(null, "");
+  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false }), extraHead: qa.head, extraScripts: qa.scripts }));
 }
 
 async function createPost(req, res, user) {
@@ -218,7 +299,8 @@ async function createPost(req, res, user) {
     body = await readFormBody(req);
   } catch (err) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."] }) }));
+    const qa0 = quillAssets(null, "");
+    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."] }), extraHead: qa0.head, extraScripts: qa0.scripts }));
     return;
   }
 
@@ -234,6 +316,7 @@ async function createPost(req, res, user) {
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
 
   if (errors.length) {
+    const qa1 = quillAssets(null, data.body);
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     res.end(
       layout({
@@ -241,6 +324,8 @@ async function createPost(req, res, user) {
         activeNav: "blog",
         user,
         body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: "/admin/posts/new", isEdit: false }),
+        extraHead: qa1.head,
+        extraScripts: qa1.scripts,
       })
     );
     return;
@@ -255,6 +340,7 @@ async function createPost(req, res, user) {
   } catch (err) {
     console.error("[posts] create failed:", err.message);
     const dbErrors = err.code === "23505" ? ["A post with this slug already exists."] : [`Database error: ${err.message}`];
+    const qa2 = quillAssets(null, data.body);
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     res.end(
       layout({
@@ -262,6 +348,8 @@ async function createPost(req, res, user) {
         activeNav: "blog",
         user,
         body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: "/admin/posts/new", isEdit: false }),
+        extraHead: qa2.head,
+        extraScripts: qa2.scripts,
       })
     );
     return;
@@ -290,7 +378,8 @@ async function editPostForm(req, res, user, id) {
     return;
   }
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true }) }));
+  const qa3 = quillAssets(id, (post.data && post.data.body) || "");
+  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true }), extraHead: qa3.head, extraScripts: qa3.scripts }));
 }
 
 async function updatePost(req, res, user, id) {
@@ -330,6 +419,7 @@ async function updatePost(req, res, user, id) {
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
 
   if (errors.length) {
+    const qa4 = quillAssets(id, data.body);
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     res.end(
       layout({
@@ -337,6 +427,8 @@ async function updatePost(req, res, user, id) {
         activeNav: "blog",
         user,
         body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: `/admin/posts/${id}/edit`, isEdit: true }),
+        extraHead: qa4.head,
+        extraScripts: qa4.scripts,
       })
     );
     return;
@@ -353,6 +445,7 @@ async function updatePost(req, res, user, id) {
   } catch (err) {
     console.error("[posts] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another post already uses this slug."] : [`Database error: ${err.message}`];
+    const qa5 = quillAssets(id, data.body);
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     res.end(
       layout({
@@ -360,6 +453,8 @@ async function updatePost(req, res, user, id) {
         activeNav: "blog",
         user,
         body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: `/admin/posts/${id}/edit`, isEdit: true }),
+        extraHead: qa5.head,
+        extraScripts: qa5.scripts,
       })
     );
     return;
@@ -424,4 +519,45 @@ async function uploadPostImage(req, res, user, id) {
   res.end();
 }
 
-module.exports = { listPosts, newPostForm, createPost, editPostForm, updatePost, deletePost, uploadPostImage };
+/* ============================================================
+   Inline image upload (Quill editor "insert image" button)
+   ============================================================ */
+async function uploadInlineImage(req, res, user, id) {
+  const { parseImageUpload } = require("../upload");
+
+  let existing;
+  try {
+    const result = await query("SELECT slug FROM posts WHERE id = $1", [id]);
+    existing = result.rows[0];
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: err.message }));
+    return;
+  }
+  if (!existing) {
+    res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: "Post not found." }));
+    return;
+  }
+
+  let uploadResult;
+  try {
+    uploadResult = await parseImageUpload(req, "posts", existing.slug);
+  } catch (err) {
+    console.error("[posts] inline image upload parse failed:", err.message);
+    res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: "Could not process the upload." }));
+    return;
+  }
+
+  if (uploadResult.urls.length === 0) {
+    res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ error: "No valid image file received (jpg/png/webp, max 8MB)." }));
+    return;
+  }
+
+  res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(JSON.stringify({ url: uploadResult.urls[0] }));
+}
+
+module.exports = { listPosts, newPostForm, createPost, editPostForm, updatePost, deletePost, uploadPostImage, uploadInlineImage };
