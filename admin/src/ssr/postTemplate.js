@@ -14,7 +14,7 @@ function inlineTourCardHtml(tour) {
   const img = tour.gallery && tour.gallery[0];
   return `
     <div class="inline-tour-card">
-      <div class="inline-tour-img" style="${img ? `background-image:url('../${esc(img)}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
+      <div class="inline-tour-img" style="${img ? `background-image:url('${esc(img)}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
       <div style="flex:1;">
         <div class="inline-tour-eyebrow">Featured Tour</div>
         <h3 class="inline-tour-title">${esc(tour.title)}</h3>
@@ -36,7 +36,7 @@ function sidebarTourCardHtml(tour) {
     <aside class="article-sidebar-col">
       <div class="sidebar-affiliate-card">
         <div class="sidebar-affiliate-label">Featured Tour</div>
-        <div class="sidebar-affiliate-img" style="${img ? `background-image:url('../${esc(img)}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
+        <div class="sidebar-affiliate-img" style="${img ? `background-image:url('${esc(img)}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
         <h4 class="sidebar-affiliate-title">${esc(tour.title)}</h4>
         <div style="font-size:var(--text-meta);">${(tour.aggregatedRating || 0).toFixed(1)}★ (${(tour.reviewCountTotal || 0).toLocaleString()})</div>
         <ul class="sidebar-affiliate-bullets">

@@ -299,23 +299,32 @@ ${FOOTER(0)}
 /* ============================================================
    /destinations/<island>.html
    ============================================================ */
-function renderIslandPageHtml(islandSlug, tours, posts) {
+function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
   const island = ISLANDS.find((i) => i.slug === islandSlug);
   const islandTours = tours.filter((t) => t.island === island.name);
   const islandPosts = posts.filter((p) => p.island === island.name);
+
+  // Admin-edited intro/hero photo (Destinations module) take priority over
+  // the static defaults in ./islands.js, which remain the bootstrap fallback.
+  const introText = (destinationOverride && destinationOverride.introText) || island.intro;
+  const heroImage = destinationOverride && destinationOverride.heroImage;
+  const seo = (destinationOverride && destinationOverride.seo) || {};
+  const metaTitle = seo.metaTitle || `${island.name} Tours — Tripreviewall`;
+  const metaDescription = seo.metaDescription || `Honest, aggregated ${island.name} tour reviews — every rating we collect, 5-star and 1-star alike.`;
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${island.name} Tours — Tripreviewall</title>
-<meta name="description" content="Honest, aggregated ${island.name} tour reviews — every rating we collect, 5-star and 1-star alike.">
+<title>${esc(metaTitle)}</title>
+<meta name="description" content="${esc(metaDescription)}">
 <link rel="canonical" href="${SITE_URL}/destinations/${island.slug}.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
-<meta property="og:title" content="${island.name} Tours — Tripreviewall">
-<meta property="og:description" content="Honest, aggregated ${island.name} tour reviews — every rating we collect, 5-star and 1-star alike.">
+<meta property="og:title" content="${esc(metaTitle)}">
+<meta property="og:description" content="${esc(metaDescription)}">
+${heroImage ? `<meta property="og:image" content="${SITE_URL}${heroImage}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -338,13 +347,13 @@ ${HEADER(1)}
       ${ISLANDS.map((i) => `<a class="dest-island-tab${i.slug === island.slug ? " active" : ""}" href="${i.slug}.html">${i.name}</a>`).join("")}
     </div>
 
-    <div class="dest-hero" style="background-image:${island.gradient}">
+    <div class="dest-hero" style="background-image:${heroImage ? `url('${esc(heroImage)}')` : island.gradient}; background-size:cover; background-position:center;">
       <div class="dest-hero-content">
         <h1>${island.name}</h1>
         <p>${islandTours.length} tours tracked</p>
       </div>
     </div>
-    <p class="dest-intro">${esc(island.intro)}</p>
+    <p class="dest-intro">${esc(introText)}</p>
 
     <div class="section-header-row"><h2 class="section-title">Tours on ${island.name}</h2></div>
     <div class="tour-grid">${islandTours.slice(0, 8).map((t) => tourCardHtml(t, "../", "")).join("") || `<p style="color:var(--color-text-muted);">No tours tracked yet.</p>`}</div>

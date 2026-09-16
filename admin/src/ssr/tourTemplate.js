@@ -246,11 +246,11 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
     </div>
 
     <div class="gallery">
-      <div class="gallery-main tour-photo" id="gallery-main" ${heroImg ? `style="background-image:url('../${heroImg}')"` : `style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"`}></div>
+      <div class="gallery-main tour-photo" id="gallery-main" ${heroImg ? `style="background-image:url('${heroImg}')"` : `style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"`}></div>
     </div>
     ${(tour.gallery || []).length > 1 ? `
     <div class="gallery-thumbs" id="gallery-thumbs">
-      ${tour.gallery.map((url, i) => `<div class="gallery-thumb tour-photo${i === 0 ? " active" : ""}" data-url="../${esc(url)}" style="background-image:url('../${esc(url)}')"></div>`).join("")}
+      ${tour.gallery.map((url, i) => `<div class="gallery-thumb tour-photo${i === 0 ? " active" : ""}" data-url="${esc(url)}" style="background-image:url('${esc(url)}')"></div>`).join("")}
     </div>` : ""}
     <p class="gallery-caption">Photo: Operator</p>
 
@@ -287,7 +287,7 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
     <section class="section" style="padding-top:0;">
       <h2 class="detail-section-title">Similar Tours on ${esc(tour.island)}</h2>
       <div class="similar-tours-scroll">
-        ${similarTours.length > 0 ? similarTours.map((t) => tourCardHtml(t, "../", "../")).join("") : `<p style="color:var(--color-text-muted);">No similar tours found on this island yet.</p>`}
+        ${similarTours.length > 0 ? similarTours.map((t) => tourCardHtml(t, "../", "")).join("") : `<p style="color:var(--color-text-muted);">No similar tours found on this island yet.</p>`}
       </div>
     </section>
   </div>
