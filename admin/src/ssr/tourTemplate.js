@@ -210,7 +210,6 @@ ${jsonLd(tour)}
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/tour-detail.css">
-${tour.fareharborRegularLink ? `<script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async></script>` : ""}
 </head>
 <body>
 
@@ -353,6 +352,7 @@ ${tour.fareharborRegularLink ? `<script src="https://fareharbor.com/embeds/api/v
 
 <script src="../js/main.js"></script>
 <script src="../js/tour-static-hydrate.js"></script>
+${tour.fareharborRegularLink ? `<!-- FareHarbor Lightframe API - see: https://fareharbor.com/help/website/resources/lightframe-api/ --><script defer src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes"></script>` : ""}
 </body>
 </html>`;
 }
