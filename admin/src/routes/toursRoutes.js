@@ -109,6 +109,7 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
   const gs = d.googleSnapshot || {};
   const rd = d.ratingDistribution || {};
   const bl = d.bookingLinks || {};
+  const loc = d.location || {};
   const gallery = d.gallery || [];
 
   const islandOptions = ISLANDS.map(
@@ -190,6 +191,15 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
           <div class="form-field">
             <label><input type="checkbox" name="showViator" value="1" ${bl.viator && bl.viator.show ? "checked" : ""}> Show Viator button</label>
           </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Location</h2>
+        <p class="hint" style="margin:-8px 0 16px;">Powers the Google Maps embed on the live Tour Detail page. Latitude is the N/S coordinate (roughly 19–22 for Hawaii); Longitude is E/W (roughly -155 to -160). Leave both blank to hide the map.</p>
+        <div class="form-row">
+          <div class="form-field"><label>Latitude</label><input type="text" name="locationLat" value="${esc(loc.lat != null ? loc.lat : "")}" placeholder="e.g. 21.51245"></div>
+          <div class="form-field"><label>Longitude</label><input type="text" name="locationLng" value="${esc(loc.lng != null ? loc.lng : "")}" placeholder="e.g. -157.837"></div>
         </div>
       </div>
 
@@ -310,6 +320,12 @@ function bodyToTourData(body, existingData = {}) {
       getyourguide: { url: (body.getyourguideUrl || "").trim(), show: body.showGetyourguide === "1" },
       viator: { url: (body.viatorUrl || "").trim(), show: body.showViator === "1" },
     },
+    location: (() => {
+      const lat = body.locationLat !== undefined && body.locationLat !== "" ? Number(body.locationLat) : (existingData.location ? existingData.location.lat : undefined);
+      const lng = body.locationLng !== undefined && body.locationLng !== "" ? Number(body.locationLng) : (existingData.location ? existingData.location.lng : undefined);
+      if (lat === undefined || lng === undefined || isNaN(lat) || isNaN(lng)) return existingData.location || null;
+      return { lat, lng };
+    })(),
     // Not edited by this form — preserved from whatever the tour already had,
     // so saving the main form never wipes out uploaded images or variants.
     variants: existingData.variants || [],
@@ -690,12 +706,16 @@ const { parseCsv } = require("../lib/csv");
 const EXPORT_COLUMNS = [
   "slug", "name", "island", "status", // reference only — ignored on import
   "priceFrom",
+  "location_lat", "location_lng",
+  "fareharborShortname", "showFareharbor",
+  "tripadvisorUrl", "showTripadvisor",
+  "getyourguideUrl", "showGetyourguide",
+  "viatorUrl", "showViator",
   "aggregatedRating", "reviewCountTotal", "star5", "star4", "star3", "star2", "star1",
   "fareharbor_rating", "fareharbor_count",
   "tripadvisor_rating", "tripadvisor_count",
   "getyourguide_rating", "getyourguide_count",
   "viator_rating", "viator_count",
-  "location_lat", "location_lng",
 ];
 const REFERENCE_ONLY_COLUMNS = new Set(["slug", "name", "island", "status"]);
 
@@ -722,6 +742,7 @@ async function exportToursCsv(req, res, user) {
     const dist = d.ratingDistribution || {};
     const rbs = d.ratingsBySource || {};
     const loc = d.location || {};
+    const bl = d.bookingLinks || {};
     const values = {
       slug: row.slug, name: d.name || "", island: row.island || "", status: row.status,
       priceFrom: row.price_from != null ? row.price_from : "",
@@ -735,6 +756,14 @@ async function exportToursCsv(req, res, user) {
       getyourguide_rating: rbs.getyourguide ? rbs.getyourguide.avg : "", getyourguide_count: rbs.getyourguide ? rbs.getyourguide.count : "",
       viator_rating: rbs.viator ? rbs.viator.avg : "", viator_count: rbs.viator ? rbs.viator.count : "",
       location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
+      fareharborShortname: d.fareharborShortname || "",
+      showFareharbor: bl.fareharbor && bl.fareharbor.show === false ? "FALSE" : "TRUE",
+      tripadvisorUrl: (bl.tripadvisor && bl.tripadvisor.url) || "",
+      showTripadvisor: bl.tripadvisor && bl.tripadvisor.show ? "TRUE" : "FALSE",
+      getyourguideUrl: (bl.getyourguide && bl.getyourguide.url) || "",
+      showGetyourguide: bl.getyourguide && bl.getyourguide.show ? "TRUE" : "FALSE",
+      viatorUrl: (bl.viator && bl.viator.url) || "",
+      showViator: bl.viator && bl.viator.show ? "TRUE" : "FALSE",
     };
     lines.push(EXPORT_COLUMNS.map((c) => csvEscape(values[c])).join(","));
   }
@@ -748,7 +777,7 @@ async function exportToursCsv(req, res, user) {
 
 function renderImportForm({ report = null, locationReport = null } = {}) {
   return `
-    <h1 class="page-title">Import Tours (Price, Ratings &amp; Location)</h1>
+    <h1 class="page-title">Import Tours (Price, Ratings, Location &amp; Booking Links)</h1>
     <p class="page-sub">Bulk-update real prices, ratings and map coordinates without touching code. Matches rows to tours by <strong>slug</strong> — never renames a tour or changes its Published/Draft status.</p>
 
     <div class="form-card">
@@ -777,7 +806,7 @@ function renderImportForm({ report = null, locationReport = null } = {}) {
 
     <div class="form-card">
       <h2>Columns this tool updates</h2>
-      <p style="color:var(--color-text-muted);">priceFrom, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count, location_lat, location_lng.
+      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, fareharborShortname, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
       The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
     </div>
@@ -789,6 +818,11 @@ function renderImportForm({ report = null, locationReport = null } = {}) {
 async function showImportForm(req, res, user) {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm() }));
+}
+
+/** Reads a CSV boolean cell — TRUE/true/1/yes all count as true. */
+function csvTruthy(v) {
+  return ["true", "1", "yes"].includes(String(v || "").trim().toLowerCase());
 }
 
 function numOrUndefined(v) {
@@ -886,6 +920,22 @@ async function importToursCsv(req, res, user) {
       data.location = { ...(data.location || {}), ...(lat !== undefined ? { lat } : {}), ...(lng !== undefined ? { lng } : {}) };
       changed = true;
     }
+
+    const fareharborShortname = (csvRow.fareharborShortname || "").trim();
+    if (fareharborShortname) { data.fareharborShortname = fareharborShortname; changed = true; }
+
+    const blImport = { ...(data.bookingLinks || {}) };
+    if (csvRow.showFareharbor !== undefined && csvRow.showFareharbor !== "") {
+      blImport.fareharbor = { ...(blImport.fareharbor || {}), show: csvTruthy(csvRow.showFareharbor) };
+      changed = true;
+    }
+    [["tripadvisor", "Tripadvisor"], ["getyourguide", "Getyourguide"], ["viator", "Viator"]].forEach(([key, label]) => {
+      const url = (csvRow[`${key}Url`] || "").trim();
+      const showCell = csvRow[`show${label}`];
+      if (url) { blImport[key] = { ...(blImport[key] || {}), url }; changed = true; }
+      if (showCell !== undefined && showCell !== "") { blImport[key] = { ...(blImport[key] || {}), show: csvTruthy(showCell) }; changed = true; }
+    });
+    data.bookingLinks = blImport;
 
     if (!changed) { unchanged++; continue; }
 
