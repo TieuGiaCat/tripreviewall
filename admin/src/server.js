@@ -23,6 +23,7 @@ const clickTrackingRoute = require("./routes/clickTrackingRoute");
 const categoriesRoutes = require("./routes/categoriesRoutes");
 const rssRoute = require("./routes/rssRoute");
 const auditLogRoutes = require("./routes/auditLogRoutes");
+const pageSeoRoutes = require("./routes/pageSeoRoutes");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -368,6 +369,24 @@ const server = http.createServer(async (req, res) => {
     // ---- Audit Log ----
     if (method === "GET" && pathname === "/admin/audit-log") {
       return auditLogRoutes.showAuditLog(req, res, session, urlObj);
+    }
+
+    // ---- Page SEO ----
+    if (method === "GET" && pathname === "/admin/page-seo") {
+      return pageSeoRoutes.showPageSeoList(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/page-seo/new") {
+      return pageSeoRoutes.createPageSeo(req, res, session);
+    }
+    const pageSeoEditMatch = pathname.match(/^\/admin\/page-seo\/([^/]+)\/edit$/);
+    if (pageSeoEditMatch) {
+      const pageKey = decodeURIComponent(pageSeoEditMatch[1]);
+      if (method === "GET") return pageSeoRoutes.editPageSeoForm(req, res, session, pageKey);
+      if (method === "POST") return pageSeoRoutes.updatePageSeo(req, res, session, pageKey);
+    }
+    const pageSeoDeleteMatch = pathname.match(/^\/admin\/page-seo\/([^/]+)\/delete$/);
+    if (pageSeoDeleteMatch && method === "POST") {
+      return pageSeoRoutes.deletePageSeo(req, res, session, decodeURIComponent(pageSeoDeleteMatch[1]));
     }
 
     // ---- 404 ----

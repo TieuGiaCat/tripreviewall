@@ -6,6 +6,7 @@ const { renderTourPageHtml } = require("./tourTemplate");
 const { renderPostPageHtml } = require("./postTemplate");
 const { renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS } = require("./listingTemplates");
 const { renderHomeHtml } = require("./homeTemplate");
+const { applyAllPageSeoOverrides } = require("../lib/pageSeo");
 
 const SITE_ROOT = process.env.SITE_ROOT || path.join(__dirname, "..", "..", "..", "site-not-configured");
 const TOURS_DIR = path.join(SITE_ROOT, "tours");
@@ -206,6 +207,8 @@ async function regenerateListingPages() {
       const html = await injectTracking(renderIslandPageHtml(isl.slug, allTours, allPosts, destinationsBySlug[isl.slug]));
       fs.writeFileSync(path.join(SITE_ROOT, "destinations", `${isl.slug}.html`), html, "utf8");
     }
+
+    await applyAllPageSeoOverrides();
   } catch (err) {
     console.error("[ssr] regenerateListingPages failed:", err.message);
   }

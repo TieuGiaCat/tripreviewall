@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { key: "analytics", label: "Analytics", href: "/admin/analytics" },
   { key: "users", label: "Users", href: "/admin/users" },
   { key: "audit-log", label: "Audit Log", href: "/admin/audit-log" },
+  { key: "page-seo", label: "Page SEO", href: "/admin/page-seo" },
 ];
 
 function layout({ title, activeNav, user, body, extraHead, extraScripts }) {

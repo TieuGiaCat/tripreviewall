@@ -218,4 +218,21 @@ CREATE TABLE IF NOT EXISTS audit_log (
 CREATE INDEX IF NOT EXISTS idx_audit_log_created_at ON audit_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_audit_log_target_type ON audit_log(target_type);
 
+-- ---------------------------------------------------------------
+-- page_seo  (Meta Title/Description overrides for standalone pages —
+-- Home, Contact, Transportation, and any other static page the admin
+-- registers. Applied directly onto the file at file_path via
+-- src/lib/pageSeo.js, since these pages aren't individually
+-- database-driven the way Tours/Posts are.)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS page_seo (
+  page_key TEXT PRIMARY KEY,
+  label TEXT NOT NULL,
+  file_path TEXT NOT NULL,
+  meta_title TEXT,
+  meta_description TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+
 

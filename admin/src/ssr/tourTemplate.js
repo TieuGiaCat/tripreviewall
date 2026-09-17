@@ -183,7 +183,8 @@ function jsonLd(tour) {
  */
 function renderTourPageHtml(tour, similarTours) {
   const canonical = `${SITE_URL}/tours/${tour.slug}`;
-  const metaDesc = (tour.fullDescription || `Honest review of ${tour.title}.`).slice(0, 155);
+  const pageTitle = tour.metaTitle || `${tour.title} — ${tour.company}`;
+  const metaDesc = (tour.metaDescription || tour.fullDescription || `Honest review of ${tour.title}.`).slice(0, 155);
   const heroImg = tour.gallery && tour.gallery[0];
 
   return `<!DOCTYPE html>
@@ -191,17 +192,17 @@ function renderTourPageHtml(tour, similarTours) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(tour.title)} — ${esc(tour.company)} | Tripreviewall</title>
+<title>${esc(pageTitle)} | Tripreviewall</title>
 <meta name="description" content="${esc(metaDesc)}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="${esc(tour.title)} — Tripreviewall">
+<meta property="og:title" content="${esc(pageTitle)} — Tripreviewall">
 <meta property="og:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta property="og:image" content="${SITE_URL}${heroImg}">` : ""}
 <meta property="og:url" content="${canonical}">
 <meta property="og:site_name" content="Tripreviewall">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(tour.title)} — Tripreviewall">
+<meta name="twitter:title" content="${esc(pageTitle)} — Tripreviewall">
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
 ${jsonLd(tour)}

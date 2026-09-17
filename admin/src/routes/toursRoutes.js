@@ -224,6 +224,10 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         <div class="form-row full">
           <div class="form-field"><label>Full Description</label><textarea name="fullDescription" style="min-height:140px;">${esc(d.fullDescription || "")}</textarea></div>
         </div>
+        <div class="form-row">
+          <div class="form-field"><label>Meta Title (optional — falls back to Tour Name + Company)</label><input type="text" name="metaTitle" value="${esc(d.metaTitle || "")}" maxlength="70"></div>
+          <div class="form-field"><label>Meta Description (optional — falls back to Full Description)</label><input type="text" name="metaDescription" value="${esc(d.metaDescription || "")}" maxlength="160"></div>
+        </div>
       </div>
 
       <div class="form-card">
@@ -322,6 +326,8 @@ function bodyToTourData(body, existingData = {}) {
     fareharborItemId: (body.fareharborItemId || "").trim() || null,
     highlights: linesToArray(body.highlights),
     fullDescription: (body.fullDescription || "").trim(),
+    metaTitle: (body.metaTitle || "").trim() || null,
+    metaDescription: (body.metaDescription || "").trim() || null,
     verdict: {
       headline: (body.verdictHeadline || "").trim(),
       goodFor: linesToArray(body.verdictGoodFor),

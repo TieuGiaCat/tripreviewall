@@ -19,6 +19,8 @@ function toPublicShape(row) {
     duration: d.durationLabel || "—",
     highlights: d.highlights || [],
     fullDescription: d.fullDescription || "",
+    metaTitle: d.metaTitle || "",
+    metaDescription: d.metaDescription || "",
     verdict: d.verdict || {},
     googleSnapshot: d.googleSnapshot || {},
     variants: d.variants || [],
