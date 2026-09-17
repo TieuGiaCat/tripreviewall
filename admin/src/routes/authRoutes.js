@@ -111,7 +111,7 @@ async function handleLoginPost(req, res) {
 
   clearLoginAttempts(ip);
 
-  const token = createSession({
+  const token = await createSession({
     id: row.id,
     email: row.email,
     role: row.role,
@@ -139,7 +139,7 @@ async function handleLoginPost(req, res) {
 async function handleLogout(req, res) {
   const cookies = parseCookies(req);
   const token = cookies[SESSION_COOKIE_NAME];
-  if (token) destroySession(token);
+  if (token) await destroySession(token);
 
   res.writeHead(302, {
     Location: "/admin/login",

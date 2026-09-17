@@ -180,3 +180,22 @@ CREATE TABLE IF NOT EXISTS categories (
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- ---------------------------------------------------------------
+-- admin_sessions  (DB-backed login sessions — survive `pm2 restart`
+-- and would work across multiple app processes, unlike the old
+-- in-memory Map. Row per active session; expired rows are swept
+-- periodically by the app and also filtered out on every read.)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS admin_sessions (
+  token TEXT PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  role TEXT NOT NULL,
+  name TEXT,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires_at ON admin_sessions(expires_at);
+

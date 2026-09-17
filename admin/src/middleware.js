@@ -6,10 +6,10 @@ const { SESSION_COOKIE_NAME, getSession } = require("./auth");
  * Does not redirect — callers decide what to do with a missing session
  * (route handlers use requireAuth() below for the common case).
  */
-function getCurrentUser(req) {
+async function getCurrentUser(req) {
   const cookies = parseCookies(req);
   const token = cookies[SESSION_COOKIE_NAME];
-  return getSession(token);
+  return await getSession(token);
 }
 
 /**
@@ -18,8 +18,8 @@ function getCurrentUser(req) {
  * and returns null — callers must `return` immediately when this
  * returns null so the response isn't written twice.
  */
-function requireAuth(req, res) {
-  const session = getCurrentUser(req);
+async function requireAuth(req, res) {
+  const session = await getCurrentUser(req);
   if (!session) {
     res.writeHead(302, { Location: "/admin/login" });
     res.end();

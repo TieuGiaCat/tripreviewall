@@ -150,7 +150,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ---- Everything below requires a session ----
-    const session = requireAuth(req, res);
+    const session = await requireAuth(req, res);
     if (!session) return; // requireAuth already sent the redirect response
 
     if (method === "GET" && pathname === "/admin/dashboard") {

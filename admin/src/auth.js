@@ -25,49 +25,57 @@ function verifyPassword(plain, stored) {
 }
 
 /* ============================================================
-   Sessions — in-memory Map for this MVP core.
-   NOTE: sessions are lost on server restart / do not work across
-   multiple processes (e.g. a PM2 cluster). Fine for a single-process
-   admin panel MVP; upgrade path is a `sessions` Postgres table with
-   the exact same get/set/destroy interface below, swapped in later
-   without touching any route code.
+   Sessions — stored in the admin_sessions Postgres table so they
+   survive `pm2 restart` (previously an in-memory Map, lost on every
+   restart). Same function names/shapes as before — no caller outside
+   this file needed to change beyond adding `await`.
    ============================================================ */
 
-const sessions = new Map(); // token -> { userId, email, role, name, expiresAt }
+const { query } = require("./db");
 
-function createSession(user) {
+async function createSession(user) {
   const token = crypto.randomBytes(32).toString("hex");
-  sessions.set(token, {
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    name: user.name,
-    expiresAt: Date.now() + SESSION_TTL_MS,
-  });
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+  await query(
+    `INSERT INTO admin_sessions (token, user_id, email, role, name, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6)`,
+    [token, user.id, user.email, user.role, user.name, expiresAt]
+  );
   return token;
 }
 
-function getSession(token) {
+async function getSession(token) {
   if (!token) return null;
-  const s = sessions.get(token);
-  if (!s) return null;
-  if (Date.now() > s.expiresAt) {
-    sessions.delete(token);
+  const result = await query(
+    `SELECT user_id, email, role, name, expires_at FROM admin_sessions WHERE token = $1 LIMIT 1`,
+    [token]
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  if (Date.now() > new Date(row.expires_at).getTime()) {
+    // Expired — clean it up lazily and report as logged out.
+    query(`DELETE FROM admin_sessions WHERE token = $1`, [token]).catch(() => {});
     return null;
   }
-  return s;
+  return {
+    userId: row.user_id,
+    email: row.email,
+    role: row.role,
+    name: row.name,
+    expiresAt: new Date(row.expires_at).getTime(),
+  };
 }
 
-function destroySession(token) {
-  sessions.delete(token);
+async function destroySession(token) {
+  if (!token) return;
+  await query(`DELETE FROM admin_sessions WHERE token = $1`, [token]);
 }
 
-// Periodically sweep expired sessions so the Map doesn't grow forever.
+// Periodically sweep expired session rows so the table doesn't grow forever.
 setInterval(() => {
-  const now = Date.now();
-  for (const [token, s] of sessions.entries()) {
-    if (now > s.expiresAt) sessions.delete(token);
-  }
+  query(`DELETE FROM admin_sessions WHERE expires_at < now()`).catch((err) => {
+    console.error("[auth] Failed to sweep expired sessions:", err.message);
+  });
 }, 15 * 60 * 1000).unref();
 
 module.exports = {
