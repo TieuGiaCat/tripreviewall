@@ -21,6 +21,7 @@ const usersRoutes = require("./routes/usersRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const clickTrackingRoute = require("./routes/clickTrackingRoute");
 const categoriesRoutes = require("./routes/categoriesRoutes");
+const rssRoute = require("./routes/rssRoute");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -116,6 +117,9 @@ const server = http.createServer(async (req, res) => {
     // fetches from these to render tours live from the database. ----
     if (method === "GET" && pathname === "/sitemap.xml") {
       return sitemapRoute.generateSitemap(req, res);
+    }
+    if (method === "GET" && pathname === "/rss.xml") {
+      return rssRoute.generateFeed(req, res);
     }
     if (method === "GET" && pathname === "/api/tours") {
       return publicApi.listPublishedTours(req, res);

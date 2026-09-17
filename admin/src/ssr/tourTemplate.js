@@ -147,7 +147,16 @@ function jsonLd(tour) {
       ? { "@type": "AggregateRating", ratingValue: String(tour.aggregatedRating), reviewCount: String(tour.reviewCountTotal) }
       : undefined,
   };
-  return JSON.stringify(data);
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Hawaii Tours", item: `${SITE_URL}/tours` },
+      { "@type": "ListItem", position: 3, name: tour.title },
+    ],
+  };
+  return `<script type="application/ld+json">${JSON.stringify(data)}</script>\n<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
 }
 
 /**
@@ -178,7 +187,7 @@ ${heroImg ? `<meta property="og:image" content="${SITE_URL}${heroImg}">` : ""}
 <meta name="twitter:title" content="${esc(tour.title)} — Tripreviewall">
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
-<script type="application/ld+json">${jsonLd(tour)}</script>
+${jsonLd(tour)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/tokens.css">

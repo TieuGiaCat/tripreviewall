@@ -196,6 +196,7 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
 <title>All Articles — Tripreviewall Hawaii Travel Guide</title>
 <meta name="description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
 <link rel="canonical" href="${SITE_URL}/blog">
+<link rel="alternate" type="application/rss+xml" title="Tripreviewall Blog RSS Feed" href="${SITE_URL}/rss.xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="All Articles — Tripreviewall Hawaii Travel Guide">

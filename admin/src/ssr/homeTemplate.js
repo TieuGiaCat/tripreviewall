@@ -41,6 +41,7 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
 <title>Tripreviewall — Honest Hawaii Tour Reviews</title>
 <meta name="description" content="We aggregate real Hawaii tour reviews from TripAdvisor, GetYourGuide and verified bookings — then show you the full picture, 5-star and 1-star alike.">
 <link rel="canonical" href="${SITE_URL}/">
+<link rel="alternate" type="application/rss+xml" title="Tripreviewall Blog RSS Feed" href="${SITE_URL}/rss.xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="Tripreviewall — Honest Hawaii Tour Reviews">

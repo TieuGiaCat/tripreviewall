@@ -125,6 +125,43 @@ function quillAssets(postId, initialBodyHtml) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
   }
+
+  // Quill has no native table support — register a simple custom embed
+  // block that stores the table's data as JSON on the node and renders it
+  // as plain HTML. Not editable cell-by-cell inside Quill (re-open the
+  // insert dialog to change it) — but the saved body HTML (read directly
+  // via quill.root.innerHTML on submit, never through Quill's own
+  // HTML export) contains a completely normal <table>, so it displays
+  // and reads correctly on the live article regardless of this limitation.
+  var BlockEmbed = Quill.import('blots/block/embed');
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function buildComparisonTableHtml(value) {
+    var headHtml = '<tr>' + value.headers.map(function (h) { return '<th>' + escHtml(h) + '</th>'; }).join('') + '</tr>';
+    var bodyHtml = value.rows.map(function (row) {
+      return '<tr>' + row.map(function (cell) { return '<td>' + escHtml(cell) + '</td>'; }).join('') + '</tr>';
+    }).join('');
+    return '<table class="comparison-table"><thead>' + headHtml + '</thead><tbody>' + bodyHtml + '</tbody></table>';
+  }
+  class ComparisonTableBlot extends BlockEmbed {
+    static create(value) {
+      var node = super.create();
+      node.setAttribute('contenteditable', 'false');
+      node.setAttribute('data-table-json', JSON.stringify(value));
+      node.innerHTML = buildComparisonTableHtml(value);
+      return node;
+    }
+    static value(node) {
+      try { return JSON.parse(node.getAttribute('data-table-json')); } catch (e) { return null; }
+    }
+  }
+  ComparisonTableBlot.blotName = 'comparisonTable';
+  ComparisonTableBlot.tagName = 'div';
+  ComparisonTableBlot.className = 'ql-comparison-table-wrapper';
+  Quill.register(ComparisonTableBlot);
+  Quill.import('ui/icons').comparisonTable = '&#9638;';
+
   var quill = new Quill('#quill-editor', {
     theme: 'snow',
     modules: {
@@ -134,6 +171,7 @@ function quillAssets(postId, initialBodyHtml) {
         [{ header: [2, 3, false] }],
         [{ list: 'ordered' }, { list: 'bullet' }],
         ['link', 'image'],
+        ['comparisonTable'],
         ['clean']
       ]
     }
@@ -175,6 +213,25 @@ function quillAssets(postId, initialBodyHtml) {
         })
         .catch(function () { alert('Upload failed — check your connection and try again.'); });
     };
+  });
+
+  quill.getModule('toolbar').addHandler('comparisonTable', function () {
+    var input = prompt(
+      'Enter table data.\\n\\nFirst line = column headers. Then one row per line.\\nSeparate columns with a | character.\\n\\nExample:\\nFeature | Option A | Option B\\nPrice | $50 | $75\\nDuration | 2 hours | 4 hours',
+      'Feature | Option A | Option B\\n | | '
+    );
+    if (!input) return;
+    var lines = input.split('\\n')
+      .map(function (l) { return l.split('|').map(function (c) { return c.trim(); }); })
+      .filter(function (l) { return l.length > 0 && l.some(function (c) { return c !== ''; }); });
+    if (lines.length < 2) {
+      alert('Need at least a header row and one data row.');
+      return;
+    }
+    var value = { headers: lines[0], rows: lines.slice(1) };
+    var range = quill.getSelection(true) || { index: quill.getLength() };
+    quill.insertEmbed(range.index, 'comparisonTable', value, 'user');
+    quill.setSelection(range.index + 1);
   });
 
   var form = document.getElementById('quill-editor').closest('form');

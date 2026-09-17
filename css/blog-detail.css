@@ -100,3 +100,9 @@
 .sidebar-affiliate-bullets li { display: flex; align-items: center; gap: 6px; }
 .sidebar-affiliate-bullets svg { width: 14px; height: 14px; color: var(--color-primary); }
 .sidebar-affiliate-price { font-weight: 700; font-size: var(--text-h4); margin: 8px 0 12px; }
+
+/* Comparison table (inserted via the "Insert Comparison Table" Quill button) */
+.article-prose .comparison-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: var(--text-body-sm, 14px); }
+.article-prose .comparison-table th, .article-prose .comparison-table td { border: 1px solid var(--color-border); padding: 10px 14px; text-align: left; }
+.article-prose .comparison-table th { background: var(--color-bg-alt); font-weight: 700; }
+.article-prose .comparison-table tbody tr:nth-child(even) { background: var(--color-bg-alt); }
