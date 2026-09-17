@@ -118,7 +118,7 @@ function trackingUrl(tourSlug, platform, realUrl) {
 function bookingSidebarHtml(tour) {
   const bl = tour.bookingLinks || {};
   const showFareharbor = !bl.fareharbor || bl.fareharbor.show !== false;
-  const fareharborLink = tour.fareharborShortname ? `https://fareharbor.com/embeds/book/${tour.fareharborShortname}/` : null;
+  const fareharborLink = tour.fareharborRegularLink || null;
 
   const platforms = [
     { key: "tripadvisor", label: "TripAdvisor" },
@@ -136,11 +136,11 @@ function bookingSidebarHtml(tour) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           Real-time availability via FareHarbor
         </div>
-        ${showFareharbor && fareharborLink ? `<a href="${esc(trackingUrl(tour.slug, "fareharbor", fareharborLink))}" class="btn btn-primary btn-full" target="_blank" rel="noopener sponsored">Check Availability</a>
+        ${showFareharbor && fareharborLink ? `<a href="${esc(fareharborLink)}" class="btn btn-primary btn-full" target="_blank" rel="noopener sponsored" onclick="navigator.sendBeacon && navigator.sendBeacon('/api/log-click?tour=${encodeURIComponent(tour.slug)}&platform=fareharbor')">Check Availability</a>
         <p style="font-size:var(--text-meta);color:var(--color-text-muted);margin:10px 0 0;">This is the tour operator's own booking system — no third-party markup.</p>` : ""}
         <div class="booking-widget-frame">
           <h4>Select a date</h4>
-          <div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>
+          ${tour.fareharborCalendarScript ? tour.fareharborCalendarScript : `<div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>`}
         </div>
         ${enabled.length > 0 ? `
         <div class="booking-secondary-label">Also available on</div>
@@ -210,6 +210,7 @@ ${jsonLd(tour)}
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/tour-detail.css">
+${tour.fareharborRegularLink ? `<script src="https://fareharbor.com/embeds/api/v1/?autolightframe=yes" async></script>` : ""}
 </head>
 <body>
 
@@ -328,7 +329,7 @@ ${jsonLd(tour)}
 
 <div class="mobile-booking-bar" id="mobile-booking-bar">
   <div><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">$${tour.priceFrom}</div></div>
-  ${tour.fareharborShortname ? `<a href="${esc(trackingUrl(tour.slug, "fareharbor", `https://fareharbor.com/embeds/book/${tour.fareharborShortname}/`))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">Check Availability</a>` : ""}
+  ${tour.fareharborRegularLink ? `<a href="${esc(tour.fareharborRegularLink)}" class="btn btn-primary" target="_blank" rel="noopener sponsored" onclick="navigator.sendBeacon && navigator.sendBeacon('/api/log-click?tour=${encodeURIComponent(tour.slug)}&platform=fareharbor')">Check Availability</a>` : ""}
 </div>
 
 <footer class="site-footer">

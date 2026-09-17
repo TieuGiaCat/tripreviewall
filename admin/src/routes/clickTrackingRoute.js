@@ -52,4 +52,32 @@ async function trackClick(req, res, urlObj) {
   res.end();
 }
 
-module.exports = { trackClick };
+/**
+ * POST /api/log-click?tour=<slug>&platform=fareharbor
+ * Public, unauthenticated, fire-and-forget (called via navigator.sendBeacon
+ * from the client). Logs the click WITHOUT redirecting — used only for the
+ * FareHarbor "Check Availability" button, whose href must point directly at
+ * fareharbor.com (not through our redirect) so FareHarbor's own lightframe
+ * script recognizes and intercepts the click to show the booking iframe.
+ */
+async function logClick(req, res, urlObj) {
+  const tourSlug = (urlObj.searchParams.get("tour") || "").slice(0, 200) || null;
+  const platform = urlObj.searchParams.get("platform") || "";
+
+  if (!PLATFORMS.has(platform)) {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  try {
+    await query(`INSERT INTO click_logs (tour_slug, platform) VALUES ($1, $2)`, [tourSlug, platform]);
+  } catch (err) {
+    console.error("[click-tracking] failed to log click:", err.message);
+  }
+
+  res.writeHead(204);
+  res.end();
+}
+
+module.exports = { trackClick, logClick };

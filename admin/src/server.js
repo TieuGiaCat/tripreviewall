@@ -145,6 +145,9 @@ const server = http.createServer(async (req, res) => {
     if (method === "GET" && pathname === "/api/track-click") {
       return clickTrackingRoute.trackClick(req, res, urlObj);
     }
+    if (method === "POST" && pathname === "/api/log-click") {
+      return clickTrackingRoute.logClick(req, res, urlObj);
+    }
 
     // ---- Everything below requires a session ----
     const session = requireAuth(req, res);

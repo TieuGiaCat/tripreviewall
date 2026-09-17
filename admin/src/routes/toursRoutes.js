@@ -173,13 +173,16 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
 
       <div class="form-card">
         <h2>Booking Links</h2>
-        <p class="hint" style="margin:-8px 0 16px;">Each toggle controls whether that button shows on the live Tour Detail page. FareHarbor uses the shortname below to build its link; the other three need a full affiliate URL from that platform's partner dashboard.</p>
+        <p class="hint" style="margin:-8px 0 16px;">Each toggle controls whether that button shows on the live Tour Detail page. FareHarbor uses the full "regular_link" URL from its own partner export (not a shortname) — the other three need a full affiliate URL from that platform's partner dashboard.</p>
 
         <div class="form-row">
-          <div class="form-field"><label>FareHarbor Shortname</label><input type="text" name="fareharborShortname" value="${esc(d.fareharborShortname || "")}"></div>
+          <div class="form-field"><label>FareHarbor Regular Link</label><input type="text" name="fareharborRegularLink" value="${esc(d.fareharborRegularLink || "")}" placeholder="https://fareharbor.com/embeds/book/.../items/.../"></div>
           <div class="form-field">
             <label><input type="checkbox" name="showFareharbor" value="1" ${bl.fareharbor && bl.fareharbor.show === false ? "" : "checked"}> Show FareHarbor button</label>
           </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-field"><label>FareHarbor Calendar Script</label><textarea name="fareharborCalendarScript" style="min-height:80px;font-family:monospace;font-size:12px;" placeholder='&lt;script src="https://fareharbor.com/embeds/script/calendar/..."&gt;&lt;/script&gt;'>${esc(d.fareharborCalendarScript || "")}</textarea><div class="hint">Paste the "calendar_script" cell from the FareHarbor export — renders the real booking calendar on the live page.</div></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>TripAdvisor Affiliate URL</label><input type="text" name="tripadvisorUrl" value="${esc((bl.tripadvisor && bl.tripadvisor.url) || "")}" placeholder="https://..."></div>
@@ -313,7 +316,8 @@ function bodyToTourData(body, existingData = {}) {
     city: (body.city || "").trim(),
     tourType: (body.tourType || "").trim(),
     durationLabel: (body.durationLabel || "").trim(),
-    fareharborShortname: (body.fareharborShortname || "").trim(),
+    fareharborRegularLink: (body.fareharborRegularLink || "").trim(),
+    fareharborCalendarScript: (body.fareharborCalendarScript || "").trim(),
     fareharborItemId: (body.fareharborItemId || "").trim() || null,
     highlights: linesToArray(body.highlights),
     fullDescription: (body.fullDescription || "").trim(),
@@ -653,20 +657,25 @@ async function removeTourImage(req, res, user, id) {
 
 /**
  * Handles a raw FareHarbor partner export uploaded directly (columns:
- * item_id, location_lat, location_long, ...). Matches item_id against each
- * tour's stored variants[].fareharborItemId and sets tour.data.location.
+ * item_id, location_lat, location_long, regular_link, calendar_script, ...).
+ * Matches item_id against each tour's stored variants[].fareharborItemId
+ * and sets location, the FareHarbor booking link and the calendar embed.
  * Corrects FareHarbor's own export, which has location_lat/location_long
  * swapped (confirmed against real coordinates across multiple islands).
  */
 async function applyFareharborLocationImport(csvRows) {
-  const locationByItemId = {};
+  const infoByItemId = {};
   let badRows = 0;
   for (const row of csvRows) {
     const itemId = (row.item_id || "").trim();
     const lat = Number(row.location_long);
     const lng = Number(row.location_lat);
     if (!itemId || isNaN(lat) || isNaN(lng)) { badRows++; continue; }
-    locationByItemId[itemId] = { lat, lng };
+    infoByItemId[itemId] = {
+      lat, lng,
+      regularLink: (row.regular_link || "").trim(),
+      calendarScript: (row.calendar_script || "").trim(),
+    };
   }
 
   let toursResult;
@@ -682,16 +691,18 @@ async function applyFareharborLocationImport(csvRows) {
 
   for (const tourRow of toursResult.rows) {
     const variants = (tourRow.data && tourRow.data.variants) || [];
-    let location = null;
+    let info = null;
     let matchedItemId = null;
     for (const v of variants) {
       const itemId = String(v.fareharborItemId || "").trim();
-      if (itemId && locationByItemId[itemId]) { location = locationByItemId[itemId]; matchedItemId = itemId; break; }
+      if (itemId && infoByItemId[itemId]) { info = infoByItemId[itemId]; matchedItemId = itemId; break; }
     }
-    if (!location) { noMatch++; continue; }
+    if (!info) { noMatch++; continue; }
 
-    const data = { ...(tourRow.data || {}), location };
+    const data = { ...(tourRow.data || {}), location: { lat: info.lat, lng: info.lng } };
     if (!data.fareharborItemId && matchedItemId) data.fareharborItemId = matchedItemId; // keep the new top-level field in sync going forward
+    if (info.regularLink) data.fareharborRegularLink = info.regularLink;
+    if (info.calendarScript) data.fareharborCalendarScript = info.calendarScript;
     try {
       await query("UPDATE tours SET data = $1, updated_at = now() WHERE slug = $2", [JSON.stringify(data), tourRow.slug]);
       matched++;
@@ -711,7 +722,7 @@ async function applyFareharborLocationImport(csvRows) {
   return {
     updated: matched,
     unchanged: 0,
-    notice: `Detected a FareHarbor location export — matched ${matched} tour(s) by item_id instead of slug. ${noMatch} tour(s) had no matching item_id.`,
+    notice: `Detected a raw FareHarbor export — matched ${matched} tour(s) by item_id, updating location, the FareHarbor booking link and the calendar embed. ${noMatch} tour(s) had no matching item_id.`,
     errors,
   };
 }
@@ -733,7 +744,7 @@ const EXPORT_COLUMNS = [
   "priceFrom",
   "location_lat", "location_lng",
   "fareharborItemId",
-  "fareharborShortname", "showFareharbor",
+  "fareharborRegularLink", "fareharborCalendarScript", "showFareharbor",
   "tripadvisorUrl", "showTripadvisor",
   "getyourguideUrl", "showGetyourguide",
   "viatorUrl", "showViator",
@@ -783,7 +794,8 @@ async function exportToursCsv(req, res, user) {
       viator_rating: rbs.viator ? rbs.viator.avg : "", viator_count: rbs.viator ? rbs.viator.count : "",
       location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
       fareharborItemId: d.fareharborItemId || "",
-      fareharborShortname: d.fareharborShortname || "",
+      fareharborRegularLink: d.fareharborRegularLink || "",
+      fareharborCalendarScript: d.fareharborCalendarScript || "",
       showFareharbor: bl.fareharbor && bl.fareharbor.show === false ? "FALSE" : "TRUE",
       tripadvisorUrl: (bl.tripadvisor && bl.tripadvisor.url) || "",
       showTripadvisor: bl.tripadvisor && bl.tripadvisor.show ? "TRUE" : "FALSE",
@@ -842,7 +854,7 @@ function renderImportForm({ report = null, backfillReport = null } = {}) {
 
     <div class="form-card">
       <h2>Columns this tool updates</h2>
-      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, fareharborShortname, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
+      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
       The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect. <strong>fareharborItemId is the match key</strong> — it must be present and correct for a row to update anything.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
     </div>
@@ -1005,8 +1017,10 @@ async function importToursCsv(req, res, user) {
       changed = true;
     }
 
-    const fareharborShortname = (csvRow.fareharborShortname || "").trim();
-    if (fareharborShortname) { data.fareharborShortname = fareharborShortname; changed = true; }
+    const fareharborRegularLink = (csvRow.fareharborRegularLink || "").trim();
+    if (fareharborRegularLink) { data.fareharborRegularLink = fareharborRegularLink; changed = true; }
+    const fareharborCalendarScript = (csvRow.fareharborCalendarScript || "").trim();
+    if (fareharborCalendarScript) { data.fareharborCalendarScript = fareharborCalendarScript; changed = true; }
 
     const blImport = { ...(data.bookingLinks || {}) };
     if (csvRow.showFareharbor !== undefined && csvRow.showFareharbor !== "") {
