@@ -249,7 +249,7 @@ ${FOOTER(0)}
 /* ============================================================
    /destinations
    ============================================================ */
-function renderDestinationsHubHtml(islandCounts) {
+function renderDestinationsHubHtml(islandCounts, destinationsBySlug = {}) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -282,11 +282,15 @@ ${HEADER(0)}
       <p class="page-subline">Four islands, one honest rating system. Pick an island to see every tour we track there.</p>
     </div>
     <div class="dest-grid" style="margin-bottom:96px;">
-      ${ISLANDS.map((isl) => `
-      <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${isl.gradient}">
+      ${ISLANDS.map((isl) => {
+        const heroImage = destinationsBySlug[isl.slug] && destinationsBySlug[isl.slug].heroImage;
+        const bg = heroImage ? `url('${esc(heroImage)}')` : isl.gradient;
+        return `
+      <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${bg}; background-size:cover; background-position:center;">
         <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
         <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
-      </a>`).join("")}
+      </a>`;
+      }).join("")}
     </div>
   </div>
 </main>

@@ -26,7 +26,7 @@ function blogCardHtml(p) {
     </a>`;
 }
 
-function renderHomeHtml(tours, posts, islandCounts) {
+function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
   const featured = tours
     .map((t) => ({ ...t, badge: EDITORS_PICK_SLUGS.includes(t.slug) ? "Editor's Pick" : null }))
     .sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0) || b.aggregatedRating - a.aggregatedRating)
@@ -200,11 +200,15 @@ function renderHomeHtml(tours, posts, islandCounts) {
     <div class="container">
       <div class="section-header"><h2 class="section-title">Explore by Island</h2></div>
       <div class="dest-grid">
-        ${ISLANDS.map((isl) => `
-        <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${isl.gradient}">
+        ${ISLANDS.map((isl) => {
+          const heroImage = destinationsBySlug[isl.slug] && destinationsBySlug[isl.slug].heroImage;
+          const bg = heroImage ? `url('${esc(heroImage)}')` : isl.gradient;
+          return `
+        <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${bg}; background-size:cover; background-position:center;">
           <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
           <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
-        </a>`).join("")}
+        </a>`;
+        }).join("")}
       </div>
     </div>
   </section>
