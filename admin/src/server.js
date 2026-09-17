@@ -17,6 +17,9 @@ const publicLeadRoutes = require("./routes/publicLeadRoutes");
 const destinationsRoutes = require("./routes/destinationsRoutes");
 const authorsRoutes = require("./routes/authorsRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
+const usersRoutes = require("./routes/usersRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+const clickTrackingRoute = require("./routes/clickTrackingRoute");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -133,6 +136,9 @@ const server = http.createServer(async (req, res) => {
     // validated inside the handler; never trusts the client beyond that. ----
     if (method === "POST" && pathname === "/api/leads") {
       return publicLeadRoutes.createLead(req, res);
+    }
+    if (method === "GET" && pathname === "/api/track-click") {
+      return clickTrackingRoute.trackClick(req, res, urlObj);
     }
 
     // ---- Everything below requires a session ----
@@ -286,6 +292,32 @@ const server = http.createServer(async (req, res) => {
     }
     if (method === "POST" && pathname === "/admin/media/apply") {
       return mediaRoutes.applyPickedImage(req, res, session);
+    }
+
+    // ---- Users (admin role only — enforced inside usersRoutes.js) ----
+    if (method === "GET" && pathname === "/admin/users") {
+      return usersRoutes.listUsers(req, res, session);
+    }
+    if (method === "GET" && pathname === "/admin/users/new") {
+      return usersRoutes.newUserForm(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/users/new") {
+      return usersRoutes.createUser(req, res, session);
+    }
+    const userEditMatch = pathname.match(/^\/admin\/users\/([^/]+)\/edit$/);
+    if (userEditMatch) {
+      const id = userEditMatch[1];
+      if (method === "GET") return usersRoutes.editUserForm(req, res, session, id);
+      if (method === "POST") return usersRoutes.updateUser(req, res, session, id);
+    }
+    const userDeleteMatch = pathname.match(/^\/admin\/users\/([^/]+)\/delete$/);
+    if (userDeleteMatch && method === "POST") {
+      return usersRoutes.deleteUser(req, res, session, userDeleteMatch[1]);
+    }
+
+    // ---- Analytics ----
+    if (method === "GET" && pathname === "/admin/analytics") {
+      return analyticsRoutes.showAnalytics(req, res, session);
     }
 
     // ---- 404 ----

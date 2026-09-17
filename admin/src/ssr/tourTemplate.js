@@ -94,6 +94,10 @@ function ratingsSectionHtml(tour) {
     </section>`;
 }
 
+function trackingUrl(tourSlug, platform, realUrl) {
+  return `/api/track-click?tour=${encodeURIComponent(tourSlug)}&platform=${platform}&url=${encodeURIComponent(realUrl)}`;
+}
+
 function bookingSidebarHtml(tour) {
   const bl = tour.bookingLinks || {};
   const showFareharbor = !bl.fareharbor || bl.fareharbor.show !== false;
@@ -115,7 +119,7 @@ function bookingSidebarHtml(tour) {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           Real-time availability via FareHarbor
         </div>
-        ${showFareharbor && fareharborLink ? `<a href="${esc(fareharborLink)}" class="btn btn-primary btn-full" target="_blank" rel="noopener sponsored">Check Availability</a>
+        ${showFareharbor && fareharborLink ? `<a href="${esc(trackingUrl(tour.slug, "fareharbor", fareharborLink))}" class="btn btn-primary btn-full" target="_blank" rel="noopener sponsored">Check Availability</a>
         <p style="font-size:var(--text-meta);color:var(--color-text-muted);margin:10px 0 0;">This is the tour operator's own booking system — no third-party markup.</p>` : ""}
         <div class="booking-widget-frame">
           <h4>Select a date</h4>
@@ -124,7 +128,7 @@ function bookingSidebarHtml(tour) {
         ${enabled.length > 0 ? `
         <div class="booking-secondary-label">Also available on</div>
         <div class="booking-secondary-list">
-          ${enabled.map((p) => `<a href="${esc(bl[p.key].url)}" class="btn btn-secondary btn-full" target="_blank" rel="noopener sponsored">${p.label}</a>`).join("")}
+          ${enabled.map((p) => `<a href="${esc(trackingUrl(tour.slug, p.key, bl[p.key].url))}" class="btn btn-secondary btn-full" target="_blank" rel="noopener sponsored">${p.label}</a>`).join("")}
         </div>` : ""}
         <p class="booking-disclosure">Tripreviewall may earn a commission if you book through the links above, at no extra cost to you.</p>
       </div>
@@ -295,7 +299,7 @@ ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
 
 <div class="mobile-booking-bar" id="mobile-booking-bar">
   <div><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">$${tour.priceFrom}</div></div>
-  ${tour.fareharborShortname ? `<a href="https://fareharbor.com/embeds/book/${tour.fareharborShortname}/" class="btn btn-primary" target="_blank" rel="noopener sponsored">Check Availability</a>` : ""}
+  ${tour.fareharborShortname ? `<a href="${esc(trackingUrl(tour.slug, "fareharbor", `https://fareharbor.com/embeds/book/${tour.fareharborShortname}/`))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">Check Availability</a>` : ""}
 </div>
 
 <footer class="site-footer">

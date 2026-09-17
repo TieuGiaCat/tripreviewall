@@ -155,3 +155,17 @@ CREATE TABLE IF NOT EXISTS authors (
 );
 
 CREATE INDEX IF NOT EXISTS idx_authors_status ON authors(status);
+
+-- ---------------------------------------------------------------
+-- click_logs  (affiliate booking-link clicks — Analytics module)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS click_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tour_slug TEXT,
+  platform TEXT NOT NULL CHECK (platform IN ('fareharbor', 'tripadvisor', 'getyourguide', 'viator')),
+  clicked_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_click_logs_tour_slug ON click_logs(tour_slug);
+CREATE INDEX IF NOT EXISTS idx_click_logs_platform ON click_logs(platform);
+CREATE INDEX IF NOT EXISTS idx_click_logs_clicked_at ON click_logs(clicked_at DESC);

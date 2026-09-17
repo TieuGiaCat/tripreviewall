@@ -9,11 +9,8 @@ const NAV_ITEMS = [
   { key: "authors", label: "Authors", href: "/admin/authors" },
   { key: "settings", label: "Settings", href: "/admin/settings/email" },
   { key: "media", label: "Media Library", href: "/admin/media" },
-  // Future modules — routes not built yet in this core, listed here so the
-  // sidebar shape matches master-technical-architecture.md §2 and doesn't
-  // need restructuring later. Unbuilt links intentionally point to "#".
-  { key: "analytics", label: "Analytics", href: "#" },
-  { key: "users", label: "Users", href: "#" },
+  { key: "analytics", label: "Analytics", href: "/admin/analytics" },
+  { key: "users", label: "Users", href: "/admin/users" },
 ];
 
 function layout({ title, activeNav, user, body, extraHead, extraScripts }) {
