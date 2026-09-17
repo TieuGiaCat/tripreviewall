@@ -191,6 +191,9 @@ const server = http.createServer(async (req, res) => {
     if (method === "POST" && pathname === "/admin/tours/import") {
       return toursRoutes.importToursCsv(req, res, session);
     }
+    if (method === "POST" && pathname === "/admin/tours/backfill-fareharbor-ids") {
+      return toursRoutes.backfillFareharborIds(req, res, session);
+    }
 
     // ---- Blog Posts ----
     if (method === "GET" && pathname === "/admin/posts") {

@@ -136,6 +136,12 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
     ${errors.length ? `<div class="alert alert-error">${errors.map(esc).join("<br>")}</div>` : ""}
 
     <form method="POST" action="${formAction}">
+      <div class="tab-nav" style="display:flex;gap:8px;margin-bottom:16px;">
+        <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="basics" onclick="switchTourTab('basics')" style="background:var(--color-primary,#c1440e);color:#fff;">1. Basics</button>
+        <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="content" onclick="switchTourTab('content')">2. Content &amp; Reviews</button>
+      </div>
+
+      <div class="tour-tab-panel" data-tab-panel="basics">
       <div class="form-card">
         <h2>General</h2>
         <div class="form-row">
@@ -161,6 +167,7 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         </div>
         <div class="form-row">
           <div class="form-field"><label>Price From (USD)</label><input type="number" step="1" min="0" name="priceFrom" value="${esc(tour.price_from != null ? tour.price_from : "")}"></div>
+          <div class="form-field"><label>FareHarbor Item ID</label><input type="text" name="fareharborItemId" value="${esc(d.fareharborItemId || "")}" placeholder="e.g. 115595"><div class="hint">The primary item_id for this tour — used to match FareHarbor import files.</div></div>
         </div>
       </div>
 
@@ -202,7 +209,9 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
           <div class="form-field"><label>Longitude</label><input type="text" name="locationLng" value="${esc(loc.lng != null ? loc.lng : "")}" placeholder="e.g. -157.837"></div>
         </div>
       </div>
+      </div>
 
+      <div class="tour-tab-panel" data-tab-panel="content" style="display:none;">
       <div class="form-card">
         <h2>Content</h2>
         <div class="form-row full">
@@ -256,12 +265,25 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
           <div class="form-field"><label>Last Checked Date</label><input type="date" name="googleLastChecked" value="${esc(gs.lastCheckedDate || "")}"></div>
         </div>
       </div>
+      </div>
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${isEdit ? "Save Changes" : "Create Tour"}</button>
         <a href="/admin/tours" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
+    <script>
+      function switchTourTab(tab) {
+        document.querySelectorAll('.tour-tab-panel').forEach(function (el) {
+          el.style.display = el.getAttribute('data-tab-panel') === tab ? '' : 'none';
+        });
+        document.querySelectorAll('.tour-tab-btn').forEach(function (btn) {
+          var active = btn.getAttribute('data-tab') === tab;
+          btn.style.background = active ? 'var(--color-primary, #c1440e)' : '';
+          btn.style.color = active ? '#fff' : '';
+        });
+      }
+    </script>
 
     <div class="form-card">
       <h2>Gallery</h2>
@@ -292,6 +314,7 @@ function bodyToTourData(body, existingData = {}) {
     tourType: (body.tourType || "").trim(),
     durationLabel: (body.durationLabel || "").trim(),
     fareharborShortname: (body.fareharborShortname || "").trim(),
+    fareharborItemId: (body.fareharborItemId || "").trim() || null,
     highlights: linesToArray(body.highlights),
     fullDescription: (body.fullDescription || "").trim(),
     verdict: {
@@ -660,13 +683,15 @@ async function applyFareharborLocationImport(csvRows) {
   for (const tourRow of toursResult.rows) {
     const variants = (tourRow.data && tourRow.data.variants) || [];
     let location = null;
+    let matchedItemId = null;
     for (const v of variants) {
       const itemId = String(v.fareharborItemId || "").trim();
-      if (itemId && locationByItemId[itemId]) { location = locationByItemId[itemId]; break; }
+      if (itemId && locationByItemId[itemId]) { location = locationByItemId[itemId]; matchedItemId = itemId; break; }
     }
     if (!location) { noMatch++; continue; }
 
     const data = { ...(tourRow.data || {}), location };
+    if (!data.fareharborItemId && matchedItemId) data.fareharborItemId = matchedItemId; // keep the new top-level field in sync going forward
     try {
       await query("UPDATE tours SET data = $1, updated_at = now() WHERE slug = $2", [JSON.stringify(data), tourRow.slug]);
       matched++;
@@ -693,7 +718,7 @@ async function applyFareharborLocationImport(csvRows) {
 
 module.exports = {
   listTours, newTourForm, createTour, editTourForm, updateTour, deleteTour, uploadTourImage, removeTourImage,
-  exportToursCsv, showImportForm, importToursCsv,
+  exportToursCsv, showImportForm, importToursCsv, backfillFareharborIds,
 };
 
 /* ============================================================
@@ -707,6 +732,7 @@ const EXPORT_COLUMNS = [
   "slug", "name", "island", "status", // reference only — ignored on import
   "priceFrom",
   "location_lat", "location_lng",
+  "fareharborItemId",
   "fareharborShortname", "showFareharbor",
   "tripadvisorUrl", "showTripadvisor",
   "getyourguideUrl", "showGetyourguide",
@@ -756,6 +782,7 @@ async function exportToursCsv(req, res, user) {
       getyourguide_rating: rbs.getyourguide ? rbs.getyourguide.avg : "", getyourguide_count: rbs.getyourguide ? rbs.getyourguide.count : "",
       viator_rating: rbs.viator ? rbs.viator.avg : "", viator_count: rbs.viator ? rbs.viator.count : "",
       location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
+      fareharborItemId: d.fareharborItemId || "",
       fareharborShortname: d.fareharborShortname || "",
       showFareharbor: bl.fareharbor && bl.fareharbor.show === false ? "FALSE" : "TRUE",
       tripadvisorUrl: (bl.tripadvisor && bl.tripadvisor.url) || "",
@@ -775,10 +802,19 @@ async function exportToursCsv(req, res, user) {
   res.end(lines.join("\n"));
 }
 
-function renderImportForm({ report = null, locationReport = null } = {}) {
+function renderImportForm({ report = null, backfillReport = null } = {}) {
   return `
     <h1 class="page-title">Import Tours (Price, Ratings, Location &amp; Booking Links)</h1>
-    <p class="page-sub">Bulk-update real prices, ratings and map coordinates without touching code. Matches rows to tours by <strong>slug</strong> — never renames a tour or changes its Published/Draft status.</p>
+    <p class="page-sub">Bulk-update real prices, ratings and map coordinates without touching code. Matches rows to tours by <strong>FareHarbor Item ID</strong> — never renames a tour or changes its Published/Draft status.</p>
+
+    <div class="form-card">
+      <h2>One-time: backfill FareHarbor IDs from existing variants</h2>
+      <p style="margin-bottom:12px;color:var(--color-text-muted);">Since Import now matches by FareHarbor Item ID instead of slug, run this once so your existing tours have that field filled in (copied from the item_id already stored on their first variant). Safe to run more than once — it only fills in tours that don't have a FareHarbor Item ID yet.</p>
+      ${backfillReport ? `<div class="alert alert-success">${esc(backfillReport)}</div>` : ""}
+      <form method="POST" action="/admin/tours/backfill-fareharbor-ids">
+        <button type="submit" class="btn btn-secondary">Backfill FareHarbor IDs Now</button>
+      </form>
+    </div>
 
     <div class="form-card">
       <h2>Step 1 — Export the current data</h2>
@@ -797,7 +833,7 @@ function renderImportForm({ report = null, locationReport = null } = {}) {
         </div>` : ""}
       <form method="POST" action="/admin/tours/import" enctype="multipart/form-data">
         <div class="form-field">
-          <label>CSV file (must include the "slug" column — everything else is optional)</label>
+          <label>CSV file (must include the "fareharborItemId" column — everything else is optional)</label>
           <input type="file" name="csvFile" accept=".csv" required>
         </div>
         <button type="submit" class="btn btn-primary" style="margin-top:12px;">Import</button>
@@ -807,7 +843,7 @@ function renderImportForm({ report = null, locationReport = null } = {}) {
     <div class="form-card">
       <h2>Columns this tool updates</h2>
       <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, fareharborShortname, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
-      The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect.</p>
+      The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect. <strong>fareharborItemId is the match key</strong> — it must be present and correct for a row to update anything.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
     </div>
 
@@ -816,8 +852,45 @@ function renderImportForm({ report = null, locationReport = null } = {}) {
 }
 
 async function showImportForm(req, res, user) {
+  const urlObj = new URL(req.url, "http://x");
+  const backfillReport = urlObj.searchParams.get("backfillReport") || null;
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm() }));
+  res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ backfillReport }) }));
+}
+
+/** One-click, browser-triggered migration: copies each tour's first variant's
+ * fareharborItemId up to the new top-level data.fareharborItemId field, for
+ * any tour that doesn't already have one set. Safe to run repeatedly. */
+async function backfillFareharborIds(req, res, user) {
+  let rows;
+  try {
+    const result = await query(`SELECT slug, data FROM tours`);
+    rows = result.rows;
+  } catch (err) {
+    res.writeHead(302, { Location: "/admin/tours/import?backfillReport=" + encodeURIComponent(`Database error: ${err.message}`) });
+    res.end();
+    return;
+  }
+
+  let filled = 0, alreadySet = 0, noVariants = 0;
+  for (const row of rows) {
+    const data = row.data || {};
+    if (data.fareharborItemId) { alreadySet++; continue; }
+    const variants = data.variants || [];
+    const firstWithId = variants.find((v) => v && v.fareharborItemId);
+    if (!firstWithId) { noVariants++; continue; }
+    data.fareharborItemId = String(firstWithId.fareharborItemId).trim();
+    try {
+      await query("UPDATE tours SET data = $1, updated_at = now() WHERE slug = $2", [JSON.stringify(data), row.slug]);
+      filled++;
+    } catch (err) {
+      console.error(`[backfill-fareharbor-ids] ${row.slug}: ${err.message}`);
+    }
+  }
+
+  const message = `${filled} tour(s) backfilled. ${alreadySet} already had a FareHarbor Item ID. ${noVariants} had no variants to copy from — fill those in manually.`;
+  res.writeHead(302, { Location: "/admin/tours/import?backfillReport=" + encodeURIComponent(message) });
+  res.end();
 }
 
 /** Reads a CSV boolean cell — TRUE/true/1/yes all count as true. */
@@ -872,19 +945,30 @@ async function importToursCsv(req, res, user) {
   const errors = [];
   let anyPublishedTouched = false;
 
-  for (const csvRow of csvRows) {
-    const slug = (csvRow.slug || "").trim();
-    if (!slug) { errors.push("A row had no slug — skipped."); continue; }
+  // Look tours up by fareharborItemId now (not slug) — build the lookup once.
+  let allTours;
+  try {
+    const result = await query(`SELECT slug, status, island, price_from, data FROM tours`);
+    allTours = result.rows;
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated: 0, unchanged: 0, errors: [`Database error: ${err.message}`] } }) }));
+    return;
+  }
+  const tourByFareharborId = {};
+  for (const t of allTours) {
+    const id = String((t.data && t.data.fareharborItemId) || "").trim();
+    if (id) tourByFareharborId[id] = t;
+  }
 
-    let existing;
-    try {
-      const result = await query("SELECT slug, status, island, price_from, data FROM tours WHERE slug = $1", [slug]);
-      existing = result.rows[0];
-    } catch (err) {
-      errors.push(`${slug}: database error — ${err.message}`);
-      continue;
-    }
-    if (!existing) { errors.push(`${slug}: no tour with this slug — skipped.`); continue; }
+  for (const csvRow of csvRows) {
+    const fhId = (csvRow.fareharborItemId || "").trim();
+    const rowLabel = fhId || csvRow.slug || "(blank row)";
+    if (!fhId) { errors.push(`${rowLabel}: no fareharborItemId — skipped.`); continue; }
+
+    const existing = tourByFareharborId[fhId];
+    if (!existing) { errors.push(`${fhId}: no tour with this FareHarbor Item ID — skipped.`); continue; }
+    const slug = existing.slug;
 
     const data = existing.data || {};
     let changed = false;
