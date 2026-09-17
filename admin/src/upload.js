@@ -62,4 +62,33 @@ function slugSafe(s) {
   return String(s || "item").replace(/[^a-z0-9-]/gi, "").slice(0, 60);
 }
 
-module.exports = { parseImageUpload, UPLOAD_ROOT };
+/**
+ * Reads an uploaded CSV file's text content (field name "csvFile") without
+ * permanently storing it — used by the Tours Export/Import admin feature.
+ * Returns the raw file text, or null if no file was actually uploaded.
+ */
+function parseCsvUpload(req) {
+  return new Promise((resolve, reject) => {
+    const form = formidable({ multiples: false, maxFileSize: 5 * 1024 * 1024 });
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      const file = Array.isArray(files.csvFile) ? files.csvFile[0] : files.csvFile;
+      if (!file || !file.filepath) {
+        resolve(null);
+        return;
+      }
+      try {
+        const text = fs.readFileSync(file.filepath, "utf8");
+        fs.unlink(file.filepath, () => {});
+        resolve(text);
+      } catch (readErr) {
+        reject(readErr);
+      }
+    });
+  });
+}
+
+module.exports = { parseImageUpload, parseCsvUpload, UPLOAD_ROOT };

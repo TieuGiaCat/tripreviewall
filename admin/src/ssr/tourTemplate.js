@@ -3,7 +3,24 @@ const { starsRowHtml, histogramHtml, tourCardHtml } = require("./sharedHtml");
 
 const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
 
-function mockRatingsBySource(tour) {
+function ratingsBySourceForDisplay(tour) {
+  const real = tour.ratingsBySource || {};
+  const platformMap = [
+    { key: "fareharbor", name: "FareHarbor" },
+    { key: "tripadvisor", name: "TripAdvisor" },
+    { key: "getyourguide", name: "GetYourGuide" },
+    { key: "viator", name: "Viator" },
+  ];
+  const hasAnyReal = platformMap.some((p) => real[p.key] && real[p.key].avg != null);
+  if (hasAnyReal) {
+    // Use real per-platform numbers wherever we have them; only fall back
+    // to the aggregate for a platform that hasn't been researched yet.
+    return platformMap
+      .filter((p) => real[p.key] && real[p.key].avg != null)
+      .map((p) => ({ name: p.name, avg: Number(real[p.key].avg), count: Number(real[p.key].count) || 0 }));
+  }
+  // Nothing real entered yet — fall back to the illustrative split so the
+  // page still looks complete rather than empty.
   const c = tour.reviewCountTotal || 0;
   const r = tour.aggregatedRating || 0;
   return [
@@ -69,7 +86,7 @@ function verdictHtml(v) {
 }
 
 function ratingsSectionHtml(tour) {
-  const sources = mockRatingsBySource(tour);
+  const sources = ratingsBySourceForDisplay(tour);
   const gs = tour.googleSnapshot || {};
   return `
     <section class="detail-section" id="ratings">
@@ -288,7 +305,10 @@ ${jsonLd(tour)}
 
         <section class="detail-section" id="tab-location">
           <h2 class="detail-section-title">Location</h2>
-          <div class="map-embed">Map embed placeholder</div>
+          ${tour.location && tour.location.lat != null && tour.location.lng != null
+            ? `<iframe src="https://maps.google.com/maps?q=${tour.location.lat},${tour.location.lng}&z=14&output=embed" class="map-embed" style="width:100%;height:320px;border:0;" loading="lazy" title="Map showing the approximate location of ${esc(tour.title)}"></iframe>
+               <p style="margin-top:10px;"><a href="https://www.google.com/maps?q=${tour.location.lat},${tour.location.lng}" target="_blank" rel="noopener">Open in Google Maps →</a></p>`
+            : `<div class="map-embed">Map embed placeholder</div>`}
           <p class="detail-body-text">${esc(tour.city ? tour.city + ", " : "")}${esc(tour.island)}, Hawaii</p>
           <p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>
         </section>

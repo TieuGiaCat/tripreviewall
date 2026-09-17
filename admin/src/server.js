@@ -182,6 +182,15 @@ const server = http.createServer(async (req, res) => {
     if (removeImageMatch && method === "POST") {
       return toursRoutes.removeTourImage(req, res, session, removeImageMatch[1]);
     }
+    if (method === "GET" && pathname === "/admin/tours/export") {
+      return toursRoutes.exportToursCsv(req, res, session);
+    }
+    if (method === "GET" && pathname === "/admin/tours/import") {
+      return toursRoutes.showImportForm(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/tours/import") {
+      return toursRoutes.importToursCsv(req, res, session);
+    }
 
     // ---- Blog Posts ----
     if (method === "GET" && pathname === "/admin/posts") {

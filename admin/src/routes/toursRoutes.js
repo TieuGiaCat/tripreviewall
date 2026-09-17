@@ -86,6 +86,7 @@ async function listTours(req, res, user, urlObj) {
         <button type="submit" class="btn btn-secondary">Filter</button>
       </form>
       <a href="/admin/tours/new" class="btn btn-primary">+ New Tour</a>
+      <a href="/admin/tours/import" class="btn btn-secondary">Import / Export</a>
     </div>
 
     <table class="data-table">
@@ -611,4 +612,229 @@ async function removeTourImage(req, res, user, id) {
   res.end();
 }
 
-module.exports = { listTours, newTourForm, createTour, editTourForm, updateTour, deleteTour, uploadTourImage, removeTourImage };
+module.exports = {
+  listTours, newTourForm, createTour, editTourForm, updateTour, deleteTour, uploadTourImage, removeTourImage,
+  exportToursCsv, showImportForm, importToursCsv,
+};
+
+/* ============================================================
+   Export / Import (bulk price, ratings, location — via CSV, no
+   code/SSH required). Deliberately scoped to just these numeric
+   fields, not full tour editing, to keep bulk edits low-risk.
+   ============================================================ */
+const { parseCsv } = require("../lib/csv");
+
+const EXPORT_COLUMNS = [
+  "slug", "name", "island", "status", // reference only — ignored on import
+  "priceFrom",
+  "aggregatedRating", "reviewCountTotal", "star5", "star4", "star3", "star2", "star1",
+  "fareharbor_rating", "fareharbor_count",
+  "tripadvisor_rating", "tripadvisor_count",
+  "getyourguide_rating", "getyourguide_count",
+  "viator_rating", "viator_count",
+  "location_lat", "location_lng",
+];
+const REFERENCE_ONLY_COLUMNS = new Set(["slug", "name", "island", "status"]);
+
+function csvEscape(value) {
+  const s = value === null || value === undefined ? "" : String(value);
+  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+async function exportToursCsv(req, res, user) {
+  let rows = [];
+  try {
+    const result = await query(`SELECT slug, status, island, price_from, data FROM tours ORDER BY slug ASC`);
+    rows = result.rows;
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end(`Database error: ${err.message}`);
+    return;
+  }
+
+  const lines = [EXPORT_COLUMNS.join(",")];
+  for (const row of rows) {
+    const d = row.data || {};
+    const dist = d.ratingDistribution || {};
+    const rbs = d.ratingsBySource || {};
+    const loc = d.location || {};
+    const values = {
+      slug: row.slug, name: d.name || "", island: row.island || "", status: row.status,
+      priceFrom: row.price_from != null ? row.price_from : "",
+      aggregatedRating: d.aggregatedRating != null ? d.aggregatedRating : "",
+      reviewCountTotal: d.reviewCountTotal != null ? d.reviewCountTotal : "",
+      star5: dist.star5 != null ? dist.star5 : "", star4: dist.star4 != null ? dist.star4 : "",
+      star3: dist.star3 != null ? dist.star3 : "", star2: dist.star2 != null ? dist.star2 : "",
+      star1: dist.star1 != null ? dist.star1 : "",
+      fareharbor_rating: rbs.fareharbor ? rbs.fareharbor.avg : "", fareharbor_count: rbs.fareharbor ? rbs.fareharbor.count : "",
+      tripadvisor_rating: rbs.tripadvisor ? rbs.tripadvisor.avg : "", tripadvisor_count: rbs.tripadvisor ? rbs.tripadvisor.count : "",
+      getyourguide_rating: rbs.getyourguide ? rbs.getyourguide.avg : "", getyourguide_count: rbs.getyourguide ? rbs.getyourguide.count : "",
+      viator_rating: rbs.viator ? rbs.viator.avg : "", viator_count: rbs.viator ? rbs.viator.count : "",
+      location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
+    };
+    lines.push(EXPORT_COLUMNS.map((c) => csvEscape(values[c])).join(","));
+  }
+
+  res.writeHead(200, {
+    "Content-Type": "text/csv; charset=utf-8",
+    "Content-Disposition": `attachment; filename="tours-export-${new Date().toISOString().slice(0, 10)}.csv"`,
+  });
+  res.end(lines.join("\n"));
+}
+
+function renderImportForm({ report = null } = {}) {
+  return `
+    <h1 class="page-title">Import Tours (Price, Ratings &amp; Location)</h1>
+    <p class="page-sub">Bulk-update real prices, ratings and map coordinates without touching code. Matches rows to tours by <strong>slug</strong> — never renames a tour or changes its Published/Draft status.</p>
+
+    <div class="form-card">
+      <h2>Step 1 — Export the current data</h2>
+      <p style="margin-bottom:12px;">Download every tour's current values as a spreadsheet, fill in real numbers in Excel/Google Sheets, then come back and upload it below. Leave a cell blank to keep that tour's current value unchanged.</p>
+      <a href="/admin/tours/export" class="btn btn-secondary">Download Current Data (CSV)</a>
+    </div>
+
+    <div class="form-card">
+      <h2>Step 2 — Upload your edited file</h2>
+      ${report ? `
+        <div class="alert ${report.errors.length ? "alert-error" : "alert-success"}">
+          ${report.updated} tour${report.updated === 1 ? "" : "s"} updated.
+          ${report.unchanged ? `${report.unchanged} row(s) had no changes.` : ""}
+          ${report.errors.length ? `<br>${report.errors.map(esc).join("<br>")}` : ""}
+        </div>` : ""}
+      <form method="POST" action="/admin/tours/import" enctype="multipart/form-data">
+        <div class="form-field">
+          <label>CSV file (must include the "slug" column — everything else is optional)</label>
+          <input type="file" name="csvFile" accept=".csv" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:12px;">Import</button>
+      </form>
+    </div>
+
+    <div class="form-card">
+      <h2>Columns this tool updates</h2>
+      <p style="color:var(--color-text-muted);">priceFrom, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count, location_lat, location_lng.
+      The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect.</p>
+      <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
+    </div>
+
+    <a href="/admin/tours" class="btn btn-secondary">← Back to Tours</a>
+  `;
+}
+
+async function showImportForm(req, res, user) {
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm() }));
+}
+
+function numOrUndefined(v) {
+  if (v === undefined || v === "") return undefined;
+  const n = Number(v);
+  return isNaN(n) ? undefined : n;
+}
+
+async function importToursCsv(req, res, user) {
+  const { parseCsvUpload } = require("../upload");
+
+  let csvText;
+  try {
+    csvText = await parseCsvUpload(req);
+  } catch (err) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated: 0, unchanged: 0, errors: [`Could not read the uploaded file: ${err.message}`] } }) }));
+    return;
+  }
+  if (!csvText) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated: 0, unchanged: 0, errors: ["No file was uploaded."] } }) }));
+    return;
+  }
+
+  let csvRows;
+  try {
+    csvRows = parseCsv(csvText);
+  } catch (err) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated: 0, unchanged: 0, errors: [`Could not parse this as CSV: ${err.message}`] } }) }));
+    return;
+  }
+
+  let updated = 0, unchanged = 0;
+  const errors = [];
+  let anyPublishedTouched = false;
+
+  for (const csvRow of csvRows) {
+    const slug = (csvRow.slug || "").trim();
+    if (!slug) { errors.push("A row had no slug — skipped."); continue; }
+
+    let existing;
+    try {
+      const result = await query("SELECT slug, status, island, price_from, data FROM tours WHERE slug = $1", [slug]);
+      existing = result.rows[0];
+    } catch (err) {
+      errors.push(`${slug}: database error — ${err.message}`);
+      continue;
+    }
+    if (!existing) { errors.push(`${slug}: no tour with this slug — skipped.`); continue; }
+
+    const data = existing.data || {};
+    let changed = false;
+
+    const priceFrom = numOrUndefined(csvRow.priceFrom);
+    if (priceFrom !== undefined) { changed = true; }
+    const aggregatedRating = numOrUndefined(csvRow.aggregatedRating);
+    if (aggregatedRating !== undefined) { data.aggregatedRating = aggregatedRating; changed = true; }
+    const reviewCountTotal = numOrUndefined(csvRow.reviewCountTotal);
+    if (reviewCountTotal !== undefined) { data.reviewCountTotal = reviewCountTotal; changed = true; }
+
+    const dist = { ...(data.ratingDistribution || {}) };
+    ["star5", "star4", "star3", "star2", "star1"].forEach((k) => {
+      const v = numOrUndefined(csvRow[k]);
+      if (v !== undefined) { dist[k] = v; changed = true; }
+    });
+    data.ratingDistribution = dist;
+
+    const rbs = { ...(data.ratingsBySource || {}) };
+    ["fareharbor", "tripadvisor", "getyourguide", "viator"].forEach((platform) => {
+      const avg = numOrUndefined(csvRow[`${platform}_rating`]);
+      const count = numOrUndefined(csvRow[`${platform}_count`]);
+      if (avg !== undefined || count !== undefined) {
+        rbs[platform] = { ...(rbs[platform] || {}), ...(avg !== undefined ? { avg } : {}), ...(count !== undefined ? { count } : {}) };
+        changed = true;
+      }
+    });
+    data.ratingsBySource = rbs;
+
+    const lat = numOrUndefined(csvRow.location_lat);
+    const lng = numOrUndefined(csvRow.location_lng);
+    if (lat !== undefined || lng !== undefined) {
+      data.location = { ...(data.location || {}), ...(lat !== undefined ? { lat } : {}), ...(lng !== undefined ? { lng } : {}) };
+      changed = true;
+    }
+
+    if (!changed) { unchanged++; continue; }
+
+    try {
+      await query(
+        priceFrom !== undefined
+          ? "UPDATE tours SET data = $1, price_from = $2, updated_at = now() WHERE slug = $3"
+          : "UPDATE tours SET data = $1, updated_at = now() WHERE slug = $2",
+        priceFrom !== undefined ? [JSON.stringify(data), priceFrom, slug] : [JSON.stringify(data), slug]
+      );
+      updated++;
+      if (existing.status === "published") {
+        anyPublishedTouched = true;
+        await generateTourFile({ slug: existing.slug, status: existing.status, island: existing.island, price_from: priceFrom !== undefined ? priceFrom : existing.price_from, data });
+      }
+    } catch (err) {
+      errors.push(`${slug}: failed to save — ${err.message}`);
+    }
+  }
+
+  if (anyPublishedTouched) {
+    try { await regenerateListingPages(); } catch (err) { errors.push(`Listing pages regeneration failed: ${err.message}`); }
+  }
+
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated, unchanged, errors } }) }));
+}
