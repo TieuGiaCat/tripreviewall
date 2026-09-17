@@ -20,6 +20,7 @@ const mediaRoutes = require("./routes/mediaRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const clickTrackingRoute = require("./routes/clickTrackingRoute");
+const categoriesRoutes = require("./routes/categoriesRoutes");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -205,6 +206,27 @@ const server = http.createServer(async (req, res) => {
     const postInlineUploadMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/upload-inline-image$/);
     if (postInlineUploadMatch && method === "POST") {
       return blogRoutes.uploadInlineImage(req, res, session, postInlineUploadMatch[1]);
+    }
+
+    // ---- Categories (Blog Posts sub-page) ----
+    if (method === "GET" && pathname === "/admin/categories") {
+      return categoriesRoutes.listCategories(req, res, session);
+    }
+    if (method === "GET" && pathname === "/admin/categories/new") {
+      return categoriesRoutes.newCategoryForm(req, res, session);
+    }
+    if (method === "POST" && pathname === "/admin/categories/new") {
+      return categoriesRoutes.createCategory(req, res, session);
+    }
+    const catEditMatch = pathname.match(/^\/admin\/categories\/([^/]+)\/edit$/);
+    if (catEditMatch) {
+      const id = catEditMatch[1];
+      if (method === "GET") return categoriesRoutes.editCategoryForm(req, res, session, id);
+      if (method === "POST") return categoriesRoutes.updateCategory(req, res, session, id);
+    }
+    const catDeleteMatch = pathname.match(/^\/admin\/categories\/([^/]+)\/delete$/);
+    if (catDeleteMatch && method === "POST") {
+      return categoriesRoutes.deleteCategory(req, res, session, catDeleteMatch[1]);
     }
 
     // ---- Leads ----

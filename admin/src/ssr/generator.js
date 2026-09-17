@@ -111,7 +111,14 @@ async function generatePostFile(postRow) {
     if (post.authorSlug) {
       try {
         const result = await query(`SELECT slug, data FROM authors WHERE slug = $1 LIMIT 1`, [post.authorSlug]);
-        if (result.rows[0]) author = { slug: result.rows[0].slug, ...(result.rows[0].data || {}) };
+        if (result.rows[0]) {
+          author = { slug: result.rows[0].slug, ...(result.rows[0].data || {}) };
+          const countResult = await query(
+            `SELECT count(*)::int AS n FROM posts WHERE status = 'published' AND data->>'authorSlug' = $1`,
+            [post.authorSlug]
+          );
+          author.postCount = countResult.rows[0].n;
+        }
       } catch (err) {
         console.error("[ssr] Could not load author:", err.message);
       }
@@ -119,10 +126,16 @@ async function generatePostFile(postRow) {
 
     let relatedPosts = [];
     try {
+      // Smarter than plain "most recent": same category + same island tag
+      // scores highest, then same category, then same island, then just
+      // recency as the fallback — so "Read Next" actually relates.
       const result = await query(
-        `SELECT slug, category, island_tag, content_format, published_at, updated_at, data
-         FROM posts WHERE status = 'published' AND slug != $1 ORDER BY updated_at DESC LIMIT 3`,
-        [postRow.slug]
+        `SELECT slug, category, island_tag, content_format, published_at, updated_at, data,
+           (CASE WHEN category = $2 AND category IS NOT NULL THEN 2 ELSE 0 END +
+            CASE WHEN island_tag = $3 AND island_tag IS NOT NULL THEN 1 ELSE 0 END) AS relevance
+         FROM posts WHERE status = 'published' AND slug != $1
+         ORDER BY relevance DESC, updated_at DESC LIMIT 3`,
+        [postRow.slug, postRow.category, postRow.island_tag]
       );
       relatedPosts = result.rows.map(toPostPublicShape);
     } catch (err) {
@@ -186,7 +199,7 @@ async function regenerateListingPages() {
     }
 
     fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), await injectTracking(renderToursIndexHtml(allTours)), "utf8");
-    fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts)), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts, allPosts.filter((p) => p.featuredPillar))), "utf8");
     fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), await injectTracking(renderDestinationsHubHtml(islandCounts, destinationsBySlug)), "utf8");
     fs.writeFileSync(path.join(SITE_ROOT, "index.html"), await injectTracking(renderHomeHtml(allTours, allPosts, islandCounts, destinationsBySlug)), "utf8");
     for (const isl of ISLANDS) {

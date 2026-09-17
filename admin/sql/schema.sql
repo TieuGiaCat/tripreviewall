@@ -169,3 +169,14 @@ CREATE TABLE IF NOT EXISTS click_logs (
 CREATE INDEX IF NOT EXISTS idx_click_logs_tour_slug ON click_logs(tour_slug);
 CREATE INDEX IF NOT EXISTS idx_click_logs_platform ON click_logs(platform);
 CREATE INDEX IF NOT EXISTS idx_click_logs_clicked_at ON click_logs(clicked_at DESC);
+
+-- ---------------------------------------------------------------
+-- categories  (Blog Post categories — editable list, replaces the
+-- hardcoded 5-category array)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

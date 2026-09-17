@@ -176,8 +176,17 @@ function blogCardHtml(p, prefix) {
     </a>`;
 }
 
-function renderBlogIndexHtml(posts) {
+function renderBlogIndexHtml(posts, pillarPosts = []) {
   const sorted = [...posts].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const pillarCards = pillarPosts
+    .map((p) => `
+      <a class="pillar-card" href="/blog/${esc(p.slug)}">
+        <div class="pillar-card-img" style="background-image:${p.featuredImage ? `url('${esc(p.featuredImage)}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};"></div>
+        <div class="pillar-card-title">${esc(p.title)}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>
+      </a>`)
+    .join("");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -214,10 +223,10 @@ ${HEADER(0)}
     <p class="page-subline">Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.</p>
   </div>
 
-  <div class="pillar-band" id="pillar-band" style="display:none;" aria-label="Island and topic guides">
+  <div class="pillar-band" id="pillar-band"${pillarCards ? "" : ' style="display:none;"'} aria-label="Island and topic guides">
     <div class="container">
       <div class="pillar-eyebrow">Start Here: Island &amp; Topic Guides</div>
-      <div class="pillar-row" id="pillar-row"></div>
+      <div class="pillar-row" id="pillar-row">${pillarCards}</div>
     </div>
   </div>
 

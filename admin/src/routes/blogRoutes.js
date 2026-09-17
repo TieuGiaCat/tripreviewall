@@ -3,8 +3,8 @@ const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { generatePostFile, removePostFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 const { listActiveAuthorsForDropdown } = require("./authorsRoutes");
+const { listActiveCategoryNames } = require("./categoriesRoutes");
 
-const CATEGORIES = ["Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
 const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
 const FORMATS = ["listicle", "comparison", "deep_dive_review", "honest_take"];
 
@@ -88,6 +88,7 @@ async function listPosts(req, res, user, urlObj) {
         <button type="submit" class="btn btn-secondary">Filter</button>
       </form>
       <a href="/admin/posts/new" class="btn btn-primary">+ New Post</a>
+      <a href="/admin/categories" class="btn btn-secondary">Manage Categories</a>
     </div>
 
     <table class="data-table">
@@ -162,6 +163,12 @@ function quillAssets(postId, initialBodyHtml) {
             var range = quill.getSelection(true) || { index: quill.getLength() };
             quill.insertEmbed(range.index, 'image', data.url);
             quill.setSelection(range.index + 1);
+            var altText = prompt('Alt text for this image (describe it for SEO and screen readers):', '');
+            if (altText) {
+              var imgs = quill.root.querySelectorAll('img[src="' + data.url + '"]');
+              var justInserted = imgs[imgs.length - 1];
+              if (justInserted) justInserted.setAttribute('alt', altText);
+            }
           } else {
             alert('Upload failed: ' + (data.error || 'unknown error'));
           }
@@ -179,10 +186,10 @@ function quillAssets(postId, initialBodyHtml) {
   return { head, scripts };
 }
 
-function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [] }) {
+function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [], categoriesList = [] }) {
   const d = post.data || {};
 
-  const categoryOptions = CATEGORIES.map(
+  const categoryOptions = categoriesList.map(
     (c) => `<option value="${esc(c)}" ${post.category === c ? "selected" : ""}>${esc(c)}</option>`
   ).join("");
   const islandOptions = ISLANDS.map(
@@ -206,7 +213,7 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
           <div class="form-field"><label>Slug</label><input type="text" name="slug" value="${esc(post.slug || "")}"><div class="hint">Leave blank on create to auto-generate from the title.</div></div>
         </div>
         <div class="form-row">
-          <div class="form-field"><label>Category</label><select name="category"><option value="">— Select —</option>${categoryOptions}</select></div>
+          <div class="form-field"><label>Category</label><select name="category"><option value="">— Select —</option>${categoryOptions}</select><div class="hint"><a href="/admin/categories" target="_blank">Manage categories →</a></div></div>
           <div class="form-field"><label>Island Tag (optional)</label><select name="islandTag">${islandOptions}</select></div>
         </div>
         <div class="form-row">
@@ -231,6 +238,23 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
         </div>
         <div class="form-row">
           <div class="form-field"><label>Read Time (minutes)</label><input type="number" min="1" name="readTimeMinutes" value="${esc(d.readTimeMinutes != null ? d.readTimeMinutes : "")}"></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>SEO</h2>
+        <div class="form-row">
+          <div class="form-field"><label>Meta Title (optional — falls back to Title above)</label><input type="text" name="metaTitle" value="${esc(d.metaTitle || "")}" maxlength="70"></div>
+          <div class="form-field"><label>Meta Description (optional — falls back to Excerpt below)</label><input type="text" name="metaDescription" value="${esc(d.metaDescription || "")}" maxlength="160"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Canonical URL Override (optional — leave blank unless this content is duplicated elsewhere)</label><input type="text" name="canonicalUrl" value="${esc(d.canonicalUrl || "")}" placeholder="https://tripreviewall.com/blog/..."></div>
+          <div class="form-field">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:600;">
+              <input type="checkbox" name="featuredPillar" value="1" ${d.featuredPillar ? "checked" : ""} style="width:auto;">
+              Featured Pillar (show in the "Start Here" band on the Blog page)
+            </label>
+          </div>
         </div>
       </div>
 
@@ -300,6 +324,10 @@ function bodyToPostData(body, existingData = {}) {
     tags: (body.tags || "").split(",").map((t) => t.trim()).filter(Boolean),
     disclosureText: (body.disclosureText || "").trim(),
     relatedTourSlug: (body.relatedTourSlug || "").trim(),
+    metaTitle: (body.metaTitle || "").trim() || null,
+    metaDescription: (body.metaDescription || "").trim() || null,
+    canonicalUrl: (body.canonicalUrl || "").trim() || null,
+    featuredPillar: body.featuredPillar === "1",
     // Not edited by this form — preserved so uploading a featured image
     // never gets wiped out by an unrelated content edit.
     featuredImage: existingData.featuredImage || null,
@@ -311,20 +339,22 @@ function bodyToPostData(body, existingData = {}) {
    ============================================================ */
 async function newPostForm(req, res, user) {
   const authorsList = await listActiveAuthorsForDropdown();
+  const categoriesList = await listActiveCategoryNames();
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   const qa = quillAssets(null, "");
-  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, authorsList }), extraHead: qa.head, extraScripts: qa.scripts }));
+  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, authorsList, categoriesList }), extraHead: qa.head, extraScripts: qa.scripts }));
 }
 
 async function createPost(req, res, user) {
   const authorsList = await listActiveAuthorsForDropdown();
+  const categoriesList = await listActiveCategoryNames();
   let body;
   try {
     body = await readFormBody(req);
   } catch (err) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     const qa0 = quillAssets(null, "");
-    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."], authorsList }), extraHead: qa0.head, extraScripts: qa0.scripts }));
+    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."], authorsList, categoriesList }), extraHead: qa0.head, extraScripts: qa0.scripts }));
     return;
   }
 
@@ -336,7 +366,7 @@ async function createPost(req, res, user) {
 
   const data = bodyToPostData(body);
   const status = body.status === "published" ? "published" : "draft";
-  const category = CATEGORIES.includes(body.category) ? body.category : null;
+  const category = (body.category || "").trim() || null;
   const islandTag = ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null;
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
 
@@ -348,7 +378,7 @@ async function createPost(req, res, user) {
         title: "New Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: "/admin/posts/new", isEdit: false, authorsList }),
+        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: "/admin/posts/new", isEdit: false, authorsList, categoriesList }),
         extraHead: qa1.head,
         extraScripts: qa1.scripts,
       })
@@ -376,7 +406,7 @@ async function createPost(req, res, user) {
         title: "New Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: "/admin/posts/new", isEdit: false, authorsList }),
+        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: "/admin/posts/new", isEdit: false, authorsList, categoriesList }),
         extraHead: qa2.head,
         extraScripts: qa2.scripts,
       })
@@ -407,13 +437,15 @@ async function editPostForm(req, res, user, id) {
     return;
   }
   const authorsList = await listActiveAuthorsForDropdown();
+  const categoriesList = await listActiveCategoryNames();
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   const qa3 = quillAssets(id, (post.data && post.data.body) || "");
-  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList }), extraHead: qa3.head, extraScripts: qa3.scripts }));
+  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList, categoriesList }), extraHead: qa3.head, extraScripts: qa3.scripts }));
 }
 
 async function updatePost(req, res, user, id) {
   const authorsList = await listActiveAuthorsForDropdown();
+  const categoriesList = await listActiveCategoryNames();
   let body;
   try {
     body = await readFormBody(req);
@@ -446,7 +478,7 @@ async function updatePost(req, res, user, id) {
 
   const data = bodyToPostData(body, existing.data || {});
   const status = body.status === "published" ? "published" : "draft";
-  const category = CATEGORIES.includes(body.category) ? body.category : null;
+  const category = (body.category || "").trim() || null;
   const islandTag = ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null;
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
 
@@ -458,7 +490,7 @@ async function updatePost(req, res, user, id) {
         title: "Edit Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList }),
+        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList, categoriesList }),
         extraHead: qa4.head,
         extraScripts: qa4.scripts,
       })
@@ -493,7 +525,7 @@ async function updatePost(req, res, user, id) {
         title: "Edit Post",
         activeNav: "blog",
         user,
-        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList }),
+        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList, categoriesList }),
         extraHead: qa5.head,
         extraScripts: qa5.scripts,
       })

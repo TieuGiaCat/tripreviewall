@@ -64,6 +64,31 @@ function relatedArticlesHtml(related) {
     </a>`).join("");
 }
 
+function injectTOC(bodyHtml) {
+  const headings = [];
+  let idx = 0;
+  const processedBody = bodyHtml.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (match, level, attrs, text) => {
+    idx++;
+    const id = `toc-${idx}`;
+    const plainText = text.replace(/<[^>]+>/g, "").trim();
+    if (plainText) headings.push({ level: Number(level), id, text: plainText });
+    const cleanAttrs = (attrs || "").replace(/\sid="[^"]*"/i, "");
+    return `<h${level}${cleanAttrs} id="${id}">${text}</h${level}>`;
+  });
+  return { processedBody, headings };
+}
+
+function tocHtml(headings) {
+  if (headings.length < 2) return ""; // not worth a TOC box for 0-1 headings
+  return `
+    <div style="background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:8px;padding:20px 24px;margin:0 0 32px;">
+      <div style="font-weight:700;margin-bottom:10px;">In This Guide</div>
+      <ul style="margin:0;padding-left:20px;">
+        ${headings.map((h) => `<li style="margin-bottom:6px;${h.level === 3 ? "margin-left:16px;" : ""}"><a href="#${h.id}" style="color:var(--color-primary);text-decoration:none;">${esc(h.text)}</a></li>`).join("")}
+      </ul>
+    </div>`;
+}
+
 function jsonLd(post, relatedTour) {
   const article = {
     "@context": "https://schema.org",
@@ -116,8 +141,10 @@ function jsonLd(post, relatedTour) {
  * `relatedPosts` — up to 3 other published posts, already fetched by the caller.
  */
 function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
-  const canonical = `${SITE_URL}/blog/${post.slug}`;
-  const metaDesc = (post.excerpt || post.title).slice(0, 155);
+  const canonical = post.canonicalUrl || `${SITE_URL}/blog/${post.slug}`;
+  const metaTitle = post.metaTitle || post.title;
+  const metaDesc = (post.metaDescription || post.excerpt || post.title).slice(0, 155);
+  const { processedBody, headings } = injectTOC(post.body || "");
 
   const tags = [];
   if (post.category) tags.push(`<span class="tag-pill tag-category">${esc(post.category)}</span>`);
@@ -148,11 +175,11 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(post.title)} | Tripreviewall</title>
+<title>${esc(metaTitle)} | Tripreviewall</title>
 <meta name="description" content="${esc(metaDesc)}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="article">
-<meta property="og:title" content="${esc(post.title)}">
+<meta property="og:title" content="${esc(metaTitle)}">
 <meta property="og:description" content="${esc(metaDesc)}">
 ${post.featuredImage ? `<meta property="og:image" content="${SITE_URL}${post.featuredImage}">` : ""}
 <meta property="og:url" content="${canonical}">
@@ -161,7 +188,7 @@ ${post.featuredImage ? `<meta property="og:image" content="${SITE_URL}${post.fea
 <meta property="article:modified_time" content="${esc(String(post.updatedAt || ""))}">
 ${post.author ? `<meta property="article:author" content="${esc(post.author)}">` : ""}
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(post.title)}">
+<meta name="twitter:title" content="${esc(metaTitle)}">
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${post.featuredImage}">` : ""}
 ${jsonLd(post, relatedTour)}
@@ -237,7 +264,8 @@ ${jsonLd(post, relatedTour)}
 
     <div class="article-body-grid">
       <div class="article-body-main">
-        <div class="article-prose">${post.body || ""}</div>
+        ${tocHtml(headings)}
+        <div class="article-prose">${processedBody}</div>
 
         ${inlineTourCardHtml(relatedTour)}
 
@@ -251,6 +279,7 @@ ${jsonLd(post, relatedTour)}
               ${author.roleTitle ? `<p class="author-role">${esc(author.roleTitle)}</p>` : ""}
               ${author.experienceStatement ? `<p class="author-experience">${esc(author.experienceStatement)}</p>` : ""}
               ${author.statsLine ? `<p class="author-stats">${esc(author.statsLine)}</p>` : ""}
+              ${author.postCount != null ? `<p class="author-stats">${author.postCount} article${author.postCount === 1 ? "" : "s"} published on Tripreviewall</p>` : ""}
               ${author.profileLink ? `<a class="author-profile-link" href="${esc(author.profileLink)}">Full profile →</a>` : ""}
             </div>
           </div>` : `

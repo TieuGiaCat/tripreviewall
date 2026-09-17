@@ -95,6 +95,10 @@ function toPostPublicShape(row) {
     disclosureText: d.disclosureText || "",
     relatedTourSlug: d.relatedTourSlug || null,
     featuredImage: d.featuredImage || null,
+    metaTitle: d.metaTitle || null,
+    metaDescription: d.metaDescription || null,
+    canonicalUrl: d.canonicalUrl || null,
+    featuredPillar: !!d.featuredPillar,
     publishedAt: row.published_at,
     updatedAt: row.updated_at,
   };

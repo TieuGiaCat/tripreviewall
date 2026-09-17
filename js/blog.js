@@ -20,12 +20,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function renderPillarStrip() {
-  // No CMS-curated pillar flag exists in the DB schema yet (see
-  // tripreviewall-all-blog-brief.md §3.2) — hide the strip entirely
-  // rather than show something that isn't real, per the fallback
-  // rule in that brief ("if zero results, hide the whole band").
-  const band = document.getElementById("pillar-band");
-  if (band) band.style.display = "none";
+  // The pillar band's real content is baked in server-side (see
+  // admin/src/ssr/listingTemplates.js) from posts flagged "Featured Pillar"
+  // in Admin. Nothing to do here client-side — just leave it exactly as the
+  // server rendered it, whether that's a populated band or a hidden one.
 }
 
 function renderLayer1Tabs() {
