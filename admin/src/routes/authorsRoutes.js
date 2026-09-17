@@ -122,6 +122,7 @@ function renderAuthorForm({ author = {}, errors = [], formAction, isEdit }) {
             <input type="file" name="images" accept=".jpg,.jpeg,.png,.webp">
           </div>
           <button type="submit" class="btn btn-secondary" style="margin-top:10px;">Upload</button>
+          <button type="button" class="btn btn-secondary" style="margin-top:10px;" onclick="openMediaPicker('author', '${author.id}')">Browse Existing Images</button>
         </form>
       `
       }

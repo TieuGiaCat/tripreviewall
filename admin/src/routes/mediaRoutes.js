@@ -61,8 +61,10 @@ function listFilesOnDisk() {
 async function listMedia(req, res, user, urlObj) {
   const kindFilter = urlObj.searchParams.get("kind") || "";
   const usageFilter = urlObj.searchParams.get("usage") || "";
+  const searchQuery = (urlObj.searchParams.get("q") || "").trim().toLowerCase();
   const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
   const PAGE_SIZE = 30;
+  const pickMode = urlObj.searchParams.get("pick") === "1";
 
   let files = [];
   let dbError = null;
@@ -80,6 +82,7 @@ async function listMedia(req, res, user, urlObj) {
   if (kindFilter) files = files.filter((f) => f.kind === kindFilter);
   if (usageFilter === "used") files = files.filter((f) => f.used === true);
   if (usageFilter === "unused") files = files.filter((f) => f.used === false);
+  if (searchQuery) files = files.filter((f) => f.filename.toLowerCase().includes(searchQuery));
 
   const totalKB = files.reduce((sum, f) => sum + f.sizeKB, 0);
   const unusedCount = files.filter((f) => f.used === false).length;
@@ -96,6 +99,15 @@ async function listMedia(req, res, user, urlObj) {
           : f.used
           ? `<span class="badge badge-published">In use</span>`
           : `<span class="badge badge-draft">Unused</span>`;
+      const actionHtml = pickMode
+        ? `<button type="button" class="btn btn-primary btn-sm" style="width:100%;margin-top:6px;" onclick="pickImage('${esc(f.url)}')">Select</button>`
+        : f.used === false
+        ? `<form method="POST" action="/admin/media/delete" onsubmit="return confirm('Delete this unused file? This cannot be undone.');" style="margin-top:6px;">
+             <input type="hidden" name="kind" value="${esc(f.kind)}">
+             <input type="hidden" name="filename" value="${esc(f.filename)}">
+             <button type="submit" class="btn btn-danger btn-sm" style="width:100%;">Delete</button>
+           </form>`
+        : "";
       return `
       <div class="media-card">
         <a href="${esc(f.url)}" target="_blank" rel="noopener">
@@ -107,12 +119,7 @@ async function listMedia(req, res, user, urlObj) {
           ${usedBadge}
           <span style="font-size:11px;color:var(--color-text-muted);">${sizeLabel}</span>
         </div>
-        ${f.used === false ? `
-        <form method="POST" action="/admin/media/delete" onsubmit="return confirm('Delete this unused file? This cannot be undone.');" style="margin-top:6px;">
-          <input type="hidden" name="kind" value="${esc(f.kind)}">
-          <input type="hidden" name="filename" value="${esc(f.filename)}">
-          <button type="submit" class="btn btn-danger btn-sm" style="width:100%;">Delete</button>
-        </form>` : ""}
+        ${actionHtml}
       </div>`;
     })
     .join("");
@@ -120,6 +127,42 @@ async function listMedia(req, res, user, urlObj) {
   const kindOptions = ["", ...KINDS]
     .map((k) => `<option value="${k}" ${kindFilter === k ? "selected" : ""}>${k === "" ? "All folders" : k}</option>`)
     .join("");
+
+  const gridHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:20px;">
+      ${cards || `<p style="color:var(--color-text-muted);grid-column:1/-1;">No images match this filter.</p>`}
+    </div>
+    ${paginationHtml(page, totalPages, "/admin/media", pickMode ? { kind: kindFilter, usage: usageFilter, q: searchQuery, pick: "1" } : { kind: kindFilter, usage: usageFilter, q: searchQuery })}`;
+
+  if (pickMode) {
+    // Standalone popup page (no sidebar) — opened via window.open() from an
+    // edit form's "Browse Existing Images" button; posts the chosen URL back
+    // to the opener window and closes itself.
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Choose an Image</title>
+<link rel="stylesheet" href="/admin/public/admin.css"></head>
+<body style="padding:20px;">
+  <h1 class="page-title" style="font-size:20px;">Choose an Image</h1>
+  <div class="toolbar">
+    <form method="GET" action="/admin/media" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <input type="hidden" name="pick" value="1">
+      <input type="search" name="q" placeholder="Search by filename…" value="${esc(searchQuery)}" style="flex:1;min-width:160px;">
+      <select name="kind" onchange="this.form.submit()" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">${kindOptions}</select>
+      <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+  </div>
+  ${gridHtml}
+  <script>
+    function pickImage(url) {
+      if (window.opener) {
+        window.opener.postMessage({ type: "media-picked", url: url }, "*");
+      }
+      window.close();
+    }
+  </script>
+</body></html>`);
+    return;
+  }
 
   const body = `
     <h1 class="page-title">Media Library</h1>
@@ -131,13 +174,15 @@ async function listMedia(req, res, user, urlObj) {
     ${dbError ? `<div class="alert alert-error">Could not check which files are in use (database error: ${esc(dbError)}) — showing all files with unknown usage status. Deletion is disabled until this is resolved.</div>` : ""}
 
     <div class="toolbar">
-      <form method="GET" action="/admin/media" style="display:flex;gap:8px;">
+      <form method="GET" action="/admin/media" style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="search" name="q" placeholder="Search by filename…" value="${esc(searchQuery)}">
         <select name="kind" onchange="this.form.submit()" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">${kindOptions}</select>
         <select name="usage" onchange="this.form.submit()" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">
           <option value="">All files</option>
           <option value="used" ${usageFilter === "used" ? "selected" : ""}>In use only</option>
           <option value="unused" ${usageFilter === "unused" ? "selected" : ""}>Unused only</option>
         </select>
+        <button type="submit" class="btn btn-secondary">Filter</button>
       </form>
     </div>
 
@@ -150,10 +195,7 @@ async function listMedia(req, res, user, urlObj) {
       </form>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:20px;">
-      ${cards || `<p style="color:var(--color-text-muted);grid-column:1/-1;">No images match this filter.</p>`}
-    </div>
-    ${paginationHtml(page, totalPages, "/admin/media", { kind: kindFilter, usage: usageFilter })}
+    ${gridHtml}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -239,4 +281,105 @@ async function deleteMediaFile(req, res, user) {
   res.end();
 }
 
-module.exports = { listMedia, uploadGeneralImage, deleteMediaFile };
+module.exports = { listMedia, uploadGeneralImage, deleteMediaFile, applyPickedImage };
+
+/* ============================================================
+   Apply a Media Library-picked image to a Tour/Post/Author/Destination —
+   used by the "Browse Existing Images" picker (window.open + postMessage)
+   on each of those edit forms, as an alternative to uploading a new file.
+   ============================================================ */
+const VALID_URL_RE = /^\/uploads\/(tours|posts|authors|destinations|media)\/[a-zA-Z0-9._-]+$/;
+
+function sendJson(res, statusCode, obj) {
+  res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(JSON.stringify(obj));
+}
+
+async function applyPickedImage(req, res, user) {
+  const { readFormBody } = require("../utils");
+  let body;
+  try {
+    body = await readFormBody(req);
+  } catch (err) {
+    sendJson(res, 400, { ok: false, error: "Malformed request." });
+    return;
+  }
+
+  const { targetType, targetId, url } = body;
+  if (!VALID_URL_RE.test(url || "")) {
+    sendJson(res, 400, { ok: false, error: "That doesn't look like a valid uploaded image URL." });
+    return;
+  }
+  if (!targetId) {
+    sendJson(res, 400, { ok: false, error: "Missing target id." });
+    return;
+  }
+
+  try {
+    if (targetType === "tour") {
+      const result = await query("SELECT slug, status, island, price_from, data FROM tours WHERE id = $1", [targetId]);
+      if (!result.rows[0]) { sendJson(res, 404, { ok: false, error: "Tour not found." }); return; }
+      const row = result.rows[0];
+      const data = row.data || {};
+      data.gallery = [...(data.gallery || []), url];
+      await query("UPDATE tours SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), targetId]);
+      if (row.status === "published") {
+        const { generateTourFile, regenerateListingPages } = require("../ssr/generator");
+        await generateTourFile({ slug: row.slug, status: row.status, island: row.island, price_from: row.price_from, data });
+        await regenerateListingPages();
+      }
+    } else if (targetType === "post") {
+      const result = await query("SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE id = $1", [targetId]);
+      if (!result.rows[0]) { sendJson(res, 404, { ok: false, error: "Post not found." }); return; }
+      const row = result.rows[0];
+      const data = row.data || {};
+      data.featuredImage = url;
+      await query("UPDATE posts SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), targetId]);
+      if (row.status === "published") {
+        const { generatePostFile, regenerateListingPages } = require("../ssr/generator");
+        await generatePostFile({ ...row, data });
+        await regenerateListingPages();
+      }
+    } else if (targetType === "author") {
+      const result = await query("SELECT slug, data FROM authors WHERE id = $1", [targetId]);
+      if (!result.rows[0]) { sendJson(res, 404, { ok: false, error: "Author not found." }); return; }
+      const row = result.rows[0];
+      const data = row.data || {};
+      data.photoUrl = url;
+      await query("UPDATE authors SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), targetId]);
+      // Regenerate any already-published posts crediting this author, so the
+      // new photo shows up on their Author Box without a separate post edit.
+      try {
+        const postsResult = await query(
+          `SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data
+           FROM posts WHERE status = 'published' AND data->>'authorSlug' = $1`,
+          [row.slug]
+        );
+        if (postsResult.rows.length > 0) {
+          const { generatePostFile } = require("../ssr/generator");
+          for (const p of postsResult.rows) await generatePostFile(p);
+        }
+      } catch (err) {
+        console.error("[media] could not refresh posts crediting this author:", err.message);
+      }
+    } else if (targetType === "destination") {
+      const result = await query("SELECT slug, data FROM destinations WHERE id = $1", [targetId]);
+      if (!result.rows[0]) { sendJson(res, 404, { ok: false, error: "Destination not found." }); return; }
+      const row = result.rows[0];
+      const data = row.data || {};
+      data.heroImage = url;
+      await query("UPDATE destinations SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), targetId]);
+      const { regenerateListingPages } = require("../ssr/generator");
+      await regenerateListingPages();
+    } else {
+      sendJson(res, 400, { ok: false, error: "Unknown target type." });
+      return;
+    }
+  } catch (err) {
+    console.error("[media] applyPickedImage failed:", err.message);
+    sendJson(res, 500, { ok: false, error: `Database error: ${err.message}` });
+    return;
+  }
+
+  sendJson(res, 200, { ok: true });
+}

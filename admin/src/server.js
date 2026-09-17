@@ -284,6 +284,9 @@ const server = http.createServer(async (req, res) => {
     if (method === "POST" && pathname === "/admin/media/delete") {
       return mediaRoutes.deleteMediaFile(req, res, session);
     }
+    if (method === "POST" && pathname === "/admin/media/apply") {
+      return mediaRoutes.applyPickedImage(req, res, session);
+    }
 
     // ---- 404 ----
     res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });

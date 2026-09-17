@@ -46,6 +46,29 @@ ${extraHead || ""}
   </main>
 </div>
 ${extraScripts || ""}
+<script>
+  // Shared by every Tour/Post/Author/Destination edit form's "Browse Existing
+  // Images" button — opens the Media Library in picker mode, waits for the
+  // chosen image via postMessage, applies it server-side, then reloads.
+  function openMediaPicker(targetType, targetId) {
+    window.open("/admin/media?pick=1", "mediaPicker", "width=900,height=700");
+    window.addEventListener("message", function handler(e) {
+      if (!e.data || e.data.type !== "media-picked") return;
+      window.removeEventListener("message", handler);
+      fetch("/admin/media/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ targetType: targetType, targetId: targetId, url: e.data.url }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res.ok) location.reload();
+          else alert("Could not apply the image: " + (res.error || "unknown error"));
+        })
+        .catch(function () { alert("Could not apply the image — network error."); });
+    });
+  }
+</script>
 </body>
 </html>`;
 }

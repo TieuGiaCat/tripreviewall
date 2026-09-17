@@ -93,6 +93,7 @@ function renderDestinationForm({ destination, errors = [] }) {
           <input type="file" name="images" accept=".jpg,.jpeg,.png,.webp">
         </div>
         <button type="submit" class="btn btn-secondary" style="margin-top:10px;">Upload</button>
+        <button type="button" class="btn btn-secondary" style="margin-top:10px;" onclick="openMediaPicker('destination', '${destination.id}')">Browse Existing Images</button>
       </form>
     </div>
   `;
