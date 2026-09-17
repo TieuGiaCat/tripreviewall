@@ -28,8 +28,8 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
   const d = tour.ratingDistribution || { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 };
   return `
     <article class="tour-card">
-      <div class="tour-card-image-wrap"${img ? "" : ` style="background:linear-gradient(135deg,#0B3B4F,#5C8A72)"`}>
-        ${img ? `<img class="tour-photo" src="${esc(img)}" alt="${esc(tour.title)} — ${esc(tour.company)}">` : ""}
+      <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
+        ${img ? `<img class="tour-photo" src="${esc(img)}" alt="${esc(tour.title)} — ${esc(tour.company)}" style="opacity:0;transition:opacity 0.35s ease;" onload="this.style.opacity='1';" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
       </div>
       <div class="tour-card-body">
         <div class="tour-card-eyebrow">${esc((tour.island || "").toUpperCase())} · ${esc((tour.tourType || "").toUpperCase())}</div>

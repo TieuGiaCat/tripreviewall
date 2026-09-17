@@ -101,18 +101,18 @@ function renderStars(rating) {
 
 /* ---- Shared Tour Card template ----
    basePath: "tours/" from site root (Home, All Tours) or "" from within /tours/ folder (Similar Tours) */
-function tourCardTemplate(tour, basePath, imgPrefix) {
+function tourCardTemplate(tour, basePath) {
   basePath = basePath === undefined ? "tours/" : basePath;
-  imgPrefix = imgPrefix === undefined ? "img/" : imgPrefix;
   const d = tour.ratingDistribution;
   const badge = tour.badge ? `<span class="tour-card-badge">${tour.badge}</span>` : "";
   const linkFile = `/tours/${tour.slug}`;
-  const imgSrc = (tour.gallery && tour.gallery[0]) ? tour.gallery[0] : `${imgPrefix}${tour.slug}.webp`;
+  const imgSrc = tour.gallery && tour.gallery[0] ? tour.gallery[0] : null;
   return `
     <article class="tour-card">
-      <div class="tour-card-image-wrap">
-        <img class="tour-photo" src="${imgSrc}" alt="${tour.title} — ${tour.company}"
-             onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">
+      <div class="tour-card-image-wrap" style="background:${imgSrc ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
+        ${imgSrc ? `<img class="tour-photo" src="${imgSrc}" alt="${tour.title} — ${tour.company}"
+             style="opacity:0;transition:opacity 0.35s ease;" onload="this.style.opacity='1';"
+             onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
         ${badge}
       </div>
       <div class="tour-card-body">
@@ -149,5 +149,5 @@ function renderFeaturedTours(mode) {
   let list = ALL_TOURS.map((t) => ({ ...t, badge: EDITORS_PICK_SLUGS.includes(t.slug) ? "Editor's Pick" : null }));
   if (mode === "most-reviewed") list.sort((a, b) => b.reviewCountTotal - a.reviewCountTotal);
   else list.sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0) || b.aggregatedRating - a.aggregatedRating);
-  grid.innerHTML = list.slice(0, 8).map((t) => tourCardTemplate(t, "tours/", "img/")).join("");
+  grid.innerHTML = list.slice(0, 8).map((t) => tourCardTemplate(t, "tours/")).join("");
 }
