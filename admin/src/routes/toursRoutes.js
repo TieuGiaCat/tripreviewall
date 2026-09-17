@@ -154,6 +154,10 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
           <div class="form-field"><label>Island</label><select name="island"><option value="">— Select —</option>${islandOptions}</select></div>
         </div>
         <div class="form-row">
+          <div class="form-field"><label>Operator Contact Phone</label><input type="text" name="contactPhone" value="${esc(d.contactPhone || "")}" placeholder="e.g. (808) 555-0123"></div>
+          <div class="form-field"><label>Operator Contact Email</label><input type="email" name="contactEmail" value="${esc(d.contactEmail || "")}" placeholder="e.g. info@operator.com"></div>
+        </div>
+        <div class="form-row">
           <div class="form-field"><label>City</label><input type="text" name="city" value="${esc(d.city || "")}"></div>
           <div class="form-field"><label>Tour Type</label><input type="text" name="tourType" value="${esc(d.tourType || "")}" placeholder="e.g. Snorkel Tour"></div>
         </div>
@@ -318,6 +322,8 @@ function bodyToTourData(body, existingData = {}) {
   return {
     name: (body.name || "").trim(),
     company: (body.company || "").trim(),
+    contactPhone: (body.contactPhone || "").trim() || null,
+    contactEmail: (body.contactEmail || "").trim() || null,
     city: (body.city || "").trim(),
     tourType: (body.tourType || "").trim(),
     durationLabel: (body.durationLabel || "").trim(),

@@ -13,6 +13,8 @@ function toPublicShape(row) {
     slug: row.slug,
     title: d.name || row.slug,
     company: d.company || "",
+    contactPhone: d.contactPhone || "",
+    contactEmail: d.contactEmail || "",
     island: row.island || "",
     city: d.city || "",
     tourType: d.tourType || "Tour",

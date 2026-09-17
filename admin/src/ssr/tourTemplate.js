@@ -268,7 +268,7 @@ ${jsonLd(tour)}
       </div>
       <h1 class="detail-h1">${esc(tour.title)}</h1>
       <div class="detail-rating-row">
-        <a href="#ratings" class="detail-rating-link">
+        <a href="#tab-review" class="detail-rating-link" onclick="var btn=document.querySelector('.content-tab[data-target=\'tab-review\']'); if (btn) switchDetailTab('tab-review', btn);">
           ${starsRowHtml(tour.aggregatedRating)}
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
           <span class="count">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews across 4 sources)</span>
@@ -288,23 +288,23 @@ ${jsonLd(tour)}
     <div class="quickfacts">${quickFactsHtml(tour)}</div>
 
     <div class="content-tabs">
-      <button class="content-tab active" data-target="tab-overview">Overview</button>
-      <button class="content-tab" data-target="tab-location">Location</button>
+      <button class="content-tab active" data-target="tab-overview" onclick="switchDetailTab('tab-overview', this)">Overview</button>
+      <button class="content-tab" data-target="tab-location" onclick="switchDetailTab('tab-location', this)">Location</button>
+      <button class="content-tab" data-target="tab-review" onclick="switchDetailTab('tab-review', this)">Review</button>
+      <button class="content-tab" data-target="tab-verdict" onclick="switchDetailTab('tab-verdict', this)">Our Verdict</button>
+      <button class="content-tab" data-target="tab-contact" onclick="switchDetailTab('tab-contact', this)">Contact</button>
     </div>
 
     <div class="detail-layout">
       <div class="detail-main">
-        <section class="detail-section" id="tab-overview">
+        <section class="detail-section content-tab-panel" id="tab-overview">
           <h2 class="detail-section-title">Overview</h2>
           <ul class="highlight-list">${(tour.highlights || []).map((h) => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(h)}</li>`).join("")}</ul>
           <p class="detail-body-text">${esc(tour.fullDescription || "")}</p>
           ${variantSelectorHtml(tour.variants)}
         </section>
 
-        ${verdictHtml(tour.verdict)}
-        ${ratingsSectionHtml(tour)}
-
-        <section class="detail-section" id="tab-location">
+        <section class="detail-section content-tab-panel" id="tab-location" style="display:none;">
           <h2 class="detail-section-title">Location</h2>
           ${tour.location && tour.location.lat != null && tour.location.lng != null
             ? `<iframe src="https://maps.google.com/maps?q=${tour.location.lat},${tour.location.lng}&z=14&output=embed" class="map-embed" style="width:100%;height:320px;border:0;" loading="lazy" title="Map showing the approximate location of ${esc(tour.title)}"></iframe>
@@ -312,6 +312,26 @@ ${jsonLd(tour)}
             : `<div class="map-embed">Map embed placeholder</div>`}
           <p class="detail-body-text">${esc(tour.city ? tour.city + ", " : "")}${esc(tour.island)}, Hawaii</p>
           <p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>
+        </section>
+
+        <div class="content-tab-panel" id="tab-review" style="display:none;">
+          ${ratingsSectionHtml(tour)}
+        </div>
+
+        <div class="content-tab-panel" id="tab-verdict" style="display:none;">
+          ${verdictHtml(tour.verdict)}
+        </div>
+
+        <section class="detail-section content-tab-panel" id="tab-contact" style="display:none;">
+          <h2 class="detail-section-title">Contact</h2>
+          ${tour.contactPhone || tour.contactEmail ? `
+          <ul class="highlight-list">
+            ${tour.company ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>${esc(tour.company)}</li>` : ""}
+            ${tour.contactPhone ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><a href="tel:${esc(tour.contactPhone)}">${esc(tour.contactPhone)}</a></li>` : ""}
+            ${tour.contactEmail ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><a href="mailto:${esc(tour.contactEmail)}">${esc(tour.contactEmail)}</a></li>` : ""}
+          </ul>
+          <p style="font-size:var(--text-meta); color:var(--color-text-muted); margin-top:12px;">This is the tour operator's own contact info, shared for general questions — not for bookings. Book directly through the "Check Availability" button for real-time availability.</p>
+          ` : `<p class="detail-body-text">No direct contact info on file for this operator yet. The fastest way to reach them is by starting a booking via FareHarbor — you'll get their confirmation details and support contact right away.</p>`}
         </section>
       </div>
 
@@ -352,6 +372,17 @@ ${jsonLd(tour)}
 </footer>
 
 <script src="../js/main.js"></script>
+<script>
+  function switchDetailTab(targetId, clickedBtn) {
+    document.querySelectorAll('.content-tab-panel').forEach(function (panel) {
+      panel.style.display = panel.id === targetId ? '' : 'none';
+    });
+    document.querySelectorAll('.content-tab').forEach(function (btn) {
+      btn.classList.remove('active');
+    });
+    if (clickedBtn) clickedBtn.classList.add('active');
+  }
+</script>
 <script src="../js/tour-static-hydrate.js"></script>
 </body>
 </html>`;
