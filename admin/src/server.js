@@ -328,6 +328,9 @@ const server = http.createServer(async (req, res) => {
     if (method === "POST" && pathname === "/admin/media/apply") {
       return mediaRoutes.applyPickedImage(req, res, session);
     }
+    if (method === "POST" && pathname === "/admin/media/fetch-url") {
+      return mediaRoutes.fetchImageFromUrl(req, res, session);
+    }
 
     // ---- Users (admin role only — enforced inside usersRoutes.js) ----
     if (method === "GET" && pathname === "/admin/users") {

@@ -65,6 +65,7 @@ async function listMedia(req, res, user, urlObj) {
   const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
   const PAGE_SIZE = 30;
   const pickMode = urlObj.searchParams.get("pick") === "1";
+  const fetchError = urlObj.searchParams.get("fetchError") || null;
 
   let files = [];
   let dbError = null;
@@ -195,6 +196,19 @@ async function listMedia(req, res, user, urlObj) {
       </form>
     </div>
 
+    <div class="form-card">
+      <h2>Fetch an image from a URL (auto-converts to WebP)</h2>
+      <p class="hint" style="margin-bottom:10px;">Paste a direct image link (e.g. from a FareHarbor CDN link) and a name — the server downloads it and saves it as an optimized .webp file.</p>
+      ${fetchError ? `<div class="alert alert-error">${esc(fetchError)}</div>` : ""}
+      <form method="POST" action="/admin/media/fetch-url">
+        <div class="form-row">
+          <div class="form-field"><label>Image URL</label><input type="url" name="imageUrl" placeholder="https://..." required></div>
+          <div class="form-field"><label>Name</label><input type="text" name="imageName" placeholder="e.g. Kaneohe Bay Kayaking" required></div>
+        </div>
+        <button type="submit" class="btn btn-secondary" style="margin-top:10px;">Fetch &amp; Save as WebP</button>
+      </form>
+    </div>
+
     ${gridHtml}
   `;
 
@@ -281,7 +295,45 @@ async function deleteMediaFile(req, res, user) {
   res.end();
 }
 
-module.exports = { listMedia, uploadGeneralImage, deleteMediaFile, applyPickedImage };
+module.exports = { listMedia, uploadGeneralImage, deleteMediaFile, applyPickedImage, fetchImageFromUrl };
+
+/* ============================================================
+   Fetch-from-URL → WebP (paste a link, get a saved file)
+   ============================================================ */
+async function fetchImageFromUrl(req, res, user) {
+  const { readFormBody } = require("../utils");
+  const { fetchAndConvertToWebp } = require("../upload");
+
+  let body;
+  try {
+    body = await readFormBody(req);
+  } catch (err) {
+    res.writeHead(302, { Location: "/admin/media?fetchError=" + encodeURIComponent("Malformed request.") });
+    res.end();
+    return;
+  }
+
+  const url = (body.imageUrl || "").trim();
+  const name = (body.imageName || "").trim();
+
+  if (!url || !name) {
+    res.writeHead(302, { Location: "/admin/media?fetchError=" + encodeURIComponent("Both an image URL and a name are required.") });
+    res.end();
+    return;
+  }
+
+  try {
+    await fetchAndConvertToWebp(url, name);
+  } catch (err) {
+    console.error("[media] fetch-from-URL failed:", err.message);
+    res.writeHead(302, { Location: "/admin/media?fetchError=" + encodeURIComponent(err.message) });
+    res.end();
+    return;
+  }
+
+  res.writeHead(302, { Location: "/admin/media" });
+  res.end();
+}
 
 /* ============================================================
    Apply a Media Library-picked image to a Tour/Post/Author/Destination —
