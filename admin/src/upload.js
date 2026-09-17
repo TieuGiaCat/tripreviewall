@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-const formidable = require("formidable");
+const { formidable } = require("formidable");
 
 const UPLOAD_ROOT = path.join(__dirname, "..", "public", "uploads");
 const ALLOWED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp"]);
