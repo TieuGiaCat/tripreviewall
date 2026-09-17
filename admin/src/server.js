@@ -22,6 +22,7 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const clickTrackingRoute = require("./routes/clickTrackingRoute");
 const categoriesRoutes = require("./routes/categoriesRoutes");
 const rssRoute = require("./routes/rssRoute");
+const auditLogRoutes = require("./routes/auditLogRoutes");
 
 const PORT = process.env.PORT || 4000;
 const PUBLIC_DIR = path.join(__dirname, "..", "public");
@@ -362,6 +363,11 @@ const server = http.createServer(async (req, res) => {
     // ---- Analytics ----
     if (method === "GET" && pathname === "/admin/analytics") {
       return analyticsRoutes.showAnalytics(req, res, session);
+    }
+
+    // ---- Audit Log ----
+    if (method === "GET" && pathname === "/admin/audit-log") {
+      return auditLogRoutes.showAuditLog(req, res, session, urlObj);
     }
 
     // ---- 404 ----

@@ -2,6 +2,7 @@ const { query } = require("../db");
 const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { generateTourFile, removeTourFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
+const { logAudit } = require("../auditLog");
 
 const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
 
@@ -440,6 +441,8 @@ async function createTour(req, res, user) {
     return;
   }
 
+  await logAudit(user, "create", "tour", slug, `Created tour "${data.name || slug}"`);
+
   res.writeHead(302, { Location: "/admin/tours" });
   res.end();
 }
@@ -550,6 +553,8 @@ async function updateTour(req, res, user, id) {
     return;
   }
 
+  await logAudit(user, "update", "tour", slug, `Updated tour "${data.name || slug}"`);
+
   res.writeHead(302, { Location: "/admin/tours" });
   res.end();
 }
@@ -557,7 +562,11 @@ async function updateTour(req, res, user, id) {
 async function deleteTour(req, res, user, id) {
   try {
     const result = await query("DELETE FROM tours WHERE id = $1 RETURNING slug", [id]);
-    if (result.rows[0]) { removeTourFile(result.rows[0].slug); await regenerateListingPages(); }
+    if (result.rows[0]) {
+      removeTourFile(result.rows[0].slug);
+      await regenerateListingPages();
+      await logAudit(user, "delete", "tour", result.rows[0].slug, `Deleted tour "${result.rows[0].slug}"`);
+    }
   } catch (err) {
     console.error("[tours] delete failed:", err.message);
   }

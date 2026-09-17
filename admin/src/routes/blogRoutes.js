@@ -4,6 +4,7 @@ const { layout, paginationHtml } = require("../render");
 const { generatePostFile, removePostFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 const { listActiveAuthorsForDropdown } = require("./authorsRoutes");
 const { listActiveCategoryNames } = require("./categoriesRoutes");
+const { logAudit } = require("../auditLog");
 
 const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
 const FORMATS = ["listicle", "comparison", "deep_dive_review", "honest_take"];
@@ -471,6 +472,8 @@ async function createPost(req, res, user) {
     return;
   }
 
+  await logAudit(user, "create", "post", slug, `Created post "${data.title || slug}"`);
+
   res.writeHead(302, { Location: "/admin/posts" });
   res.end();
 }
@@ -590,6 +593,8 @@ async function updatePost(req, res, user, id) {
     return;
   }
 
+  await logAudit(user, "update", "post", slug, `Updated post "${data.title || slug}"`);
+
   res.writeHead(302, { Location: "/admin/posts" });
   res.end();
 }
@@ -597,7 +602,11 @@ async function updatePost(req, res, user, id) {
 async function deletePost(req, res, user, id) {
   try {
     const result = await query("DELETE FROM posts WHERE id = $1 RETURNING slug", [id]);
-    if (result.rows[0]) { removePostFile(result.rows[0].slug); await regenerateListingPages(); }
+    if (result.rows[0]) {
+      removePostFile(result.rows[0].slug);
+      await regenerateListingPages();
+      await logAudit(user, "delete", "post", result.rows[0].slug, `Deleted post "${result.rows[0].slug}"`);
+    }
   } catch (err) {
     console.error("[posts] delete failed:", err.message);
   }

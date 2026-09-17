@@ -2,6 +2,7 @@ const { query } = require("../db");
 const { readFormBody, esc } = require("../utils");
 const { layout } = require("../render");
 const { hashPassword } = require("../auth");
+const { logAudit } = require("../auditLog");
 
 const ROLES = ["admin", "editor"];
 
@@ -170,6 +171,8 @@ async function createUser(req, res, user) {
     return;
   }
 
+  await logAudit(user, "create", "user", email, `Created user "${email}" (role: ${role})`);
+
   res.writeHead(302, { Location: "/admin/users" });
   res.end();
 }
@@ -273,6 +276,13 @@ async function updateUser(req, res, user, id) {
     return;
   }
 
+  const changeNotes = [];
+  if (existing.role !== role) changeNotes.push(`role ${existing.role} → ${role}`);
+  if (existing.status !== status) changeNotes.push(`status ${existing.status} → ${status}`);
+  if (body.password) changeNotes.push("password changed");
+  const changeSummary = changeNotes.length ? ` (${changeNotes.join(", ")})` : "";
+  await logAudit(user, "update", "user", email, `Updated user "${email}"${changeSummary}`);
+
   res.writeHead(302, { Location: "/admin/users" });
   res.end();
 }
@@ -287,7 +297,7 @@ async function deleteUser(req, res, user, id) {
   }
 
   try {
-    const target = await query("SELECT role, status FROM admin_users WHERE id = $1", [id]);
+    const target = await query("SELECT email, role, status FROM admin_users WHERE id = $1", [id]);
     if (target.rows[0] && target.rows[0].role === "admin" && target.rows[0].status === "active") {
       const countResult = await query(`SELECT count(*)::int AS n FROM admin_users WHERE role = 'admin' AND status = 'active' AND id != $1`, [id]);
       if (countResult.rows[0].n === 0) {
@@ -297,6 +307,7 @@ async function deleteUser(req, res, user, id) {
       }
     }
     await query("DELETE FROM admin_users WHERE id = $1", [id]);
+    if (target.rows[0]) await logAudit(user, "delete", "user", target.rows[0].email, `Deleted user "${target.rows[0].email}"`);
   } catch (err) {
     console.error("[users] delete failed:", err.message);
   }

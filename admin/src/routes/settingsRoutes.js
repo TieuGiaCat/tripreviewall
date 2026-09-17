@@ -3,6 +3,7 @@ const { layout } = require("../render");
 const { esc, readFormBody } = require("../utils");
 const { encrypt } = require("../lib/crypto-secret");
 const mailer = require("../lib/mailer");
+const { logAudit } = require("../auditLog");
 
 async function getSmtpSettings() {
   const result = await query("SELECT data FROM settings WHERE key = 'email_smtp' LIMIT 1");
@@ -155,6 +156,8 @@ async function saveEmailSettings(req, res, user) {
     return;
   }
 
+  await logAudit(user, "update", "settings", "email_smtp", "Updated Email (SMTP) settings");
+
   if (body.action === "test") {
     try {
       await mailer.sendTestEmail(data.notifyToEmail);
@@ -282,6 +285,8 @@ async function saveTrackingSettings(req, res, user) {
     res.end(layout({ title: "Settings — Tracking", activeNav: "settings", user, body: renderTrackingForm({ t: data, errors: [`Database error: ${err.message}`] }) }));
     return;
   }
+
+  await logAudit(user, "update", "settings", "tracking", "Updated Tracking (GTM/Pixel) scripts");
 
   // Regenerate every public page now, so the new/changed snippet takes
   // effect immediately rather than waiting for the next content edit.

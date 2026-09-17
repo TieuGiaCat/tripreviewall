@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { key: "media", label: "Media Library", href: "/admin/media" },
   { key: "analytics", label: "Analytics", href: "/admin/analytics" },
   { key: "users", label: "Users", href: "/admin/users" },
+  { key: "audit-log", label: "Audit Log", href: "/admin/audit-log" },
 ];
 
 function layout({ title, activeNav, user, body, extraHead, extraScripts }) {

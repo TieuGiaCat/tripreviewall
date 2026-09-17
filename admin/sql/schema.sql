@@ -199,3 +199,23 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
 
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_expires_at ON admin_sessions(expires_at);
 
+-- ---------------------------------------------------------------
+-- audit_log  ("who changed what and when" — now that multiple
+-- admin/editor accounts exist. Fire-and-forget writes from
+-- src/auditLog.js; never blocks or fails the operation it records.)
+-- ---------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES admin_users(id) ON DELETE SET NULL,
+  user_email TEXT,
+  action TEXT NOT NULL CHECK (action IN ('create', 'update', 'delete')),
+  target_type TEXT NOT NULL,
+  target_id TEXT,
+  summary TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_log_created_at ON audit_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_log_target_type ON audit_log(target_type);
+
+
