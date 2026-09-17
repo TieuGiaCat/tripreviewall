@@ -268,7 +268,7 @@ ${jsonLd(tour)}
       </div>
       <h1 class="detail-h1">${esc(tour.title)}</h1>
       <div class="detail-rating-row">
-        <a href="#tab-review" class="detail-rating-link" onclick="var btn=document.querySelector('.content-tab[data-target=\'tab-review\']'); if (btn) switchDetailTab('tab-review', btn);">
+        <a href="#tab-review" class="detail-rating-link" onclick="switchDetailTab('tab-review', document.querySelector('.content-tab[data-target=&quot;tab-review&quot;]'), event);">
           ${starsRowHtml(tour.aggregatedRating)}
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
           <span class="count">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews across 4 sources)</span>
@@ -288,11 +288,11 @@ ${jsonLd(tour)}
     <div class="quickfacts">${quickFactsHtml(tour)}</div>
 
     <div class="content-tabs">
-      <button class="content-tab active" data-target="tab-overview" onclick="switchDetailTab('tab-overview', this)">Overview</button>
-      <button class="content-tab" data-target="tab-location" onclick="switchDetailTab('tab-location', this)">Location</button>
-      <button class="content-tab" data-target="tab-review" onclick="switchDetailTab('tab-review', this)">Review</button>
-      <button class="content-tab" data-target="tab-verdict" onclick="switchDetailTab('tab-verdict', this)">Our Verdict</button>
-      <button class="content-tab" data-target="tab-contact" onclick="switchDetailTab('tab-contact', this)">Contact</button>
+      <button class="content-tab active" data-target="tab-overview" onclick="switchDetailTab('tab-overview', this, event)">Overview</button>
+      <button class="content-tab" data-target="tab-location" onclick="switchDetailTab('tab-location', this, event)">Location</button>
+      <button class="content-tab" data-target="tab-review" onclick="switchDetailTab('tab-review', this, event)">Review</button>
+      <button class="content-tab" data-target="tab-verdict" onclick="switchDetailTab('tab-verdict', this, event)">Our Verdict</button>
+      <button class="content-tab" data-target="tab-contact" onclick="switchDetailTab('tab-contact', this, event)">Contact</button>
     </div>
 
     <div class="detail-layout">
@@ -373,7 +373,8 @@ ${jsonLd(tour)}
 
 <script src="../js/main.js"></script>
 <script>
-  function switchDetailTab(targetId, clickedBtn) {
+  function switchDetailTab(targetId, clickedBtn, evt) {
+    if (evt) { evt.preventDefault(); evt.stopPropagation(); }
     document.querySelectorAll('.content-tab-panel').forEach(function (panel) {
       panel.style.display = panel.id === targetId ? '' : 'none';
     });
@@ -381,6 +382,7 @@ ${jsonLd(tour)}
       btn.classList.remove('active');
     });
     if (clickedBtn) clickedBtn.classList.add('active');
+    return false;
   }
 </script>
 <script src="../js/tour-static-hydrate.js"></script>
