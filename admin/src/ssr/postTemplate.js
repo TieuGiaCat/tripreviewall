@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 
-const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
+const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
 
 function fmtDate(d) {
   if (!d) return "";
@@ -119,7 +119,7 @@ function jsonLd(post, relatedTour) {
     const review = {
       "@context": "https://schema.org",
       "@type": "Review",
-      itemReviewed: { "@type": "TouristTrip", name: relatedTour.title },
+      itemReviewed: { "@type": "Product", name: relatedTour.title },
       author: { "@type": "Person", name: post.author || "Tripreviewall Editorial Team" },
       datePublished: post.publishedAt,
       reviewRating: {

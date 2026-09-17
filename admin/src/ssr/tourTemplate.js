@@ -1,7 +1,7 @@
 const { esc } = require("../utils");
 const { starsRowHtml, histogramHtml, tourCardHtml } = require("./sharedHtml");
 
-const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
+const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
 
 function ratingsBySourceForDisplay(tour) {
   const real = tour.ratingsBySource || {};
@@ -155,7 +155,7 @@ function bookingSidebarHtml(tour) {
 function jsonLd(tour) {
   const data = {
     "@context": "https://schema.org",
-    "@type": "TouristTrip",
+    "@type": "Product",
     name: tour.title,
     description: (tour.fullDescription || "").slice(0, 300),
     image: tour.gallery && tour.gallery[0] ? `${SITE_URL}${tour.gallery[0]}` : undefined,
