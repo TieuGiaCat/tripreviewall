@@ -612,6 +612,69 @@ async function removeTourImage(req, res, user, id) {
   res.end();
 }
 
+/**
+ * Handles a raw FareHarbor partner export uploaded directly (columns:
+ * item_id, location_lat, location_long, ...). Matches item_id against each
+ * tour's stored variants[].fareharborItemId and sets tour.data.location.
+ * Corrects FareHarbor's own export, which has location_lat/location_long
+ * swapped (confirmed against real coordinates across multiple islands).
+ */
+async function applyFareharborLocationImport(csvRows) {
+  const locationByItemId = {};
+  let badRows = 0;
+  for (const row of csvRows) {
+    const itemId = (row.item_id || "").trim();
+    const lat = Number(row.location_long);
+    const lng = Number(row.location_lat);
+    if (!itemId || isNaN(lat) || isNaN(lng)) { badRows++; continue; }
+    locationByItemId[itemId] = { lat, lng };
+  }
+
+  let toursResult;
+  try {
+    toursResult = await query(`SELECT slug, status, island, price_from, data FROM tours`);
+  } catch (err) {
+    return { updated: 0, unchanged: 0, errors: [`Database error: ${err.message}`] };
+  }
+
+  let matched = 0, noMatch = 0;
+  const errors = badRows > 0 ? [`${badRows} row(s) in the file had no item_id or coordinates — skipped.`] : [];
+  let anyPublishedTouched = false;
+
+  for (const tourRow of toursResult.rows) {
+    const variants = (tourRow.data && tourRow.data.variants) || [];
+    let location = null;
+    for (const v of variants) {
+      const itemId = String(v.fareharborItemId || "").trim();
+      if (itemId && locationByItemId[itemId]) { location = locationByItemId[itemId]; break; }
+    }
+    if (!location) { noMatch++; continue; }
+
+    const data = { ...(tourRow.data || {}), location };
+    try {
+      await query("UPDATE tours SET data = $1, updated_at = now() WHERE slug = $2", [JSON.stringify(data), tourRow.slug]);
+      matched++;
+      if (tourRow.status === "published") {
+        anyPublishedTouched = true;
+        await generateTourFile({ slug: tourRow.slug, status: tourRow.status, island: tourRow.island, price_from: tourRow.price_from, data });
+      }
+    } catch (err) {
+      errors.push(`${tourRow.slug}: failed to save — ${err.message}`);
+    }
+  }
+
+  if (anyPublishedTouched) {
+    try { await regenerateListingPages(); } catch (err) { errors.push(`Listing pages regeneration failed: ${err.message}`); }
+  }
+
+  return {
+    updated: matched,
+    unchanged: 0,
+    notice: `Detected a FareHarbor location export — matched ${matched} tour(s) by item_id instead of slug. ${noMatch} tour(s) had no matching item_id.`,
+    errors,
+  };
+}
+
 module.exports = {
   listTours, newTourForm, createTour, editTourForm, updateTour, deleteTour, uploadTourImage, removeTourImage,
   exportToursCsv, showImportForm, importToursCsv,
@@ -683,7 +746,7 @@ async function exportToursCsv(req, res, user) {
   res.end(lines.join("\n"));
 }
 
-function renderImportForm({ report = null } = {}) {
+function renderImportForm({ report = null, locationReport = null } = {}) {
   return `
     <h1 class="page-title">Import Tours (Price, Ratings &amp; Location)</h1>
     <p class="page-sub">Bulk-update real prices, ratings and map coordinates without touching code. Matches rows to tours by <strong>slug</strong> — never renames a tour or changes its Published/Draft status.</p>
@@ -696,9 +759,10 @@ function renderImportForm({ report = null } = {}) {
 
     <div class="form-card">
       <h2>Step 2 — Upload your edited file</h2>
+      <p style="margin-bottom:12px;color:var(--color-text-muted);">Also accepts a raw FareHarbor partner export directly (the file with an "item_id" column) — it's auto-detected and matched by FareHarbor item ID instead of slug, to fill in real map coordinates.</p>
       ${report ? `
         <div class="alert ${report.errors.length ? "alert-error" : "alert-success"}">
-          ${report.updated} tour${report.updated === 1 ? "" : "s"} updated.
+          ${report.notice ? esc(report.notice) + "<br>" : `${report.updated} tour${report.updated === 1 ? "" : "s"} updated. `}
           ${report.unchanged ? `${report.unchanged} row(s) had no changes.` : ""}
           ${report.errors.length ? `<br>${report.errors.map(esc).join("<br>")}` : ""}
         </div>` : ""}
@@ -756,6 +820,17 @@ async function importToursCsv(req, res, user) {
   } catch (err) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated: 0, unchanged: 0, errors: [`Could not parse this as CSV: ${err.message}`] } }) }));
+    return;
+  }
+
+  // Auto-detect: a raw FareHarbor partner export (has "item_id", no "slug")
+  // gets routed to the location-matching importer instead of the standard
+  // slug-based one — same upload button handles both file types.
+  const looksLikeFareharborExport = csvRows.length > 0 && csvRows[0].item_id !== undefined && csvRows[0].slug === undefined;
+  if (looksLikeFareharborExport) {
+    const report = await applyFareharborLocationImport(csvRows);
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report }) }));
     return;
   }
 
