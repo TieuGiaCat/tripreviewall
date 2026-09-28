@@ -113,24 +113,9 @@ function jsonLd(post, relatedTour) {
     `<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`,
   ];
 
-  // Review schema — only when this is a deep-dive review of one specific
-  // tour, and we actually have that tour's aggregate rating to cite.
-  if (post.contentFormat === "deep_dive_review" && relatedTour && relatedTour.aggregatedRating) {
-    const review = {
-      "@context": "https://schema.org",
-      "@type": "Review",
-      itemReviewed: { "@type": "Product", name: relatedTour.title },
-      author: { "@type": "Person", name: post.author || "Tripreviewall Editorial Team" },
-      datePublished: post.publishedAt,
-      reviewRating: {
-        "@type": "Rating",
-        ratingValue: String(relatedTour.aggregatedRating),
-        bestRating: "5",
-        worstRating: "1",
-      },
-    };
-    scripts.push(`<script type="application/ld+json">${JSON.stringify(review)}</script>`);
-  }
+  // No Review schema: the only rating available is the tour's aggregate from
+  // other booking sites, and Google's review-snippet policy forbids marking
+  // that up as a review (it also produced 'Invalid object type' errors).
 
   return scripts.join("\n");
 }

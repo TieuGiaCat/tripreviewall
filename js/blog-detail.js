@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderInlineTourCard(tour);
     renderSidebarCard(tour);
     const link = document.getElementById("internal-tour-link");
-    if (link) link.href = `../tours/tour-detail.html?slug=${tour.slug}`;
+    if (link) link.href = `/tours/${tour.slug}`;
   }
   if (typeof BLOG_POSTS !== "undefined") renderRelatedArticles();
 });
@@ -33,7 +33,7 @@ function renderInlineTourCard(tour) {
         <div class="inline-tour-diff">${tour.company} — ${tour.duration}, ${tour.tourType.toLowerCase()}.</div>
         <div class="inline-tour-footer">
           <span class="inline-tour-price">From $${tour.priceFrom}</span>
-          <a href="../tours/tour-detail.html?slug=${tour.slug}" class="btn btn-primary">Check Availability</a>
+          <a href="/tours/${tour.slug}" class="btn btn-primary">Check Availability</a>
         </div>
         <p class="inline-tour-disclosure">This is an affiliate link. If you book, Tripreviewall may earn a commission at no extra cost to you.</p>
       </div>
@@ -54,7 +54,7 @@ function renderSidebarCard(tour) {
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${tour.island}</li>
     </ul>
     <div class="sidebar-affiliate-price">From $${tour.priceFrom}/person</div>
-    <a href="../tours/tour-detail.html?slug=${tour.slug}" class="btn btn-primary btn-full">Check Availability</a>
+    <a href="/tours/${tour.slug}" class="btn btn-primary btn-full">Check Availability</a>
     <p class="inline-tour-disclosure">Tripreviewall may earn a commission if you book through this link, at no extra cost to you.</p>`;
 }
 
@@ -63,7 +63,7 @@ function renderRelatedArticles() {
   if (!el) return;
   const list = BLOG_POSTS.filter((p) => p.slug !== CURRENT_ARTICLE_SLUG).slice(0, 3);
   el.innerHTML = list.map((p) => `
-    <a href="${p.hasDetailPage ? p.slug + '.html' : '#'}" class="blog-card">
+    <a href="${p.hasDetailPage ? '/blog/' + p.slug : '#'}" class="blog-card">
       <div class="blog-card-image" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category}</div>

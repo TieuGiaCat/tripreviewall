@@ -128,7 +128,7 @@ function renderRelatedArticles() {
   if (typeof BLOG_POSTS === "undefined") return;
   const list = BLOG_POSTS.slice(0, 3);
   el.innerHTML = list.map((p) => `
-    <a href="${p.hasDetailPage ? "blog/" + p.slug + ".html" : "#"}" class="blog-card">
+    <a href="${p.hasDetailPage ? "/blog/" + p.slug : "#"}" class="blog-card">
       <div class="blog-card-image" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category}</div>

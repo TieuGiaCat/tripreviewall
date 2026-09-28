@@ -153,16 +153,23 @@ function bookingSidebarHtml(tour) {
 }
 
 function jsonLd(tour) {
+  // TouristTrip (not Product): this site reviews tours, it doesn't sell them,
+  // so Product/Offer triggers Google's Merchant listing requirements (return
+  // policy, shipping, availability) that can never apply here.
+  // No aggregateRating: Google's review-snippet rules forbid marking up
+  // ratings aggregated from other websites (TripAdvisor, GetYourGuide...),
+  // and TouristTrip isn't an eligible parent type for it anyway — that was
+  // the "Invalid object type for field <parent_node>" error.
   const data = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "TouristTrip",
     name: tour.title,
+    url: `${SITE_URL}/tours/${tour.slug}`,
     description: (tour.fullDescription || "").slice(0, 300),
     image: tour.gallery && tour.gallery[0] ? `${SITE_URL}${tour.gallery[0]}` : undefined,
-    offers: { "@type": "Offer", price: String(tour.priceFrom), priceCurrency: "USD" },
-    aggregateRating: tour.reviewCountTotal
-      ? { "@type": "AggregateRating", ratingValue: String(tour.aggregatedRating), reviewCount: String(tour.reviewCountTotal) }
-      : undefined,
+    touristType: tour.tourType || undefined,
+    provider: tour.company ? { "@type": "Organization", name: tour.company } : undefined,
+    offers: tour.priceFrom ? { "@type": "Offer", price: String(tour.priceFrom), priceCurrency: "USD" } : undefined,
   };
   const breadcrumb = {
     "@context": "https://schema.org",
