@@ -82,6 +82,14 @@ function renderToursIndexHtml(tours) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#0B3B4F">
 <title>All Hawaii Tours — Tripreviewall</title>
 <meta name="description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide — ranked by real, honest data, updated continuously.">
 <link rel="canonical" href="${SITE_URL}/tours">
@@ -193,6 +201,14 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#0B3B4F">
 <title>All Articles — Tripreviewall Hawaii Travel Guide</title>
 <meta name="description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
 <link rel="canonical" href="${SITE_URL}/blog">
@@ -265,6 +281,14 @@ function renderDestinationsHubHtml(islandCounts, destinationsBySlug = {}) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#0B3B4F">
 <title>Explore Hawaii by Island — Tripreviewall</title>
 <meta name="description" content="Browse honest, aggregated Hawaii tour reviews by island — Oahu, Maui, Kauai and Big Island.">
 <link rel="canonical" href="${SITE_URL}/destinations">
@@ -331,6 +355,14 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#0B3B4F">
 <title>${esc(metaTitle)}</title>
 <meta name="description" content="${esc(metaDescription)}">
 <link rel="canonical" href="${SITE_URL}/destinations/${island.slug}">
