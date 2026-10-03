@@ -313,3 +313,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 /* Cards hidden by the blog filters / "Load More" */
 .blog-card[hidden] { display: none !important; }
+
+/* ---- Breadcrumb (every page) ---- */
+.breadcrumb { font-size: var(--text-meta); color: var(--color-text-muted); padding: 20px 0 0; }
+.breadcrumb a:hover { color: var(--color-primary); }
+.breadcrumb .sep { margin: 0 6px; color: var(--color-border-strong); }
+.breadcrumb .current { color: var(--color-text); }

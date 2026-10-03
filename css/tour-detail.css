@@ -3,11 +3,7 @@
    Extends css/style.css (header/footer/buttons/tour-card reused as-is)
    ============================================================ */
 
-/* ---- Breadcrumb ---- */
-.breadcrumb { font-size: var(--text-meta); color: var(--color-text-muted); padding: 20px 0 0; }
-.breadcrumb a:hover { color: var(--color-primary); }
-.breadcrumb .sep { margin: 0 6px; color: var(--color-border-strong); }
-.breadcrumb .current { color: var(--color-text); }
+/* Breadcrumb styles live in style.css (used on every page). */
 
 /* ---- Title block ---- */
 .detail-title-block { padding: 16px 0 24px; }

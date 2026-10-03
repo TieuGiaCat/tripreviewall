@@ -16,6 +16,7 @@ function settingsSubNav(active) {
       <div style="display:flex;gap:4px;">
         <a href="/admin/settings/email" style="padding:10px 16px;border-bottom:2px solid ${active === "email" ? "var(--color-primary)" : "transparent"};font-weight:600;color:${active === "email" ? "var(--color-primary)" : "var(--color-text-muted)"};">Email</a>
         <a href="/admin/settings/tracking" style="padding:10px 16px;border-bottom:2px solid ${active === "tracking" ? "var(--color-primary)" : "transparent"};font-weight:600;color:${active === "tracking" ? "var(--color-primary)" : "var(--color-text-muted)"};">Tracking</a>
+        <a href="/admin/settings/site-info" style="padding:10px 16px;border-bottom:2px solid ${active === "site-info" ? "var(--color-primary)" : "transparent"};font-weight:600;color:${active === "site-info" ? "var(--color-primary)" : "var(--color-text-muted)"};">Site Info</a>
       </div>
     </div>`;
 }
@@ -310,3 +311,77 @@ async function saveTrackingSettings(req, res, user) {
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
   res.end(layout({ title: "Settings — Tracking", activeNav: "settings", user, body: renderTrackingForm({ t: data, notice: "Saved — every page has been regenerated with the new tracking scripts." }) }));
 }
+
+
+/* ============================================================
+   Settings → Site Info (phone, email, hours, address, operator name)
+   Used in every page's header drawer and footer and on Contact /
+   Transportation / Privacy. Saving rebuilds all public pages in the
+   background so the new details appear everywhere.
+   ============================================================ */
+const { loadSiteInfo, saveSiteInfo } = require("../lib/siteInfo");
+
+const SITE_INFO_FIELDS = [
+  { key: "phone", label: "Phone (shown on the site)", hint: "e.g. +1 (808) 226-1884 — the tap-to-call link is built from it." },
+  { key: "email", label: "Contact email", hint: "Shown in the footer, Contact, Privacy and Affiliate pages." },
+  { key: "hours", label: "Opening hours", hint: "e.g. Mon–Fri 8:30–20:00 · Sat–Sun 9:30–21:30 (HST)" },
+  { key: "address", label: "Address", hint: "Shown on the Contact page." },
+  { key: "operatorName", label: "Operated by", hint: "Company name in the footer copyright line." },
+];
+
+function renderSiteInfoForm({ info = {}, errors = [], notice = null }) {
+  return `
+    ${settingsSubNav("site-info")}
+    <h1 class="page-title">Settings — Site Info</h1>
+    <p class="page-sub">Contact details used across the whole public site (footer, mobile menu, Contact page…). After saving, every page is rebuilt automatically — it takes about a minute to appear everywhere.</p>
+    ${errors.length ? `<div class="alert alert-error">${errors.map(esc).join("<br>")}</div>` : ""}
+    ${notice ? `<div class="alert alert-success">${esc(notice)}</div>` : ""}
+    <form method="POST" action="/admin/settings/site-info">
+      <div class="form-card">
+        ${SITE_INFO_FIELDS.map((f) => `
+        <div class="form-row full">
+          <div class="form-field"><label>${f.label}</label><input type="text" name="${f.key}" value="${esc(info[f.key] || "")}" maxlength="200"><div class="hint">${esc(f.hint)}</div></div>
+        </div>`).join("")}
+      </div>
+      <div class="form-actions"><button type="submit" class="btn btn-primary">Save &amp; rebuild pages</button></div>
+    </form>`;
+}
+
+async function showSiteInfoSettings(req, res, user) {
+  const info = await loadSiteInfo();
+  const notice = new URL(req.url, "http://x").searchParams.get("saved") ? "Saved. All public pages are being rebuilt in the background." : null;
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(layout({ title: "Settings — Site Info", activeNav: "settings", user, body: renderSiteInfoForm({ info, notice }) }));
+}
+
+async function saveSiteInfoSettings(req, res, user) {
+  let body;
+  try {
+    body = await readFormBody(req);
+  } catch (err) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end("Malformed request.");
+    return;
+  }
+  const errors = [];
+  if (body.email && !/^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(body.email.trim())) errors.push("Contact email doesn't look like a valid address.");
+  if (errors.length) {
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Settings — Site Info", activeNav: "settings", user, body: renderSiteInfoForm({ info: body, errors }) }));
+    return;
+  }
+  const data = {};
+  SITE_INFO_FIELDS.forEach((f) => { data[f.key] = String(body[f.key] || "").trim(); });
+  await saveSiteInfo(data);
+  await logAudit(user, "update", "settings", "site_info", "Updated Site Info (phone/email/hours/address)");
+
+  // Rebuild everything in the background — the footer is on every page.
+  const { regenerateAllPages } = require("../ssr/generator");
+  regenerateAllPages().catch((err) => console.error("[settings] rebuild after Site Info save failed:", err.message));
+
+  res.writeHead(302, { Location: "/admin/settings/site-info?saved=1" });
+  res.end();
+}
+
+module.exports.showSiteInfoSettings = showSiteInfoSettings;
+module.exports.saveSiteInfoSettings = saveSiteInfoSettings;

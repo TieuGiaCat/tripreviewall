@@ -1,7 +1,9 @@
 const { query } = require("../db");
 
-const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
-const TOURS_PER_PAGE = 24; // keep in sync with ssr/listingTemplates.js
+const { SITE_URL } = require("../siteConfig");
+const { ISLANDS } = require("../ssr/islands");
+const { TOURS_PER_PAGE } = require("../ssr/listingTemplates");
+
 
 // Static pages that always exist, independent of DB content.
 const STATIC_PAGES = [
@@ -9,10 +11,7 @@ const STATIC_PAGES = [
   { path: "/tours", priority: "0.9" },
   { path: "/blog", priority: "0.9" },
   { path: "/destinations", priority: "0.8" },
-  { path: "/destinations/oahu", priority: "0.7" },
-  { path: "/destinations/maui", priority: "0.7" },
-  { path: "/destinations/kauai", priority: "0.7" },
-  { path: "/destinations/big-island", priority: "0.7" },
+  ...ISLANDS.map((isl) => ({ path: `/destinations/${isl.slug}`, priority: "0.7" })),
   // /transportation is temporarily noindex (placeholder content) — left out on purpose.
   { path: "/about", priority: "0.4" },
   { path: "/contact", priority: "0.4" },

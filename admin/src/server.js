@@ -345,6 +345,14 @@ async function routeRequest(req, res) {
     return settingsRoutes.saveTrackingSettings(req, res, session);
   }
 
+  // ---- Settings → Site Info ----
+  if (method === "GET" && pathname === "/admin/settings/site-info") {
+    return settingsRoutes.showSiteInfoSettings(req, res, session);
+  }
+  if (method === "POST" && pathname === "/admin/settings/site-info") {
+    return settingsRoutes.saveSiteInfoSettings(req, res, session);
+  }
+
   // ---- Destinations ----
   if (method === "GET" && pathname === "/admin/destinations") {
     return destinationsRoutes.listDestinations(req, res, session);

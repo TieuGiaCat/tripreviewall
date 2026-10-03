@@ -1,9 +1,9 @@
 const { esc } = require("../utils");
-const { ASSET_V } = require("./assetVersion");
+const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
 const { imgUrl, jsonLdScript } = require("./sharedHtml");
 const { sanitizeHtml } = require("../lib/sanitizeHtml");
 
-const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
+const { SITE_URL } = require("../siteConfig");
 
 function fmtDate(d) {
   if (!d) return "";
@@ -24,20 +24,19 @@ function inlineTourCardHtml(tour) {
         <div class="inline-tour-rating">${(tour.aggregatedRating || 0).toFixed(1)}★ · ${(tour.reviewCountTotal || 0).toLocaleString()} reviews</div>
         <div class="inline-tour-diff">${esc(tour.company)} — ${esc(tour.duration)}, ${esc((tour.tourType || "").toLowerCase())}.</div>
         <div class="inline-tour-footer">
-          <span class="inline-tour-price">From $${tour.priceFrom}</span>
-          <a href="/tours/${esc(tour.slug)}" class="btn btn-primary">Check Availability</a>
+          <span class="inline-tour-price">${tour.priceFrom != null ? `From $${esc(tour.priceFrom)}` : "Price on request"}</span>
+          <a href="/tours/${esc(tour.slug)}" class="btn btn-primary">View tour &amp; reviews</a>
         </div>
-        <p class="inline-tour-disclosure">This is an affiliate link. If you book, Tripreviewall may earn a commission at no extra cost to you.</p>
+        <p class="inline-tour-disclosure">Booking links on the tour page are affiliate links — Tripreviewall may earn a commission at no extra cost to you.</p>
       </div>
     </div>`;
 }
 
-function sidebarTourCardHtml(tour) {
+/** Inner card markup — also used by hand-written pages via {{sidebarTourCard:slug}}. */
+function sidebarTourCardInner(tour) {
   if (!tour) return "";
   const img = tour.gallery && tour.gallery[0];
   return `
-    <aside class="article-sidebar-col">
-      <div class="sidebar-affiliate-card">
         <div class="sidebar-affiliate-label">Featured Tour</div>
         <div class="sidebar-affiliate-img" style="${img ? `background-image:url('${esc(imgUrl(img, 400))}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
         <h4 class="sidebar-affiliate-title">${esc(tour.title)}</h4>
@@ -47,9 +46,16 @@ function sidebarTourCardHtml(tour) {
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(tour.tourType)}</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(tour.island)}</li>
         </ul>
-        <div class="sidebar-affiliate-price">From $${tour.priceFrom}/person</div>
-        <a href="/tours/${esc(tour.slug)}" class="btn btn-primary btn-full">Check Availability</a>
-        <p class="inline-tour-disclosure">Tripreviewall may earn a commission if you book through this link, at no extra cost to you.</p>
+        <div class="sidebar-affiliate-price">${tour.priceFrom != null ? `From $${esc(tour.priceFrom)}/person` : "Price on request"}</div>
+        <a href="/tours/${esc(tour.slug)}" class="btn btn-primary btn-full">View tour &amp; reviews</a>
+        <p class="inline-tour-disclosure">Booking links on the tour page are affiliate links — Tripreviewall may earn a commission at no extra cost to you.</p>`;
+}
+
+function sidebarTourCardHtml(tour) {
+  if (!tour) return "";
+  return `
+    <aside class="article-sidebar-col">
+      <div class="sidebar-affiliate-card">${sidebarTourCardInner(tour)}
       </div>
     </aside>`;
 }
@@ -166,14 +172,6 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0B3B4F">
 <title>${esc(metaTitle)} | Tripreviewall</title>
 <meta name="description" content="${esc(metaDesc)}">
 <link rel="canonical" href="${canonical}">
@@ -191,55 +189,11 @@ ${post.author ? `<meta property="article:author" content="${esc(post.author)}">`
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(post.featuredImage, 1200)}">` : ""}
 ${jsonLd(post, relatedTour)}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="../css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="../css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="../css/blog-detail.css?v=${ASSET_V}">
+${headBoilerplate(["blog-detail"])}
 </head>
 <body>
 
-<a href="#main" class="skip-link">Skip to content</a>
-
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="/" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
-    <nav class="main-nav" aria-label="Primary">
-      <a href="/tours">Tours</a>
-      <a href="/destinations">Destinations</a>
-      <a href="/blog">Blog</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-    </nav>
-    <div class="header-actions">
-      <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="mobile-drawer">
-  <div class="mobile-drawer-backdrop" data-drawer-backdrop></div>
-  <div class="mobile-drawer-panel" role="dialog" aria-label="Site menu">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span class="logo"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
-      <button class="close-btn" data-drawer-close aria-label="Close menu">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-    <nav>
-      <a href="/tours" class="mobile-nav-link">Tours</a>
-      <a href="/destinations" class="mobile-nav-link">Destinations</a>
-      <a href="/blog" class="mobile-nav-link">Blog</a>
-      <a href="/about" class="mobile-nav-link">About</a>
-      <a href="/contact" class="mobile-nav-link">Contact</a>
-    </nav>
-  </div>
-</div>
+${siteHeader()}
 
 <main id="main">
   <div class="container">
@@ -306,28 +260,11 @@ ${jsonLd(post, relatedTour)}
   </div>
 </main>
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
-        <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
-      </div>
-      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
-      <div class="footer-col"><h4>Contact Us</h4>
-        <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
-        <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
-      </div>
-    </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
-    <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
-  </div>
-</footer>
+${siteFooter()}
 
-<script src="../js/main.js?v=${ASSET_V}"></script>
+${scriptTags(["main"])}
 </body>
 </html>`;
 }
 
-module.exports = { renderPostPageHtml };
+module.exports = { renderPostPageHtml, inlineTourCardHtml, sidebarTourCardInner, relatedArticlesHtml };

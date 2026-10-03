@@ -3,6 +3,8 @@ const { readFormBody, slugify, esc, linesToArray } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { generateTourFile, removeTourFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 const { logAudit } = require("../auditLog");
+const { LEGACY_EDITORS_PICK_SLUGS } = require("../siteConfig");
+const { tourAffiliateIssues, SQL_HAS_AFFILIATE_ISSUE, clientRulesJson } = require("../lib/affiliateLinks");
 
 const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
 
@@ -13,6 +15,7 @@ async function listTours(req, res, user, urlObj) {
   const search = (urlObj.searchParams.get("q") || "").trim();
   const statusFilter = urlObj.searchParams.get("status") || "";
   const islandFilter = urlObj.searchParams.get("island") || "";
+  const linksFilter = urlObj.searchParams.get("links") === "missing" ? "missing" : "";
   const SORTS = {
     updated_desc: { label: "Updated — newest first", sql: "updated_at DESC" },
     updated_asc: { label: "Updated — oldest first", sql: "updated_at ASC" },
@@ -39,6 +42,7 @@ async function listTours(req, res, user, urlObj) {
   } else if (islandFilter === "none") {
     conditions.push(`(island IS NULL OR island = '')`);
   }
+  if (linksFilter === "missing") conditions.push(SQL_HAS_AFFILIATE_ISSUE);
   const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   let rows = [];
@@ -64,7 +68,7 @@ async function listTours(req, res, user, urlObj) {
 
   // Clickable column headers: keep the current search/filters, flip the sort.
   const sortLink = (label, nextSort, arrow) => {
-    const qs = new URLSearchParams({ q: search, status: statusFilter, island: islandFilter, sort: nextSort });
+    const qs = new URLSearchParams({ q: search, status: statusFilter, island: islandFilter, links: linksFilter, sort: nextSort });
     return `<a href="/admin/tours?${esc(qs.toString())}" style="color:inherit;text-decoration:none;">${label}${arrow}</a>`;
   };
 
@@ -74,7 +78,8 @@ async function listTours(req, res, user, urlObj) {
       const rating = t.data && t.data.aggregatedRating;
       return `<tr>
         <td><a href="/admin/tours/${t.id}/edit" style="color:var(--color-primary);font-weight:600;">${esc(name)}</a><br>
-            <span style="color:var(--color-text-muted);font-size:12px;">${esc(t.slug)}</span></td>
+            <span style="color:var(--color-text-muted);font-size:12px;">${esc(t.slug)}</span>
+            ${(() => { const issues = tourAffiliateIssues(t.data); return issues.length ? `<br><span title="${esc(issues.map((i) => i.message).join("\n"))}" style="display:inline-block;margin-top:4px;padding:1px 8px;border-radius:999px;background:#fff8e1;border:1px solid #f0c36d;color:#7a5a00;font-size:11px;font-weight:600;">⚠ ${issues.length} link${issues.length > 1 ? "s" : ""} without affiliate ID</span>` : ""; })()}</td>
         <td>${esc(t.island || "—")}</td>
         <td><span class="badge ${t.status === "published" ? "badge-published" : "badge-draft"}">${esc(t.status)}</span></td>
         <td>${t.price_from != null ? "$" + esc(t.price_from) : "—"}</td>
@@ -109,6 +114,10 @@ async function listTours(req, res, user, urlObj) {
           ${ISLANDS.map((isl) => `<option value="${isl}" ${islandFilter === isl ? "selected" : ""}>${isl}</option>`).join("")}
           <option value="none" ${islandFilter === "none" ? "selected" : ""}>No island set</option>
         </select>
+        <select name="links" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">
+          <option value="">All booking links</option>
+          <option value="missing" ${linksFilter === "missing" ? "selected" : ""}>⚠ Missing affiliate ID</option>
+        </select>
         <select name="sort" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">
           ${Object.entries(SORTS).map(([key, o]) => `<option value="${key}" ${sort === key ? "selected" : ""}>${o.label}</option>`).join("")}
         </select>
@@ -122,7 +131,7 @@ async function listTours(req, res, user, urlObj) {
       <thead><tr><th>${sortLink("Name", sort === "name_asc" ? "name_desc" : "name_asc", sort.startsWith("name_") ? (sort === "name_asc" ? " ▲" : " ▼") : "")}</th><th>Island</th><th>Status</th><th>Price</th><th>Rating</th><th>${sortLink("Updated", sort === "updated_desc" ? "updated_asc" : "updated_desc", sort.startsWith("updated_") ? (sort === "updated_desc" ? " ▼" : " ▲") : "")}</th><th>Actions</th></tr></thead>
       <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:32px;">No tours match this search yet.</td></tr>`}</tbody>
     </table>
-    ${paginationHtml(page, totalPages, "/admin/tours", { q: search, status: statusFilter, island: islandFilter, sort })}
+    ${paginationHtml(page, totalPages, "/admin/tours", { q: search, status: statusFilter, island: islandFilter, links: linksFilter, sort })}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -205,22 +214,26 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         </div>
         <div class="form-row">
           <div class="form-field"><label>Price From (USD)</label><input type="number" step="1" min="0" name="priceFrom" value="${esc(tour.price_from != null ? tour.price_from : "")}"></div>
+          <div class="form-field"><label><input type="checkbox" name="editorsPick" value="1" ${(typeof d.editorsPick === "boolean" ? d.editorsPick : LEGACY_EDITORS_PICK_SLUGS.includes(tour.slug)) ? "checked" : ""}> Editor's Pick</label><div class="hint">Shows an "Editor's Pick" badge on the tour card and puts it first on the home page.</div></div>
+        </div>
+        <div class="form-row">
           <div class="form-field"><label>FareHarbor Item ID</label><input type="text" name="fareharborItemId" value="${esc(d.fareharborItemId || "")}" placeholder="e.g. 115595"><div class="hint">The primary item_id for this tour — used to match FareHarbor import files.</div></div>
         </div>
       </div>
 
       <div class="form-card">
         <h2>Booking Links</h2>
+        ${(() => { const issues = tourAffiliateIssues(d); return issues.length ? `<div class="alert" style="background:#fff8e1;border:1px solid #f0c36d;color:#7a5a00;margin-bottom:16px;"><strong>⚠ ${issues.length} booking link${issues.length > 1 ? "s are" : " is"} missing our affiliate ID</strong> — visitors can still book, but we earn no commission:<br>${issues.map((i) => "• " + esc(i.message)).join("<br>")}</div>` : ""; })()}
         <p class="hint" style="margin:-8px 0 16px;">Each toggle controls whether that button shows on the live Tour Detail page. FareHarbor uses the full "regular_link" URL from its own partner export (not a shortname) — the other three need a full affiliate URL from that platform's partner dashboard.</p>
 
         <div class="form-row">
-          <div class="form-field"><label>FareHarbor Regular Link</label><input type="text" name="fareharborRegularLink" value="${esc(d.fareharborRegularLink || "")}" placeholder="https://fareharbor.com/embeds/book/.../items/.../"></div>
+          <div class="form-field"><label>FareHarbor Regular Link</label><input type="text" name="fareharborRegularLink" data-aff="fareharbor" value="${esc(d.fareharborRegularLink || "")}" placeholder="https://fareharbor.com/embeds/book/.../items/.../"><div class="aff-warn" hidden></div></div>
           <div class="form-field">
             <label><input type="checkbox" name="showFareharbor" value="1" ${bl.fareharbor && bl.fareharbor.show === false ? "" : "checked"}> Show FareHarbor button</label>
           </div>
         </div>
         <div class="form-row full">
-          <div class="form-field"><label>FareHarbor Calendar Script</label><textarea name="fareharborCalendarScript" style="min-height:80px;font-family:monospace;font-size:12px;" placeholder='&lt;script src="https://fareharbor.com/embeds/script/calendar/..."&gt;&lt;/script&gt;'>${esc(d.fareharborCalendarScript || "")}</textarea><div class="hint">Paste the "calendar_script" cell from the FareHarbor export — renders the real booking calendar on the live page.</div></div>
+          <div class="form-field"><label>FareHarbor Calendar Script</label><textarea name="fareharborCalendarScript" style="min-height:80px;font-family:monospace;font-size:12px;" data-aff="fareharbor-script" placeholder='&lt;script src="https://fareharbor.com/embeds/script/calendar/..."&gt;&lt;/script&gt;'>${esc(d.fareharborCalendarScript || "")}</textarea><div class="aff-warn" hidden></div><div class="hint">Paste the "calendar_script" cell from the FareHarbor export — renders the real booking calendar on the live page.</div></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>TripAdvisor Affiliate URL</label><input type="text" name="tripadvisorUrl" value="${esc((bl.tripadvisor && bl.tripadvisor.url) || "")}" placeholder="https://..."></div>
@@ -229,13 +242,13 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
           </div>
         </div>
         <div class="form-row">
-          <div class="form-field"><label>GetYourGuide Affiliate URL</label><input type="text" name="getyourguideUrl" value="${esc((bl.getyourguide && bl.getyourguide.url) || "")}" placeholder="https://..."></div>
+          <div class="form-field"><label>GetYourGuide Affiliate URL</label><input type="text" name="getyourguideUrl" data-aff="getyourguide" value="${esc((bl.getyourguide && bl.getyourguide.url) || "")}" placeholder="https://..."><div class="aff-warn" hidden></div></div>
           <div class="form-field">
             <label><input type="checkbox" name="showGetyourguide" value="1" ${bl.getyourguide && bl.getyourguide.show ? "checked" : ""}> Show GetYourGuide button</label>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-field"><label>Viator Affiliate URL</label><input type="text" name="viatorUrl" value="${esc((bl.viator && bl.viator.url) || "")}" placeholder="https://..."></div>
+          <div class="form-field"><label>Viator Affiliate URL</label><input type="text" name="viatorUrl" data-aff="viator" value="${esc((bl.viator && bl.viator.url) || "")}" placeholder="https://..."><div class="aff-warn" hidden></div></div>
           <div class="form-field">
             <label><input type="checkbox" name="showViator" value="1" ${bl.viator && bl.viator.show ? "checked" : ""}> Show Viator button</label>
           </div>
@@ -332,7 +345,60 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         <a href="/admin/tours" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
+    <style>
+      .aff-warn { margin-top:6px; padding:8px 10px; border-radius:4px; background:#fff8e1; border:1px solid #f0c36d; color:#7a5a00; font-size:12px; line-height:1.4; }
+      .aff-warn button { margin-left:6px; padding:2px 8px; font-size:12px; border:1px solid #b88a00; background:#fff; color:#7a5a00; border-radius:3px; cursor:pointer; }
+      .aff-ok { border-color:#9cc5a1 !important; }
+    </style>
     <script>
+      // Live check: does each booking link carry OUR affiliate ID? (rules from lib/affiliateLinks.js)
+      var AFF_RULES = ${clientRulesJson()};
+      function affParse(v) { try { return new URL(String(v || "").trim().replace(/&amp;/g, "&")); } catch (e) { return null; } }
+      function affHostOk(u, hosts) { var h = u.hostname.toLowerCase(); return hosts.some(function (d) { return h === d || h.slice(-(d.length + 1)) === "." + d; }); }
+      function affCheck(platform, value) {
+        var rule = AFF_RULES[platform]; if (!rule || !String(value || "").trim()) return null;
+        var u = affParse(value); if (!u) return rule.label + " link is not a valid URL.";
+        if (!affHostOk(u, rule.hosts)) return rule.label + " link doesn't point to " + rule.hosts[0] + ".";
+        var missing = Object.keys(rule.required).filter(function (k) { return u.searchParams.get(k) !== rule.required[k]; }).map(function (k) { return k + "=" + rule.required[k]; });
+        return missing.length ? "Missing our affiliate ID (" + missing.join(", ") + ") — bookings through this link earn no commission." : null;
+      }
+      function affFix(platform, value) {
+        var rule = AFF_RULES[platform]; var u = affParse(value); if (!rule || !u) return value;
+        Object.keys(rule.add).forEach(function (k) { u.searchParams.set(k, rule.add[k]); });
+        return u.toString();
+      }
+      function affScriptSrc(v) { var m = String(v || "").match(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i); return m ? m[1] : null; }
+      function affRefresh(input) {
+        var kind = input.getAttribute("data-aff");
+        var box = input.parentElement.querySelector(".aff-warn");
+        if (!box) return;
+        var problem = null, fixed = null;
+        if (kind === "fareharbor-script") {
+          if (String(input.value).trim()) {
+            var src = affScriptSrc(input.value);
+            if (!src) problem = 'No <script src="…"> found — paste the full calendar_script cell from FareHarbor.';
+            else { problem = affCheck("fareharbor", src); if (problem) fixed = input.value.replace(src, affFix("fareharbor", src)); }
+          }
+        } else {
+          problem = affCheck(kind, input.value);
+          if (problem && affParse(input.value) && affHostOk(affParse(input.value), AFF_RULES[kind].hosts)) fixed = affFix(kind, input.value);
+        }
+        input.classList.toggle("aff-ok", !problem && !!String(input.value).trim());
+        if (!problem) { box.hidden = true; box.innerHTML = ""; return; }
+        box.hidden = false;
+        box.textContent = "⚠ " + problem;
+        if (fixed) {
+          var btn = document.createElement("button");
+          btn.type = "button"; btn.textContent = "Add our affiliate ID";
+          btn.addEventListener("click", function () { input.value = fixed; affRefresh(input); });
+          box.appendChild(btn);
+        }
+      }
+      document.querySelectorAll("[data-aff]").forEach(function (input) {
+        input.addEventListener("input", function () { affRefresh(input); });
+        affRefresh(input);
+      });
+
       var PACKAGE_DATA = ${pkJson};
       function escAttr(v) {
         return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -463,6 +529,7 @@ function bodyToTourData(body, existingData = {}) {
     fareharborRegularLink: (body.fareharborRegularLink || "").trim(),
     fareharborCalendarScript: (body.fareharborCalendarScript || "").trim(),
     fareharborItemId: (body.fareharborItemId || "").trim() || null,
+    editorsPick: body.editorsPick === "1",
     highlights: linesToArray(body.highlights),
     fullDescription: (body.fullDescription || "").trim(),
     metaTitle: (body.metaTitle || "").trim() || null,
@@ -1227,6 +1294,9 @@ async function importToursCsv(req, res, user) {
       if (showCell !== undefined && showCell !== "") { blImport[key] = { ...(blImport[key] || {}), show: csvTruthy(showCell) }; changed = true; }
     });
     data.bookingLinks = blImport;
+
+    const linkIssues = tourAffiliateIssues(data);
+    if (linkIssues.length) warnings.push(`${fhId} (${slug}): ${linkIssues.map((i) => i.message).join(" ")}`);
 
     if (!changed) { unchanged++; continue; }
 

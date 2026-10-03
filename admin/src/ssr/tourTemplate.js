@@ -1,11 +1,11 @@
 const { esc } = require("../utils");
-const { ASSET_V } = require("./assetVersion");
+const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
 const { starsRowHtml, tourCardHtml, imgUrl, imgSrcset, jsonLdScript } = require("./sharedHtml");
 
 const HERO_SIZES = "(min-width: 1280px) 1200px, 100vw";
 const HERO_WIDTHS = [400, 800, 1200, 1600];
 
-const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
+const { SITE_URL } = require("../siteConfig");
 
 /**
  * Platform cards for the "Review" tab — only the platforms ticked in admin
@@ -283,14 +283,6 @@ function renderTourPageHtml(tour, similarTours) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0B3B4F">
 <title>${esc(pageTitle)} | Tripreviewall</title>
 <meta name="description" content="${esc(metaDesc)}">
 <link rel="canonical" href="${canonical}">
@@ -305,56 +297,12 @@ ${heroImg ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImg, 120
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(heroImg, 1200)}">` : ""}
 ${jsonLd(tour)}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
 ${heroImg ? `<link rel="preload" as="image" href="${esc(imgUrl(heroImg, 800))}"${imgSrcset(heroImg, HERO_WIDTHS) ? ` imagesrcset="${esc(imgSrcset(heroImg, HERO_WIDTHS))}" imagesizes="${HERO_SIZES}"` : ""} fetchpriority="high">` : ""}
-<link rel="stylesheet" href="../css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="../css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="../css/tour-detail.css?v=${ASSET_V}">
+${headBoilerplate(["tour-detail"])}
 </head>
 <body>
 
-<a href="#main" class="skip-link">Skip to content</a>
-
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="/" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
-    <nav class="main-nav" aria-label="Primary">
-      <a href="/tours">Tours</a>
-      <a href="/destinations">Destinations</a>
-      <a href="/blog">Blog</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-    </nav>
-    <div class="header-actions">
-      <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="mobile-drawer">
-  <div class="mobile-drawer-backdrop" data-drawer-backdrop></div>
-  <div class="mobile-drawer-panel" role="dialog" aria-label="Site menu">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span class="logo"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
-      <button class="close-btn" data-drawer-close aria-label="Close menu">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-    <nav>
-      <a href="/tours" class="mobile-nav-link">Tours</a>
-      <a href="/destinations" class="mobile-nav-link">Destinations</a>
-      <a href="/blog" class="mobile-nav-link">Blog</a>
-      <a href="/about" class="mobile-nav-link">About</a>
-      <a href="/contact" class="mobile-nav-link">Contact</a>
-    </nav>
-  </div>
-</div>
+${siteHeader()}
 
 <main id="main">
   <div class="container">
@@ -455,26 +403,9 @@ ${heroImg ? `<link rel="preload" as="image" href="${esc(imgUrl(heroImg, 800))}"$
 
 ${mobileBookingHtml(tour)}
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
-        <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
-      </div>
-      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
-      <div class="footer-col"><h4>Contact Us</h4>
-        <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
-        <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
-      </div>
-    </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
-    <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
-  </div>
-</footer>
+${siteFooter()}
 
-<script src="../js/main.js?v=${ASSET_V}"></script>
+${scriptTags(["main"])}
 <script>
   function switchDetailTab(targetId, clickedBtn, evt) {
     if (evt) { evt.preventDefault(); evt.stopPropagation(); }
@@ -505,7 +436,7 @@ ${mobileBookingHtml(tour)}
     return false;
   }
 </script>
-<script src="../js/tour-static-hydrate.js?v=${ASSET_V}"></script>
+${scriptTags(["tour-static-hydrate"])}
 </body>
 </html>`;
 }

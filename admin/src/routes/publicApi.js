@@ -1,4 +1,5 @@
 const { query } = require("../db");
+const { LEGACY_EDITORS_PICK_SLUGS } = require("../siteConfig");
 
 /**
  * Maps a DB row (id, slug, status, island, price_from, data{...}) to the
@@ -26,6 +27,7 @@ function toPublicShape(row) {
     verdict: d.verdict || {},
     googleSnapshot: d.googleSnapshot || {},
     variants: d.variants || [],
+    editorsPick: typeof d.editorsPick === "boolean" ? d.editorsPick : LEGACY_EDITORS_PICK_SLUGS.includes(row.slug),
     packages: d.packages || { show: false, items: [] },
     fareharborItemId: d.fareharborItemId || "",
     fareharborRegularLink: d.fareharborRegularLink || "",

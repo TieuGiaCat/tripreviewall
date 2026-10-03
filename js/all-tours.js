@@ -21,15 +21,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   initSearch();
   initSort();
   if (atState.query || atState.island || atState.type) {
-    await enterClientMode();
-    renderAllTours({ scroll: false });
+    if (await enterClientMode()) renderAllTours({ scroll: false });
   }
 });
 
+/** Loads the full list once. Returns false (and leaves the server-rendered list alone) if the API is unreachable. */
 async function enterClientMode() {
-  if (atClientMode) return;
-  if (typeof ALL_TOURS === "undefined") window.ALL_TOURS = await loadAllTours();
-  atClientMode = true;
+  if (atClientMode) return true;
+  if (typeof ALL_TOURS === "undefined" || !ALL_TOURS.length) window.ALL_TOURS = await loadAllTours();
+  atClientMode = ALL_TOURS.length > 0;
+  return atClientMode;
 }
 
 function matchesKeyword(t, keyword) {
@@ -68,9 +69,7 @@ function getFilteredSorted() {
   return list;
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
+// escHtml() comes from main.js (loaded before this file).
 
 function activeFilterChips() {
   const chips = [];
@@ -165,7 +164,7 @@ function initSearch() {
     clearTimeout(debounce);
     debounce = setTimeout(async () => {
       atState.query = input.value.trim(); atState.page = 1;
-      await enterClientMode();
+      if (!(await enterClientMode())) return;
       syncUrl();
       renderAllTours();
     }, 250);
@@ -177,7 +176,6 @@ function initSort() {
   if (!select) return;
   select.addEventListener("change", async (e) => {
     atState.sort = e.target.value; atState.page = 1;
-    await enterClientMode();
-    renderAllTours();
+    if (await enterClientMode()) renderAllTours();
   });
 }

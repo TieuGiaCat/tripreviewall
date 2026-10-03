@@ -3,7 +3,7 @@ const path = require("path");
 const { query } = require("../db");
 const { esc } = require("../utils");
 
-const SITE_ROOT = process.env.SITE_ROOT || path.join(__dirname, "..", "..", "..", "site-not-configured");
+const { SITE_ROOT } = require("../siteConfig");
 
 /**
  * Rewrites the <title> and <meta name="description"> tags inside an HTML

@@ -8,9 +8,12 @@ const { TOURS_PER_PAGE, renderToursIndexHtml, renderBlogIndexHtml, renderDestina
 const { renderHomeHtml } = require("./homeTemplate");
 const { applyAllPageSeoOverrides } = require("../lib/pageSeo");
 const { ensureSocialTags } = require("./sharedHtml");
-const { ASSET_V } = require("./assetVersion");
+const { ensureSiteInfo } = require("../lib/siteInfo");
+const { PAGES_DIR } = require("../siteConfig");
+const { parsePageSource, renderStaticPage } = require("./pageTemplate");
+const { assetV } = require("./assetVersion");
 
-const SITE_ROOT = process.env.SITE_ROOT || path.join(__dirname, "..", "..", "..", "site-not-configured");
+const { SITE_ROOT } = require("../siteConfig");
 const TOURS_DIR = path.join(SITE_ROOT, "tours");
 const POSTS_DIR = path.join(SITE_ROOT, "blog");
 
@@ -67,7 +70,7 @@ async function injectTracking(html) {
     if (head) html = html.replace("<head>", () => `<head>\n${head}`);
     if (body) html = html.replace("<body>", () => `<body>\n${body}`);
     if (head || body) {
-      html = html.replace("</body>", () => `<script src="/js/consent.js?v=${ASSET_V}" defer></script>\n</body>`);
+      html = html.replace("</body>", () => `<script src="/js/consent.js?v=${assetV()}" defer></script>\n</body>`);
     }
   } catch (err) {
     console.error("[ssr] injectTracking failed (page still written without tracking scripts):", err.message);
@@ -77,6 +80,7 @@ async function injectTracking(html) {
 
 /** Writes/updates the static file for a published tour. No-ops silently if SITE_ROOT isn't configured yet. */
 async function generateTourFile(tourRow) {
+  await ensureSiteInfo();
   if (isReservedSlug(tourRow.slug)) {
     console.error(`[ssr] Refusing to generate a tour file for reserved slug "${tourRow.slug}".`);
     return;
@@ -115,6 +119,7 @@ function removeTourFile(slug) {
 
 /** Writes/updates the static file for a published post. */
 async function generatePostFile(postRow) {
+  await ensureSiteInfo();
   if (isReservedSlug(postRow.slug)) {
     console.error(`[ssr] Refusing to generate a post file for reserved slug "${postRow.slug}".`);
     return;
@@ -192,8 +197,37 @@ function removePostFile(slug) {
    Listing / hub pages — regenerated wholesale (queries are cheap
    at this scale) any time a tour or post is published/unpublished.
    ============================================================ */
+/**
+ * Hand-written pages (admin/pages/*.html → SITE_ROOT). They're build output now,
+ * not tracked in git, so Page SEO edits on the server can never block a
+ * `git pull` again. Returns the list of files written.
+ */
+async function generateStaticPages(allTours, allPosts) {
+  const written = [];
+  const toursBySlug = {};
+  (allTours || []).forEach((t) => { toursBySlug[t.slug] = t; });
+  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? walk(path.join(dir, e.name)) : (e.name.endsWith(".html") ? [path.join(dir, e.name)] : []));
+  let sources = [];
+  try { sources = walk(PAGES_DIR); } catch (err) { console.error("[ssr] no pages directory:", err.message); return written; }
+  for (const file of sources) {
+    try {
+      const page = parsePageSource(fs.readFileSync(file, "utf8"));
+      const html = await injectTracking(renderStaticPage(page, { toursBySlug, posts: allPosts || [] }));
+      const outPath = path.join(SITE_ROOT, page.output);
+      fs.mkdirSync(path.dirname(outPath), { recursive: true });
+      fs.writeFileSync(outPath, html, "utf8");
+      written.push(page.output);
+    } catch (err) {
+      console.error(`[ssr] static page ${path.relative(PAGES_DIR, file)} failed:`, err.message);
+    }
+  }
+  return written;
+}
+
 async function regenerateListingPages() {
   try {
+    await ensureSiteInfo();
     fs.mkdirSync(path.join(SITE_ROOT, "destinations"), { recursive: true });
 
     let allTours = [];
@@ -245,6 +279,7 @@ async function regenerateListingPages() {
       fs.writeFileSync(path.join(SITE_ROOT, "destinations", `${isl.slug}.html`), html, "utf8");
     }
 
+    await generateStaticPages(allTours, allPosts);
     await applyAllPageSeoOverrides();
   } catch (err) {
     console.error("[ssr] regenerateListingPages failed:", err.message);
@@ -273,5 +308,5 @@ async function regenerateAllPages() {
 
 module.exports = {
   generateTourFile, removeTourFile, generatePostFile, removePostFile,
-  isReservedSlug, regenerateListingPages, regenerateAllPages, SITE_ROOT,
+  isReservedSlug, regenerateListingPages, regenerateAllPages, generateStaticPages, SITE_ROOT,
 };

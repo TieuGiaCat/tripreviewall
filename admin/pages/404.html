@@ -1,0 +1,40 @@
+<!--page
+output: 404.html
+title: Page Not Found | Tripreviewall
+description: This page doesn't exist. Browse honest Hawaii tour reviews by island instead.
+path: 
+robots: noindex, follow
+ogType: website
+-->
+<main id="main" class="nf-page">
+  <style>
+    .nf-page { padding: 72px 0 96px; }
+    .nf-wrap { max-width: 760px; margin: 0 auto; text-align: center; }
+    .nf-eyebrow { font-size: var(--text-caption); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-cta); margin: 0 0 12px; }
+    .nf-code { font-family: var(--font-serif); font-weight: 700; font-size: clamp(5rem, 18vw, 9rem); line-height: 1; color: var(--color-primary); margin: 0; letter-spacing: -0.02em; }
+    .nf-code span { color: var(--color-accent-display); }
+    .nf-title { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h2); margin: 16px 0 12px; }
+    .nf-text { color: var(--color-text-muted); font-size: var(--text-body-lg); margin: 0 auto 32px; max-width: 560px; }
+    .nf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+    .nf-islands-label { font-size: var(--text-meta); font-weight: 600; color: var(--color-text-muted); margin: 0 0 14px; }
+    .nf-islands { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 640px) { .nf-islands { grid-template-columns: repeat(4, 1fr); } }
+    .nf-island { display: flex; align-items: flex-end; min-height: 96px; padding: 14px 16px; border-radius: var(--radius-md); color: #fff; font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h4); text-decoration: none; text-align: left; transition: transform 150ms ease, box-shadow 150ms ease; }
+    .nf-island:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
+    .nf-island small { display: block; font-family: var(--font-sans); font-weight: 500; font-size: var(--text-caption); opacity: 0.85; }
+  </style>
+  <div class="container">
+    <div class="nf-wrap">
+      <p class="nf-eyebrow">Off the map</p>
+      <p class="nf-code" aria-hidden="true">4<span>0</span>4</p>
+      <h1 class="nf-title">This page took a detour</h1>
+      <p class="nf-text">The link may be old, or the tour may have been renamed. Every review is still here — pick an island or browse the full list.</p>
+      <div class="nf-actions">
+        <a href="/tours" class="btn btn-primary">Browse all Hawaii tours</a>
+        <a href="/" class="btn btn-secondary">Back to home</a>
+      </div>
+      <p class="nf-islands-label">Or jump to an island</p>
+      <div class="nf-islands">{{islandCards}}</div>
+    </div>
+  </div>
+</main>

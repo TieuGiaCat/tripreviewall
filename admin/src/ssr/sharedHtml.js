@@ -11,7 +11,7 @@ function jsonLdScript(obj) {
  * the branded /og-default.jpg (1200×630), and twitter:card is upgraded to the
  * large-image layout. Run on every generated page (see generator.js).
  */
-const SITE_URL_FOR_OG = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
+const { SITE_URL: SITE_URL_FOR_OG } = require("../siteConfig");
 const OG_DEFAULT_IMAGE = `${SITE_URL_FOR_OG}/og-default.jpg`;
 function ensureSocialTags(html) {
   const headEnd = html.indexOf("</head>");
@@ -80,6 +80,7 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
   return `
     <article class="tour-card">
       <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
+        ${tour.editorsPick ? `<span class="tour-card-badge">Editor's Pick</span>` : ""}
         ${img ? `<img class="tour-photo" src="${esc(imgUrl(img, 400))}"${imgSrcset(img, [400, 800]) ? ` srcset="${esc(imgSrcset(img, [400, 800]))}" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${esc(tour.title)} — ${esc(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
       </div>
       <div class="tour-card-body">

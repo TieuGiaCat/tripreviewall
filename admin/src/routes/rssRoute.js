@@ -1,7 +1,7 @@
 const { query } = require("../db");
 const { esc } = require("../utils");
 
-const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
+const { SITE_URL } = require("../siteConfig");
 
 /**
  * GET /rss.xml — RSS 2.0 feed of the 30 most recently updated published

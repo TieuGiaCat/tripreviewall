@@ -1,73 +1,10 @@
 const { esc } = require("../utils");
-const { ASSET_V } = require("./assetVersion");
+const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
 const { tourCardHtml, imgUrl } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
-const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
+const { SITE_URL, CATEGORY_GRADIENTS, DEFAULT_GRADIENT, BLOG_CATEGORIES: CATEGORY_LIST } = require("../siteConfig");
 
-const HEADER = (depth) => {
-  const p = depth === 0 ? "" : "../";
-  return `
-<header class="site-header">
-  <div class="container header-inner">
-    <a href="/" class="logo" aria-label="Tripreviewall home"><span class="part-1">Tripreview</span><span class="part-2">all</span></a>
-    <nav class="main-nav" aria-label="Primary">
-      <a href="/tours">Tours</a>
-      <a href="/destinations">Destinations</a>
-      <a href="/blog">Blog</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-    </nav>
-    <div class="header-actions">
-      <button class="hamburger" data-drawer-open aria-label="Open menu" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
-    </div>
-  </div>
-</header>
-
-<div class="mobile-drawer">
-  <div class="mobile-drawer-backdrop" data-drawer-backdrop></div>
-  <div class="mobile-drawer-panel" role="dialog" aria-label="Site menu">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <span class="logo"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
-      <button class="close-btn" data-drawer-close aria-label="Close menu">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-    <nav>
-      <a href="/tours" class="mobile-nav-link">Tours</a>
-      <a href="/destinations" class="mobile-nav-link">Destinations</a>
-      <a href="/blog" class="mobile-nav-link">Blog</a>
-      <a href="/about" class="mobile-nav-link">About</a>
-      <a href="/contact" class="mobile-nav-link">Contact</a>
-    </nav>
-  </div>
-</div>`;
-};
-
-const FOOTER = (depth) => {
-  const p = depth === 0 ? "" : "../";
-  return `
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <span class="logo reversed"><span class="part-1">Tripreview</span><span class="part-2">all</span></span>
-        <p class="footer-tagline">Independent Hawaii tour reviews — five-star and one-star alike.</p>
-      </div>
-      <div class="footer-col"><h4>Explore</h4><a href="/tours">Tours</a><a href="/destinations">Destinations</a><a href="/blog">Blog</a><a href="/transportation">Transportation</a></div>
-      <div class="footer-col"><h4>Company</h4><a href="/about">About</a><a href="/contact">Contact</a><a href="/affiliate-disclosure">Affiliate Disclosure</a><a href="/privacy-policy">Privacy Policy</a></div>
-      <div class="footer-col"><h4>Contact Us</h4>
-        <div class="footer-contact-row"><a href="tel:+18082261884">+1 (808) 226-1884</a></div>
-        <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
-      </div>
-    </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
-    <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
-  </div>
-</footer>`;
-};
 
 /* ============================================================
    /tours
@@ -108,14 +45,6 @@ function renderToursIndexHtml(tours, page = 1) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0B3B4F">
 <title>All Hawaii Tours${pageSuffix} — Tripreviewall</title>
 <meta name="description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide — ranked by real, honest data, updated continuously.">
 <link rel="canonical" href="${SITE_URL}${canonicalPath}">
@@ -129,18 +58,10 @@ ${page < totalPages ? `<link rel="next" href="${SITE_URL}${toursPageUrl(page + 1
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="All Hawaii Tours — Tripreviewall">
 <meta name="twitter:description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/css/all-tours.css?v=${ASSET_V}">
+${headBoilerplate(["all-tours"])}
 </head>
 <body>
-<a href="#main" class="skip-link">Skip to content</a>
-${HEADER(0)}
+${siteHeader()}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -181,10 +102,8 @@ ${HEADER(0)}
     </div>
   </div>
 </main>
-${FOOTER(0)}
-<script src="/js/data-loader.js?v=${ASSET_V}"></script>
-<script src="/js/main.js?v=${ASSET_V}"></script>
-<script src="/js/all-tours.js?v=${ASSET_V}"></script>
+${siteFooter()}
+${scriptTags(["data-loader", "main", "all-tours"])}
 </body>
 </html>`;
 }
@@ -200,18 +119,11 @@ function fmtPostDate(d) {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
 }
 
-const BLOG_CATEGORIES = ["All", "Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
+const BLOG_CATEGORIES = ["All", ...CATEGORY_LIST];
 const BLOG_INITIAL_VISIBLE = 6;
 
 function blogCardHtml(p, prefix, hidden) {
-  const gradients = {
-    "Real Traveler Reviews & Data": "linear-gradient(135deg,#B85C4A,#0B3B4F)",
-    "Tour Reviews by Type": "linear-gradient(135deg,#D97B4F,#0B3B4F)",
-    "Island Guides": "linear-gradient(135deg,#0B3B4F,#5C8A72)",
-    "Booking & Practical Info": "linear-gradient(135deg,#26313A,#B8592F)",
-    "Planning & Comparisons": "linear-gradient(135deg,#5C8A72,#0B3B4F)",
-  };
-  const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (gradients[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
+  const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (CATEGORY_GRADIENTS[p.category] || DEFAULT_GRADIENT);
   return `
     <a href="/blog/${esc(p.slug)}" class="blog-card" data-category="${esc(p.category || "")}" data-island="${esc(p.island || "")}"${hidden ? " hidden" : ""}>
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
@@ -243,14 +155,6 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0B3B4F">
 <title>All Articles — Tripreviewall Hawaii Travel Guide</title>
 <meta name="description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
 <link rel="canonical" href="${SITE_URL}/blog">
@@ -263,18 +167,10 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="All Articles — Tripreviewall">
 <meta name="twitter:description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/css/blog.css?v=${ASSET_V}">
+${headBoilerplate(["blog"])}
 </head>
 <body>
-<a href="#main" class="skip-link">Skip to content</a>
-${HEADER(0)}
+${siteHeader()}
 <main id="main">
   <div class="container blog-page-header">
     <nav class="breadcrumb" aria-label="Breadcrumb" style="padding:0 0 12px;">
@@ -309,10 +205,8 @@ ${HEADER(0)}
     </div>
   </div>
 </main>
-${FOOTER(0)}
-<script src="/js/data-loader.js?v=${ASSET_V}"></script>
-<script src="/js/main.js?v=${ASSET_V}"></script>
-<script src="/js/blog.js?v=${ASSET_V}"></script>
+${siteFooter()}
+${scriptTags(["main", "blog"])}
 </body>
 </html>`;
 }
@@ -326,14 +220,6 @@ function renderDestinationsHubHtml(islandCounts, destinationsBySlug = {}) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0B3B4F">
 <title>Explore Hawaii by Island — Tripreviewall</title>
 <meta name="description" content="Browse honest, aggregated Hawaii tour reviews by island — Oahu, Maui, Kauai and Big Island.">
 <link rel="canonical" href="${SITE_URL}/destinations">
@@ -342,18 +228,10 @@ function renderDestinationsHubHtml(islandCounts, destinationsBySlug = {}) {
 <meta property="og:title" content="Explore Hawaii by Island — Tripreviewall">
 <meta property="og:description" content="Browse honest, aggregated Hawaii tour reviews by island.">
 <meta property="og:url" content="${SITE_URL}/destinations">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="/css/pages.css?v=${ASSET_V}">
+${headBoilerplate(["pages"])}
 </head>
 <body>
-<a href="#main" class="skip-link">Skip to content</a>
-${HEADER(0)}
+${siteHeader()}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -376,8 +254,8 @@ ${HEADER(0)}
     </div>
   </div>
 </main>
-${FOOTER(0)}
-<script src="/js/main.js?v=${ASSET_V}"></script>
+${siteFooter()}
+${scriptTags(["main"])}
 </body>
 </html>`;
 }
@@ -403,14 +281,6 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
-<link rel="manifest" href="/site.webmanifest">
-<meta name="theme-color" content="#0B3B4F">
 <title>${esc(metaTitle)}</title>
 <meta name="description" content="${esc(metaDescription)}">
 <link rel="canonical" href="${SITE_URL}/destinations/${island.slug}">
@@ -420,18 +290,10 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <meta property="og:description" content="${esc(metaDescription)}">
 ${heroImage ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImage, 1200)}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="../css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="../css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="../css/pages.css?v=${ASSET_V}">
+${headBoilerplate(["pages"])}
 </head>
 <body>
-<a href="#main" class="skip-link">Skip to content</a>
-${HEADER(1)}
+${siteHeader()}
 <main id="main">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -463,8 +325,8 @@ ${HEADER(1)}
     </section>
   </div>
 </main>
-${FOOTER(1)}
-<script src="../js/main.js?v=${ASSET_V}"></script>
+${siteFooter()}
+${scriptTags(["main"])}
 </body>
 </html>`;
 }

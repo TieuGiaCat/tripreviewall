@@ -1,22 +1,14 @@
 /* ============================================================
-   tripreviewall.com — Home page behavior
-   Vanilla JS, no build step required.
-   Uses ALL_TOURS (data/tours-full.js) as single source of truth.
+   tripreviewall.com — shared site behavior (every page)
+   Header shrink, mobile drawer, home "Top Rated / Most Reviewed" tabs and
+   the client-side tour card used when lists are re-sorted in the browser.
+   Pages arrive fully rendered by the server; nothing is fetched on load.
    ============================================================ */
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   initHeaderScroll();
   initMobileDrawer();
   initTourTabs();
-  // The home page arrives fully rendered from the server (tour grid + latest
-  // posts), so nothing is fetched on load. The full tour list is only
-  // downloaded the first time a visitor switches the Top Rated / Most
-  // Reviewed tab — this keeps the initial page light for PageSpeed.
-  const blogGrid = document.getElementById("home-blog-grid");
-  if (blogGrid && !blogGrid.querySelector("a, article")) {
-    window.BLOG_POSTS = await loadAllPosts();
-    renderHomeBlogPreview();
-  }
 });
 
 /* Same rule as the server-side imgUrl(): local uploads can be fetched resized. */
@@ -25,35 +17,8 @@ function resizedImg(url, w) {
   return url + "?w=" + w;
 }
 
-const HOME_CAT_GRADIENTS = {
-  "Comparison": "linear-gradient(135deg,#5C8A72,#0B3B4F)",
-  "Real Traveler Reviews & Data": "linear-gradient(135deg,#B85C4A,#0B3B4F)",
-  "Tour Reviews by Type": "linear-gradient(135deg,#D97B4F,#0B3B4F)",
-  "Island Guides": "linear-gradient(135deg,#0B3B4F,#5C8A72)",
-  "Booking & Practical Info": "linear-gradient(135deg,#26313A,#B8592F)",
-  "Planning & Comparisons": "linear-gradient(135deg,#5C8A72,#0B3B4F)"
-};
-
-function renderHomeBlogPreview() {
-  const grid = document.getElementById("home-blog-grid");
-  if (!grid || typeof BLOG_POSTS === "undefined") return;
-  const latest = [...BLOG_POSTS].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 3);
-  if (latest.length === 0) {
-    grid.parentElement.style.display = "none"; // whole "From the Editors" section hides if there's truly nothing yet
-    return;
-  }
-  grid.innerHTML = latest.map((p) => {
-    const bg = p.featuredImage ? `url('${resizedImg(p.featuredImage, 800)}')` : (HOME_CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
-    return `
-    <a href="/blog/${p.slug}" class="blog-card">
-      <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
-      <div class="blog-card-body">
-        <div class="blog-card-cat">${p.category || ""}</div>
-        <h3 class="blog-card-title">${p.title}</h3>
-        <div class="blog-card-meta">${new Date(p.updatedAt).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}${p.readTime ? " · " + p.readTime + " min read" : ""}</div>
-      </div>
-    </a>`;
-  }).join("");
+function escHtml(s) {
+  return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 /* ---- Sticky header shrink-on-scroll ---- */
@@ -75,12 +40,31 @@ function initMobileDrawer() {
   const backdrop = document.querySelector("[data-drawer-backdrop]");
   const drawer = document.querySelector(".mobile-drawer");
   if (!openBtn || !drawer) return;
-  const open = () => { drawer.classList.add("open"); openBtn.setAttribute("aria-expanded", "true"); };
-  const close = () => { drawer.classList.remove("open"); openBtn.setAttribute("aria-expanded", "false"); };
+  const panel = drawer.querySelector(".mobile-drawer-panel");
+  const focusables = () => Array.from(panel.querySelectorAll("a[href], button:not([disabled])"));
+  const open = () => {
+    drawer.classList.add("open"); openBtn.setAttribute("aria-expanded", "true");
+    (closeBtn || focusables()[0])?.focus();
+  };
+  const close = () => {
+    if (!drawer.classList.contains("open")) return;
+    drawer.classList.remove("open"); openBtn.setAttribute("aria-expanded", "false");
+    openBtn.focus();
+  };
   openBtn.addEventListener("click", open);
   closeBtn?.addEventListener("click", close);
   backdrop?.addEventListener("click", close);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  document.addEventListener("keydown", (e) => {
+    if (!drawer.classList.contains("open")) return;
+    if (e.key === "Escape") { close(); return; }
+    if (e.key === "Tab") { // keep keyboard focus inside the open menu
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
 }
 
 /* ---- Featured Tours tabs ---- */
@@ -90,10 +74,11 @@ function initTourTabs() {
     tab.addEventListener("click", async () => {
       tabs.forEach((t) => t.classList.remove("active"));
       tab.classList.add("active");
-      if (typeof ALL_TOURS === "undefined" && typeof loadAllTours === "function") {
+      if ((typeof ALL_TOURS === "undefined" || !ALL_TOURS.length) && typeof loadAllTours === "function") {
         window.ALL_TOURS = await loadAllTours();
       }
-      renderFeaturedTours(tab.dataset.tab);
+      if (ALL_TOURS.length) renderFeaturedTours(tab.dataset.tab); // API down → keep the server-rendered grid
+
     });
   });
 }
@@ -110,47 +95,43 @@ function renderStars(rating) {
 }
 
 /* ---- Shared Tour Card template ----
-   basePath: "tours/" from site root (Home, All Tours) or "" from within /tours/ folder (Similar Tours) */
-function tourCardTemplate(tour, basePath) {
-  basePath = basePath === undefined ? "tours/" : basePath;
-  const badge = tour.badge ? `<span class="tour-card-badge">${tour.badge}</span>` : "";
-  const linkFile = `/tours/${tour.slug}`;
-  const imgSrc = tour.gallery && tour.gallery[0] ? tour.gallery[0] : null;
+   MUST stay identical to tourCardHtml() in admin/src/ssr/sharedHtml.js —
+   it's used when a list is re-sorted/filtered in the browser, and the cards
+   shouldn't change look when that happens. */
+function tourCardTemplate(tour) {
+  const img = tour.gallery && tour.gallery[0] ? tour.gallery[0] : null;
+  const bl = tour.bookingLinks || {};
+  const hasFareharbor = !!tour.fareharborRegularLink && !(bl.fareharbor && bl.fareharbor.show === false);
+  const price = tour.priceFrom != null ? `From <span class="tabular">$${escHtml(tour.priceFrom)}</span>` : `<span class="tabular">Price on request</span>`;
+  const resized = img ? resizedImg(img, 400) : null;
   return `
     <article class="tour-card">
-      <div class="tour-card-image-wrap" style="background:${imgSrc ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
-        ${imgSrc ? `<img class="tour-photo" src="${resizedImg(imgSrc, 400)}"${resizedImg(imgSrc, 400) !== imgSrc ? ` srcset="${resizedImg(imgSrc, 400)} 400w, ${resizedImg(imgSrc, 800)} 800w" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""}
-             width="400" height="300" loading="lazy" decoding="async" alt="${tour.title} — ${tour.company}"
-             onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
-        ${badge}
+      <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
+        ${tour.editorsPick ? `<span class="tour-card-badge">Editor's Pick</span>` : ""}
+        ${img ? `<img class="tour-photo" src="${escHtml(resized)}"${resized !== img ? ` srcset="${escHtml(resizedImg(img, 400))} 400w, ${escHtml(resizedImg(img, 800))} 800w" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${escHtml(tour.title)} — ${escHtml(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
       </div>
       <div class="tour-card-body">
-        <div class="tour-card-eyebrow">${tour.island.toUpperCase()} · ${tour.tourType.toUpperCase()}</div>
-        <h3 class="tour-card-title">${tour.title}</h3>
+        <div class="tour-card-eyebrow">${escHtml((tour.island || "").toUpperCase())} · ${escHtml((tour.tourType || "").toUpperCase())}</div>
+        <h3 class="tour-card-title">${escHtml(tour.title)}</h3>
         <div class="tour-card-rating">
-          ${renderStars(tour.aggregatedRating)}
-          <span class="score tabular">${tour.aggregatedRating.toFixed(1)}</span>
-          <span class="count tabular">(${tour.reviewCountTotal.toLocaleString()} reviews)</span>
+          ${renderStars(tour.aggregatedRating || 0)}
+          <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
+          <span class="count tabular">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews)</span>
         </div>
         <div class="tour-card-divider"></div>
         <div class="tour-card-footer">
-          <div class="tour-card-price">
-            ${tour.priceFrom != null ? `From <span class="tabular">$${tour.priceFrom}</span>` : `<span class="tabular">Price on request</span>`}
-            ${tour.fareharborRegularLink && !(tour.bookingLinks && tour.bookingLinks.fareharbor && tour.bookingLinks.fareharbor.show === false) ? `<span class="via">via FareHarbor</span>` : ""}
-          </div>
-          <a href="${linkFile}" class="btn btn-primary">View Tour</a>
+          <div class="tour-card-price">${price}${hasFareharbor ? `<span class="via">via FareHarbor</span>` : ""}</div>
+          <a href="/tours/${encodeURIComponent(tour.slug)}" class="btn btn-primary">View Tour</a>
         </div>
       </div>
     </article>`;
 }
 
-const EDITORS_PICK_SLUGS = ["ohana-surf-project-sup-lessons"];
-
 function renderFeaturedTours(mode) {
   const grid = document.getElementById("tour-grid");
   if (!grid || typeof ALL_TOURS === "undefined") return;
-  let list = ALL_TOURS.map((t) => ({ ...t, badge: EDITORS_PICK_SLUGS.includes(t.slug) ? "Editor's Pick" : null }));
-  if (mode === "most-reviewed") list.sort((a, b) => b.reviewCountTotal - a.reviewCountTotal);
-  else list.sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0) || b.aggregatedRating - a.aggregatedRating);
-  grid.innerHTML = list.slice(0, 8).map((t) => tourCardTemplate(t, "tours/")).join("");
+  const list = ALL_TOURS.slice();
+  if (mode === "most-reviewed") list.sort((a, b) => (b.reviewCountTotal || 0) - (a.reviewCountTotal || 0));
+  else list.sort((a, b) => (b.editorsPick ? 1 : 0) - (a.editorsPick ? 1 : 0) || (b.aggregatedRating || 0) - (a.aggregatedRating || 0));
+  grid.innerHTML = list.slice(0, 8).map((t) => tourCardTemplate(t)).join("");
 }

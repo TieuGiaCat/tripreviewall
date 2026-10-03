@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderRateTable();
   renderFaq();
   initForm();
-  renderRelatedArticles();
+
 });
 
 function renderFleetTabs() {
@@ -121,19 +121,4 @@ function initForm() {
       alert(err.message || "Something went wrong — please try again or call us directly.");
     }
   });
-}
-
-function renderRelatedArticles() {
-  const el = document.getElementById("tp-related-articles");
-  if (typeof BLOG_POSTS === "undefined") return;
-  const list = BLOG_POSTS.slice(0, 3);
-  el.innerHTML = list.map((p) => `
-    <a href="${p.hasDetailPage ? "/blog/" + p.slug : "#"}" class="blog-card">
-      <div class="blog-card-image" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"></div>
-      <div class="blog-card-body">
-        <div class="blog-card-cat">${p.category}</div>
-        <h3 class="blog-card-title">${p.title}</h3>
-        <div class="blog-card-meta">${p.updatedAt} · ${p.readTime} min read</div>
-      </div>
-    </a>`).join("");
 }
