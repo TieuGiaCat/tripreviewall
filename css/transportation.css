@@ -81,3 +81,11 @@
 /* Rate table scrolls sideways on phones instead of pushing the page wider (C19) */
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 8px; }
 .table-scroll .rate-table { min-width: 560px; }
+
+/* ---- FAQ (moved from tour-detail.css so this page no longer loads that file) ---- */
+.faq-item { border-bottom: 1px solid var(--color-border); }
+.faq-question { width: 100%; text-align: left; background: none; border: none; padding: 16px 0; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: var(--text-h4); }
+.faq-question svg { width: 18px; height: 18px; color: var(--color-primary); flex-shrink: 0; transition: transform 150ms; }
+.faq-item.open .faq-question svg { transform: rotate(45deg); }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 200ms ease; font-size: var(--text-body); color: var(--color-text-muted); }
+.faq-item.open .faq-answer { max-height: 200px; padding-bottom: 16px; }

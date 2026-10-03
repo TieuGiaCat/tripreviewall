@@ -42,24 +42,27 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000).unref();
 
-let slugCache = { set: null, at: 0 };
-async function isPublishedSlug(slug) {
+// Published slugs per table, refreshed every 5 minutes.
+const slugCaches = { tours: { set: null, at: 0 }, posts: { set: null, at: 0 } };
+async function isPublishedSlug(slug, table = "tours") {
   if (!slug) return false;
-  if (!slugCache.set || Date.now() - slugCache.at > 5 * 60 * 1000) {
+  const cache = slugCaches[table];
+  if (!cache.set || Date.now() - cache.at > 5 * 60 * 1000) {
     try {
-      const r = await query(`SELECT slug FROM tours WHERE status = 'published'`);
-      slugCache = { set: new Set(r.rows.map((x) => x.slug)), at: Date.now() };
+      const r = await query(`SELECT slug FROM ${table === "posts" ? "posts" : "tours"} WHERE status = 'published'`);
+      cache.set = new Set(r.rows.map((x) => x.slug));
+      cache.at = Date.now();
     } catch (err) {
       console.error("[click-tracking] could not load slugs:", err.message);
       return true; // DB hiccup: don't drop real clicks
     }
   }
-  return slugCache.set.has(slug);
+  return cache.set.has(slug);
 }
 
 const BOT_UA = /bot|crawl|spider|slurp|facebookexternalhit|preview|headless|python-requests|curl|wget|httpclient|monitor/i;
 
-async function shouldCount(req, tourSlug) {
+async function shouldCount(req, slug, table) {
   if (BOT_UA.test(req.headers["user-agent"] || "")) return false;
   const ip = getClientIp(req);
   const now = Date.now();
@@ -67,12 +70,17 @@ async function shouldCount(req, tourSlug) {
   if (hits.length >= CLICK_LIMIT) return false;
   hits.push(now);
   clickHits.set(ip, hits);
-  return isPublishedSlug(tourSlug);
+  return isPublishedSlug(slug, table);
 }
 
-async function recordClick(req, tourSlug, platform) {
+/** Records a tour click, or — when postSlug is given — a click on a link inside that article. */
+async function recordClick(req, tourSlug, platform, postSlug = null) {
   try {
-    if (await shouldCount(req, tourSlug)) {
+    if (postSlug) {
+      if (await shouldCount(req, postSlug, "posts")) {
+        await query(`INSERT INTO click_logs (post_slug, platform) VALUES ($1, $2)`, [postSlug, platform]);
+      }
+    } else if (await shouldCount(req, tourSlug, "tours")) {
       await query(`INSERT INTO click_logs (tour_slug, platform) VALUES ($1, $2)`, [tourSlug, platform]);
     }
   } catch (err) {
@@ -106,6 +114,7 @@ async function trackClick(req, res, urlObj) {
 
 /**
  * POST /api/log-click?tour=<slug>&platform=fareharbor
+ * POST /api/log-click?post=<article-slug>&platform=viator   (link inside an article — js/article.js)
  * Public, unauthenticated, fire-and-forget (called via navigator.sendBeacon
  * from the client). Logs the click WITHOUT redirecting — used only for the
  * FareHarbor "Check Availability" button, whose href must point directly at
@@ -114,6 +123,7 @@ async function trackClick(req, res, urlObj) {
  */
 async function logClick(req, res, urlObj) {
   const tourSlug = (urlObj.searchParams.get("tour") || "").slice(0, 200) || null;
+  const postSlug = (urlObj.searchParams.get("post") || "").slice(0, 200) || null;
   const platform = urlObj.searchParams.get("platform") || "";
 
   if (!PLATFORMS.has(platform)) {
@@ -122,7 +132,7 @@ async function logClick(req, res, urlObj) {
     return;
   }
 
-  await recordClick(req, tourSlug, platform);
+  await recordClick(req, tourSlug, platform, postSlug);
 
   res.writeHead(204);
   res.end();

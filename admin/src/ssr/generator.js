@@ -6,7 +6,7 @@ const { renderTourPageHtml } = require("./tourTemplate");
 const { renderPostPageHtml } = require("./postTemplate");
 const { TOURS_PER_PAGE, renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS } = require("./listingTemplates");
 const { renderHomeHtml } = require("./homeTemplate");
-const { applyAllPageSeoOverrides } = require("../lib/pageSeo");
+const { applyMetaTags } = require("../lib/pageSeo");
 const { ensureSocialTags } = require("./sharedHtml");
 const { ensureSiteInfo } = require("../lib/siteInfo");
 const { PAGES_DIR } = require("../siteConfig");
@@ -78,6 +78,53 @@ async function injectTracking(html) {
   return html;
 }
 
+/* ---- Writing pages (E7) ----
+   Every page goes through writePage():
+   - the page's Page SEO override (if any) is applied before writing, so the
+     file is right the first time instead of written and then patched;
+   - a page whose HTML hasn't changed is not written at all (saving one tour
+     used to rewrite 8+ listing pages every time);
+   - writes are async and atomic (temp file + rename), so a visitor or a
+     restart in the middle never sees a half-written page. */
+async function seoOverrideFor(relPath) {
+  try {
+    const r = await query(
+      `SELECT meta_title, meta_description FROM page_seo WHERE ltrim(file_path, '/') = $1 LIMIT 1`,
+      [relPath]
+    );
+    return r.rows[0] || null;
+  } catch (err) {
+    return null; // page_seo table missing on an old DB — just write the page
+  }
+}
+
+async function writePage(outPath, html) {
+  const rel = path.relative(SITE_ROOT, outPath).split(path.sep).join("/");
+  const seo = await seoOverrideFor(rel);
+  if (seo && (seo.meta_title || seo.meta_description)) html = applyMetaTags(html, seo.meta_title, seo.meta_description);
+  await fs.promises.mkdir(path.dirname(outPath), { recursive: true });
+  try {
+    if ((await fs.promises.readFile(outPath, "utf8")) === html) return false; // unchanged
+  } catch (err) { /* new file */ }
+  const tmp = `${outPath}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
+  try {
+    await fs.promises.writeFile(tmp, html, "utf8");
+    await fs.promises.rename(tmp, outPath);
+  } catch (err) {
+    fs.promises.unlink(tmp).catch(() => {});
+    throw err;
+  }
+  return true;
+}
+
+async function removeFile(p, what) {
+  try {
+    await fs.promises.unlink(p);
+  } catch (err) {
+    if (err.code !== "ENOENT") console.error(`[ssr] Failed to remove ${what}:`, err.message);
+  }
+}
+
 /** Writes/updates the static file for a published tour. No-ops silently if SITE_ROOT isn't configured yet. */
 async function generateTourFile(tourRow) {
   await ensureSiteInfo();
@@ -86,7 +133,6 @@ async function generateTourFile(tourRow) {
     return { ok: false, error: `"${tourRow.slug}" is a reserved name — page not generated.` };
   }
   try {
-    fs.mkdirSync(TOURS_DIR, { recursive: true });
     const tour = toPublicShape(tourRow);
 
     let similar = [];
@@ -102,7 +148,7 @@ async function generateTourFile(tourRow) {
 
     let html = renderTourPageHtml(tour, similar);
     html = await injectTracking(html);
-    fs.writeFileSync(tourFilePath(tourRow.slug), html, "utf8");
+    await writePage(tourFilePath(tourRow.slug), html);
     return { ok: true };
   } catch (err) {
     console.error(`[ssr] Failed to generate tour page for "${tourRow.slug}":`, err.message);
@@ -111,12 +157,7 @@ async function generateTourFile(tourRow) {
 }
 
 function removeTourFile(slug) {
-  try {
-    const p = tourFilePath(slug);
-    if (fs.existsSync(p)) fs.unlinkSync(p);
-  } catch (err) {
-    console.error(`[ssr] Failed to remove tour page for "${slug}":`, err.message);
-  }
+  return removeFile(tourFilePath(slug), `tour page for "${slug}"`);
 }
 
 /** Writes/updates the static file for a published post. */
@@ -127,7 +168,6 @@ async function generatePostFile(postRow) {
     return;
   }
   try {
-    fs.mkdirSync(POSTS_DIR, { recursive: true });
     const post = toPostPublicShape(postRow);
 
     let relatedTour = null;
@@ -180,7 +220,7 @@ async function generatePostFile(postRow) {
 
     let html = renderPostPageHtml(post, relatedTour, relatedPosts, author);
     html = await injectTracking(html);
-    fs.writeFileSync(postFilePath(postRow.slug), html, "utf8");
+    await writePage(postFilePath(postRow.slug), html);
     return { ok: true };
   } catch (err) {
     console.error(`[ssr] Failed to generate post page for "${postRow.slug}":`, err.message);
@@ -189,12 +229,7 @@ async function generatePostFile(postRow) {
 }
 
 function removePostFile(slug) {
-  try {
-    const p = postFilePath(slug);
-    if (fs.existsSync(p)) fs.unlinkSync(p);
-  } catch (err) {
-    console.error(`[ssr] Failed to remove post page for "${slug}":`, err.message);
-  }
+  return removeFile(postFilePath(slug), `article page for "${slug}"`);
 }
 
 /* ============================================================
@@ -210,17 +245,15 @@ async function generateStaticPages(allTours, allPosts) {
   const written = [];
   const toursBySlug = {};
   (allTours || []).forEach((t) => { toursBySlug[t.slug] = t; });
-  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
-    e.isDirectory() ? walk(path.join(dir, e.name)) : (e.name.endsWith(".html") ? [path.join(dir, e.name)] : []));
+  const walk = async (dir) => (await Promise.all((await fs.promises.readdir(dir, { withFileTypes: true })).map((e) =>
+    e.isDirectory() ? walk(path.join(dir, e.name)) : (e.name.endsWith(".html") ? [path.join(dir, e.name)] : [])))).flat();
   let sources = [];
-  try { sources = walk(PAGES_DIR); } catch (err) { console.error("[ssr] no pages directory:", err.message); return written; }
+  try { sources = await walk(PAGES_DIR); } catch (err) { console.error("[ssr] no pages directory:", err.message); return written; }
   for (const file of sources) {
     try {
-      const page = parsePageSource(fs.readFileSync(file, "utf8"));
+      const page = parsePageSource(await fs.promises.readFile(file, "utf8"));
       const html = await injectTracking(renderStaticPage(page, { toursBySlug, posts: allPosts || [] }));
-      const outPath = path.join(SITE_ROOT, page.output);
-      fs.mkdirSync(path.dirname(outPath), { recursive: true });
-      fs.writeFileSync(outPath, html, "utf8");
+      await writePage(path.join(SITE_ROOT, page.output), html);
       written.push(page.output);
     } catch (err) {
       console.error(`[ssr] static page ${path.relative(PAGES_DIR, file)} failed:`, err.message);
@@ -238,11 +271,30 @@ let generationErrors = [];
  * hand-written pages. Returns { ok, errors } so callers can tell the admin
  * when something couldn't be written (B5) instead of failing silently.
  */
-async function regenerateListingPages() {
+/* Saving several tours quickly used to start several full rebuilds at the
+   same time. Now only one runs; requests that arrive meanwhile share ONE
+   follow-up rebuild, which starts when the current one finishes (so their
+   changes are always included). */
+let regenRunning = null;
+let regenQueued = null;
+function regenerateListingPages() {
+  if (!regenRunning) {
+    regenRunning = rebuildListingPages().finally(() => { regenRunning = null; });
+    return regenRunning;
+  }
+  if (!regenQueued) {
+    regenQueued = regenRunning.then(() => {
+      regenQueued = null;
+      return regenerateListingPages();
+    });
+  }
+  return regenQueued;
+}
+
+async function rebuildListingPages() {
   generationErrors = [];
   try {
     await ensureSiteInfo();
-    fs.mkdirSync(path.join(SITE_ROOT, "destinations"), { recursive: true });
 
     let allTours = [];
     let allPosts = [];
@@ -275,26 +327,30 @@ async function regenerateListingPages() {
       console.error("[ssr] regenerateListingPages: could not load destinations (using defaults):", err.message);
     }
 
-    fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), await injectTracking(renderToursIndexHtml(allTours, 1)), "utf8");
-    // /tours/page/2, /tours/page/3 … — rebuilt from scratch so a shrinking
-    // tour count never leaves stale pages behind.
+    await writePage(path.join(SITE_ROOT, "tours.html"), await injectTracking(renderToursIndexHtml(allTours, 1)));
+    // /tours/page/2, /tours/page/3 … — pages past the current count are removed
+    // so a shrinking tour list never leaves stale pages behind.
     const pagesDir = path.join(TOURS_DIR, "page");
-    fs.rmSync(pagesDir, { recursive: true, force: true });
     const totalTourPages = Math.ceil(allTours.length / TOURS_PER_PAGE);
-    if (totalTourPages > 1) fs.mkdirSync(pagesDir, { recursive: true });
     for (let n = 2; n <= totalTourPages; n++) {
-      fs.writeFileSync(path.join(pagesDir, `${n}.html`), await injectTracking(renderToursIndexHtml(allTours, n)), "utf8");
+      await writePage(path.join(pagesDir, `${n}.html`), await injectTracking(renderToursIndexHtml(allTours, n)));
     }
-    fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts, allPosts.filter((p) => p.featuredPillar))), "utf8");
-    fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), await injectTracking(renderDestinationsHubHtml(islandCounts, destinationsBySlug)), "utf8");
-    fs.writeFileSync(path.join(SITE_ROOT, "index.html"), await injectTracking(renderHomeHtml(allTours, allPosts, islandCounts, destinationsBySlug)), "utf8");
+    try {
+      for (const f of await fs.promises.readdir(pagesDir)) {
+        const n = parseInt(f, 10);
+        if (!(n >= 2 && n <= totalTourPages && f === `${n}.html`)) await removeFile(path.join(pagesDir, f), `old listing page ${f}`);
+      }
+    } catch (err) { /* no page folder yet */ }
+    await writePage(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts, allPosts.filter((p) => p.featuredPillar))));
+    await writePage(path.join(SITE_ROOT, "destinations.html"), await injectTracking(renderDestinationsHubHtml(islandCounts, destinationsBySlug)));
+    await writePage(path.join(SITE_ROOT, "index.html"), await injectTracking(renderHomeHtml(allTours, allPosts, islandCounts, destinationsBySlug)));
     for (const isl of ISLANDS) {
       const html = await injectTracking(renderIslandPageHtml(isl.slug, allTours, allPosts, destinationsBySlug[isl.slug]));
-      fs.writeFileSync(path.join(SITE_ROOT, "destinations", `${isl.slug}.html`), html, "utf8");
+      await writePage(path.join(SITE_ROOT, "destinations", `${isl.slug}.html`), html);
     }
 
     await generateStaticPages(allTours, allPosts);
-    await applyAllPageSeoOverrides();
+    // Page SEO overrides are applied inside writePage().
   } catch (err) {
     console.error("[ssr] regenerateListingPages failed:", err.message);
     generationErrors.push(`Listing pages could not be rebuilt: ${err.message}`);
@@ -327,7 +383,15 @@ async function regenerateAllPages() {
   return { ok: errors.length === 0, errors, tours: toursResult.rows.length, posts: postsResult.rows.length };
 }
 
+/** Resolves once no listing rebuild is running or queued (used by the graceful shutdown). */
+async function whenIdle() {
+  while (regenRunning || regenQueued) {
+    await (regenQueued || regenRunning).catch(() => {});
+  }
+}
+
 module.exports = {
+  whenIdle,
   generateTourFile, removeTourFile, generatePostFile, removePostFile,
   isReservedSlug, regenerateListingPages, regenerateAllPages, generateStaticPages, SITE_ROOT,
 };

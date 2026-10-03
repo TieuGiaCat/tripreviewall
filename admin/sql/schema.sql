@@ -162,6 +162,7 @@ CREATE INDEX IF NOT EXISTS idx_authors_status ON authors(status);
 CREATE TABLE IF NOT EXISTS click_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tour_slug TEXT,
+  post_slug TEXT,   -- set instead of tour_slug for links clicked inside an article
   platform TEXT NOT NULL CHECK (platform IN ('fareharbor', 'tripadvisor', 'getyourguide', 'viator')),
   clicked_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

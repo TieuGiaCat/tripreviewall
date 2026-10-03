@@ -22,7 +22,6 @@
 /* ---- Layer 2 filters ---- */
 .layer2-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 0 28px; }
 .layer2-select { border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 7px 10px; font-size: var(--text-meta); background: var(--color-bg-alt); color: var(--color-text-muted); }
-.layer2-sort { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
 /* ---- Article card additions (extends .blog-card from style.css) ---- */
 .blog-card-tags { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }

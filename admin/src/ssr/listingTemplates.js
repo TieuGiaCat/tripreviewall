@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
-const { tourCardHtml, imgUrl, coverImg, preloadImg } = require("./sharedHtml");
+const { tourCardHtml, imgUrl, coverImg, preloadImg, absUrl } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
 const { SITE_URL, CATEGORY_GRADIENTS, DEFAULT_GRADIENT, BLOG_CATEGORIES: CATEGORY_LIST } = require("../siteConfig");
@@ -95,7 +95,7 @@ ${siteHeader()}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <h3>No tours match this search yet.</h3>
       <p>Try a different keyword, or browse the full list.</p>
-      <button class="btn btn-secondary" onclick="document.getElementById('at-search-input').value='';document.getElementById('at-search-input').dispatchEvent(new Event('input'));">Clear search</button>
+      <button type="button" class="btn btn-secondary" data-clear-search="at-search-input">Clear search</button>
     </div>
     ${toursPaginationHtml(page, totalPages) || `<div class="pagination" id="pagination"></div>`}
     <div class="seo-block">
@@ -290,7 +290,7 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="${esc(metaTitle)}">
 <meta property="og:description" content="${esc(metaDescription)}">
-${heroImage ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImage, 1200)}">` : ""}
+${heroImage ? `<meta property="og:image" content="${esc(absUrl(imgUrl(heroImage, 1200)))}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
 ${preloadImg(heroImage, { sizes: "(min-width: 1280px) 1200px, 100vw" })}
 ${headBoilerplate(["pages"])}

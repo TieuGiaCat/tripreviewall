@@ -5,10 +5,48 @@
    Pages arrive fully rendered by the server; nothing is fetched on load.
    ============================================================ */
 
+/* ---- Behaviour that used to be inline onclick/onload/onerror (E9) ---- */
+// Google Fonts stylesheet loads as media="print" (non-blocking), then switches on.
+document.querySelectorAll("link[data-async-css]").forEach((l) => { l.media = "all"; });
+
+// A tour photo that fails to load is replaced by the brand gradient.
+function tourPhotoFallback(img) {
+  if (img.parentElement) img.parentElement.style.background = "linear-gradient(135deg,#0B3B4F,#5C8A72)";
+  img.remove();
+}
+document.addEventListener("error", (e) => {
+  const t = e.target;
+  if (t && t.tagName === "IMG" && t.classList.contains("tour-photo") && t.closest(".tour-card")) tourPhotoFallback(t);
+}, true); // "error" doesn't bubble — listen in the capture phase
+
 document.addEventListener("DOMContentLoaded", () => {
   initHeaderScroll();
   initMobileDrawer();
   initTourTabs();
+  // Images that already failed before this script ran.
+  document.querySelectorAll(".tour-card img.tour-photo").forEach((img) => {
+    if (img.complete && img.naturalWidth === 0 && img.currentSrc) tourPhotoFallback(img);
+  });
+});
+
+// Search forms: drop empty fields so the URL stays clean (/tours?island=Maui, not ?island=Maui&type=&q=).
+document.addEventListener("submit", (e) => {
+  const form = e.target;
+  if (!form.matches || !form.matches("form[data-strip-empty]")) return;
+  Array.prototype.forEach.call(form.elements, (el) => { if (el.name && !el.value) el.disabled = true; });
+  // Re-enable after navigation starts, so the Back button shows the form intact.
+  setTimeout(() => Array.prototype.forEach.call(form.elements, (el) => { el.disabled = false; }), 0);
+});
+
+// "Clear search" buttons: <button data-clear-search="input-id">.
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest && e.target.closest("[data-clear-search]");
+  if (!btn) return;
+  const input = document.getElementById(btn.getAttribute("data-clear-search"));
+  if (!input) return;
+  input.value = "";
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.focus();
 });
 
 /* Same rule as the server-side imgUrl(): local uploads can be fetched resized. */
@@ -109,7 +147,7 @@ function tourCardTemplate(tour) {
     <article class="tour-card">
       <a class="tour-card-image-wrap" href="/tours/${encodeURIComponent(tour.slug)}" tabindex="-1" aria-hidden="true" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
         ${tour.editorsPick ? `<span class="tour-card-badge">Editor's Pick</span>` : ""}
-        ${img ? `<img class="tour-photo" src="${escHtml(resized)}"${resized !== img ? ` srcset="${escHtml(resizedImg(img, 400))} 400w, ${escHtml(resizedImg(img, 800))} 800w" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${escHtml(tour.title)} — ${escHtml(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
+        ${img ? `<img class="tour-photo" src="${escHtml(resized)}"${resized !== img ? ` srcset="${escHtml(resizedImg(img, 400))} 400w, ${escHtml(resizedImg(img, 800))} 800w" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${escHtml(tour.title)} — ${escHtml(tour.company)}">` : ""}
       </a>
       <div class="tour-card-body">
         <div class="tour-card-eyebrow">${escHtml((tour.island || "").toUpperCase())} · ${escHtml((tour.tourType || "").toUpperCase())}</div>

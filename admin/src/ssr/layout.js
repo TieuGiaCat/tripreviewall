@@ -32,14 +32,14 @@ function headBoilerplate(extraCss = []) {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="${FONTS_URL}">
-<link rel="stylesheet" href="${FONTS_URL}" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="${FONTS_URL}" media="print" data-async-css>
 <noscript><link rel="stylesheet" href="${FONTS_URL}"></noscript>
 <link rel="stylesheet" href="/css/tokens.css?v=${v}">
 <link rel="stylesheet" href="/css/style.css?v=${v}">
 ${extraCss.map((name) => `<link rel="stylesheet" href="/css/${name}.css?v=${v}">`).join("\n")}`;
 }
 
-/** <script> tags for the site's own JS files, cache-busted. */
+/** Script tags for the site's own JS files, cache-busted. */
 function scriptTags(names = []) {
   const v = assetV();
   return names.map((name) => `<script src="/js/${name}.js?v=${v}"></script>`).join("\n");

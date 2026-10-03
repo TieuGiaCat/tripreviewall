@@ -6,6 +6,7 @@ async function showAnalytics(req, res, user) {
   let totalAllTime = 0, total7d = 0, total30d = 0;
   let byPlatform = [];
   let topTours = [];
+  let topPosts = [];
   let dbError = null;
 
   try {
@@ -34,6 +35,22 @@ async function showAnalytics(req, res, user) {
       GROUP BY cl.tour_slug ORDER BY clicks DESC LIMIT 20
     `);
     topTours = topToursResult.rows;
+
+    // Affiliate links clicked inside articles (needs migration 002 — skipped quietly before that).
+    try {
+      const topPostsResult = await query(`
+        SELECT cl.post_slug, count(*)::int AS clicks,
+          count(*) FILTER (WHERE cl.clicked_at >= now() - interval '30 days')::int AS last_30d,
+          max(p.data->>'title') AS post_title
+        FROM click_logs cl
+        LEFT JOIN posts p ON p.slug = cl.post_slug
+        WHERE cl.post_slug IS NOT NULL
+        GROUP BY cl.post_slug ORDER BY clicks DESC LIMIT 20
+      `);
+      topPosts = topPostsResult.rows;
+    } catch (err) {
+      console.error("[analytics] article clicks unavailable (run npm run migrate):", err.message);
+    }
   } catch (err) {
     console.error("[analytics] query failed:", err.message);
     dbError = err.message;
@@ -50,9 +67,16 @@ async function showAnalytics(req, res, user) {
     </tr>`)
     .join("");
 
+  const postRows = topPosts
+    .map((p) => `<tr>
+      <td>${p.post_title ? `<a href="/blog/${esc(p.post_slug)}" target="_blank" rel="noopener">${esc(p.post_title)}</a>` : esc(p.post_slug)}</td>
+      <td class="tabular">${p.clicks}</td><td class="tabular">${p.last_30d}</td>
+    </tr>`)
+    .join("");
+
   const body = `
     <h1 class="page-title">Analytics</h1>
-    <p class="page-sub">Tracks clicks on the "Check Availability" / booking buttons on each Tour Detail page — this is the closest signal we have to actual bookings, since FareHarbor and the other platforms don't share conversion data back with us.</p>
+    <p class="page-sub">Tracks clicks on the "Check Availability" / booking buttons on each Tour Detail page and on booking links inside articles — this is the closest signal we have to actual bookings, since FareHarbor and the other platforms don't share conversion data back with us.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Run <code>npm run migrate</code> if the "click_logs" table doesn't exist yet.</div>` : ""}
 
     <div class="stat-grid">
@@ -74,6 +98,15 @@ async function showAnalytics(req, res, user) {
       <table class="data-table">
         <thead><tr><th>Tour</th><th>Clicks</th></tr></thead>
         <tbody>${tourRows || `<tr><td colspan="2" style="text-align:center;color:var(--color-text-muted);padding:32px;">No clicks recorded yet.</td></tr>`}</tbody>
+      </table>
+    </div>
+
+    <div class="form-card">
+      <h2>Top 20 Articles by Affiliate-Link Clicks</h2>
+      <p class="hint">Booking links pasted inside an article's text (FareHarbor, GetYourGuide, Viator, TripAdvisor).</p>
+      <table class="data-table">
+        <thead><tr><th>Article</th><th>All Time</th><th>Last 30 Days</th></tr></thead>
+        <tbody>${postRows || `<tr><td colspan="3" style="text-align:center;color:var(--color-text-muted);padding:32px;">No article clicks recorded yet.</td></tr>`}</tbody>
       </table>
     </div>
   `;

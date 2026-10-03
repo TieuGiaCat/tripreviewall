@@ -17,7 +17,7 @@
  *   -->
  *   <!--head--> …extra <head> HTML (JSON-LD)… <!--/head-->   optional
  *   <main id="main"> … </main>
- *   <!--scripts--> …inline <script> blocks… <!--/scripts-->   optional
+ *   <!--scripts--> …inline <script> blocks… <!--/scripts-->   optional — avoid: put the code in /js and list it under "scripts:" (inline code blocks a strict CSP)
  *
  * Tokens replaced in the body:
  *   {{phone}} {{phoneHref}} {{email}} {{hours}} {{address}} {{operatorName}} {{year}}

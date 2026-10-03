@@ -285,9 +285,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (min-width: 640px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 1024px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
 .footer-tagline { font-size: var(--text-body); color: rgba(250,246,239,0.75); margin: 16px 0 20px; max-width: 320px; }
-.footer-social { display: flex; gap: 16px; }
-.footer-social a { color: var(--color-bg); }
-.footer-social svg { width: 20px; height: 20px; }
 .footer-col h4 { font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 16px; color: rgba(250,246,239,0.6); }
 .footer-col a, .footer-contact-row { display: block; font-size: 15px; color: rgba(250,246,239,0.85); margin-bottom: 12px; }
 .footer-col a:hover { color: var(--color-bg); text-decoration: underline; text-decoration-color: var(--color-cta); }

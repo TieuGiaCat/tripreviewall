@@ -44,6 +44,20 @@ function imgUrl(url, w) {
   if (!/\/uploads\//.test(url) || /\.svg$/i.test(url) || url.includes("?")) return url;
   return `${url}?w=${w}`;
 }
+/** Absolute URL for share tags / JSON-LD ("/uploads/x.jpg" → "https://tripreviewall.com/uploads/x.jpg"). */
+function absUrl(url) {
+  if (!url) return url;
+  return /^https?:\/\//i.test(url) ? url : `${SITE_URL_FOR_OG}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
+// Publisher block shared by every Article JSON-LD (D7).
+const PUBLISHER_LD = {
+  "@type": "Organization",
+  name: "Tripreviewall",
+  url: `${SITE_URL_FOR_OG}/`,
+  logo: { "@type": "ImageObject", url: `${SITE_URL_FOR_OG}/icon-512.png`, width: 512, height: 512 },
+};
+
 function imgSrcset(url, widths) {
   if (!url || imgUrl(url, 1) === url) return "";
   return widths.map((w) => `${imgUrl(url, w)} ${w}w`).join(", ");
@@ -100,7 +114,7 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
     <article class="tour-card">
       <a class="tour-card-image-wrap" href="/tours/${esc(tour.slug)}" tabindex="-1" aria-hidden="true" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
         ${tour.editorsPick ? `<span class="tour-card-badge">Editor's Pick</span>` : ""}
-        ${img ? `<img class="tour-photo" src="${esc(imgUrl(img, 400))}"${imgSrcset(img, [400, 800]) ? ` srcset="${esc(imgSrcset(img, [400, 800]))}" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${esc(tour.title)} — ${esc(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
+        ${img ? `<img class="tour-photo" src="${esc(imgUrl(img, 400))}"${imgSrcset(img, [400, 800]) ? ` srcset="${esc(imgSrcset(img, [400, 800]))}" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${esc(tour.title)} — ${esc(tour.company)}">` : ""}
       </a>
       <div class="tour-card-body">
         <div class="tour-card-eyebrow">${esc((tour.island || "").toUpperCase())} · ${esc((tour.tourType || "").toUpperCase())}</div>
@@ -119,4 +133,4 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
     </article>`;
 }
 
-module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript, ensureSocialTags, coverImg, preloadImg };
+module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript, ensureSocialTags, coverImg, preloadImg, absUrl, PUBLISHER_LD };

@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
-const { imgUrl, jsonLdScript, coverImg, preloadImg } = require("./sharedHtml");
+const { imgUrl, jsonLdScript, coverImg, preloadImg, PUBLISHER_LD, absUrl } = require("./sharedHtml");
 const { sanitizeHtml } = require("../lib/sanitizeHtml");
 
 const { SITE_URL } = require("../siteConfig");
@@ -98,15 +98,20 @@ function tocHtml(headings) {
     </div>`;
 }
 
-function jsonLd(post, relatedTour) {
+function jsonLd(post, relatedTour, canonicalUrl) {
+  // D7: image, mainEntityOfPage and publisher.logo are what Google's Article
+  // rich result looks for. Falls back to the branded share image.
   const article = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
+    description: (post.metaDescription || post.excerpt || "").slice(0, 300) || undefined,
+    image: [post.featuredImage ? `${absUrl(imgUrl(post.featuredImage, 1200))}` : `${SITE_URL}/og-default.jpg`],
     datePublished: post.publishedAt,
-    dateModified: post.updatedAt,
+    dateModified: post.updatedAt || post.publishedAt,
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
     author: { "@type": "Person", name: post.author || "Tripreviewall Editorial Team" },
-    publisher: { "@type": "Organization", name: "Tripreviewall" },
+    publisher: PUBLISHER_LD,
   };
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -136,7 +141,8 @@ function jsonLd(post, relatedTour) {
  */
 function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
   // Override only if it's a real https URL; escaped wherever it's printed.
-  const canonical = esc(/^https:\/\/[^\s"'<>]+$/.test(post.canonicalUrl || "") ? post.canonicalUrl : `${SITE_URL}/blog/${post.slug}`);
+  const canonicalRaw = /^https:\/\/[^\s"'<>]+$/.test(post.canonicalUrl || "") ? post.canonicalUrl : `${SITE_URL}/blog/${post.slug}`;
+  const canonical = esc(canonicalRaw);
   const metaTitle = post.metaTitle || post.title;
   const metaDesc = (post.metaDescription || post.excerpt || post.title).slice(0, 155);
   // Body is editor HTML — rebuilt through an allow-list so no script/handler
@@ -178,7 +184,7 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
 <meta property="og:type" content="article">
 <meta property="og:title" content="${esc(metaTitle)}">
 <meta property="og:description" content="${esc(metaDesc)}">
-${post.featuredImage ? `<meta property="og:image" content="${SITE_URL}${imgUrl(post.featuredImage, 1200)}">` : ""}
+${post.featuredImage ? `<meta property="og:image" content="${esc(absUrl(imgUrl(post.featuredImage, 1200)))}">` : ""}
 <meta property="og:url" content="${canonical}">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="article:published_time" content="${esc(String(post.publishedAt || ""))}">
@@ -187,8 +193,8 @@ ${post.author ? `<meta property="article:author" content="${esc(post.author)}">`
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(metaTitle)}">
 <meta name="twitter:description" content="${esc(metaDesc)}">
-${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(post.featuredImage, 1200)}">` : ""}
-${jsonLd(post, relatedTour)}
+${post.featuredImage ? `<meta name="twitter:image" content="${esc(absUrl(imgUrl(post.featuredImage, 1200)))}">` : ""}
+${jsonLd(post, relatedTour, canonicalRaw)}
 ${preloadImg(post.featuredImage, { sizes: "(min-width: 1280px) 1200px, 100vw" })}
 ${headBoilerplate(["blog-detail"])}
 </head>
@@ -222,7 +228,7 @@ ${siteHeader()}
     <div class="article-body-grid">
       <div class="article-body-main">
         ${tocHtml(headings)}
-        <div class="article-prose">${processedBody}</div>
+        <div class="article-prose" data-post-slug="${esc(post.slug)}">${processedBody}</div>
 
         ${inlineTourCardHtml(relatedTour)}
 
@@ -263,7 +269,7 @@ ${siteHeader()}
 
 ${siteFooter()}
 
-${scriptTags(["main"])}
+${scriptTags(["main", "article"])}
 </body>
 </html>`;
 }

@@ -5,6 +5,13 @@ const { logAudit } = require("../auditLog");
 const { esc } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { UPLOAD_ROOT } = require("../upload");
+const { RESIZE_WIDTHS } = require("../lib/uploadServer");
+
+/** The ?w= copies made by lib/uploadServer.js — removed together with the original. */
+async function removeResizedCopies(rel) {
+  await Promise.all([...RESIZE_WIDTHS].map((w) =>
+    fs.promises.unlink(path.join(UPLOAD_ROOT, ".resized", `w${w}`, rel + ".webp")).catch(() => {})));
+}
 
 const KINDS = ["tours", "posts", "authors", "destinations", "media"];
 const IMG_EXT = new Set([".jpg", ".jpeg", ".png", ".webp"]);
@@ -32,30 +39,31 @@ async function buildUsedUrlSet() {
   return used;
 }
 
-function listFilesOnDisk() {
+/* Scanning every upload folder used to happen synchronously on every page
+   view, blocking the whole server while it ran (E7). Now it's async and the
+   result is kept for 30 seconds; uploads/deletes made here clear it at once. */
+const LIST_TTL_MS = 30 * 1000;
+let fileListCache = { at: 0, files: null };
+function invalidateFileList() { fileListCache = { at: 0, files: null }; }
+
+async function listFilesOnDisk() {
+  if (fileListCache.files && Date.now() - fileListCache.at < LIST_TTL_MS) return fileListCache.files;
   const files = [];
   for (const kind of KINDS) {
     const dir = path.join(UPLOAD_ROOT, kind);
-    if (!fs.existsSync(dir)) continue;
-    for (const filename of fs.readdirSync(dir)) {
-      const ext = path.extname(filename).toLowerCase();
-      if (!IMG_EXT.has(ext)) continue;
-      const fullPath = path.join(dir, filename);
-      let stat;
-      try {
-        stat = fs.statSync(fullPath);
-      } catch (err) {
-        continue;
-      }
-      files.push({
-        kind,
-        filename,
-        url: `/uploads/${kind}/${filename}`,
-        sizeKB: Math.round(stat.size / 1024),
-        mtime: stat.mtime,
-      });
-    }
+    let names;
+    try { names = await fs.promises.readdir(dir); } catch (err) { continue; }
+    const stats = await Promise.all(names
+      .filter((filename) => IMG_EXT.has(path.extname(filename).toLowerCase()))
+      .map(async (filename) => {
+        try {
+          const stat = await fs.promises.stat(path.join(dir, filename));
+          return { kind, filename, url: `/uploads/${kind}/${filename}`, sizeKB: Math.round(stat.size / 1024), mtime: stat.mtime };
+        } catch (err) { return null; }
+      }));
+    stats.forEach((f) => { if (f) files.push(f); });
   }
+  fileListCache = { at: Date.now(), files };
   return files;
 }
 
@@ -72,11 +80,11 @@ async function listMedia(req, res, user, urlObj) {
   let dbError = null;
   try {
     const usedUrls = await buildUsedUrlSet();
-    files = listFilesOnDisk().map((f) => ({ ...f, used: usedUrls.has(f.url) }));
+    files = (await listFilesOnDisk()).map((f) => ({ ...f, used: usedUrls.has(f.url) }));
   } catch (err) {
     console.error("[media] list failed:", err.message);
     dbError = err.message;
-    files = listFilesOnDisk().map((f) => ({ ...f, used: null })); // unknown usage if DB scan failed
+    files = (await listFilesOnDisk()).map((f) => ({ ...f, used: null })); // unknown usage if DB scan failed
   }
 
   files.sort((a, b) => b.mtime - a.mtime);
@@ -221,6 +229,7 @@ async function uploadGeneralImage(req, res, user) {
   const { parseImageUpload } = require("../upload");
   try {
     const result = await parseImageUpload(req, "media", "general");
+    invalidateFileList();
     if (result.urls.length) await logAudit(user, "create", "media", result.urls.join(", ").slice(0, 200), `Uploaded ${result.urls.length} image(s)`);
     if (result.urls.length === 0) {
       // Nothing valid uploaded — just bounce back, the list page has no
@@ -288,7 +297,9 @@ async function deleteMediaFile(req, res, user) {
   try {
     const fullPath = path.join(UPLOAD_ROOT, kind, filename);
     if (!fullPath.startsWith(UPLOAD_ROOT)) throw new Error("Path escapes upload root.");
-    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+    await fs.promises.unlink(fullPath).catch((e) => { if (e.code !== "ENOENT") throw e; });
+    await removeResizedCopies(`${kind}/${filename}`);
+    invalidateFileList();
     await logAudit(user, "delete", "media", url, `Deleted image ${url}`);
   } catch (err) {
     console.error("[media] delete failed:", err.message);
@@ -327,6 +338,7 @@ async function fetchImageFromUrl(req, res, user) {
 
   try {
     await fetchAndConvertToWebp(url, name);
+    invalidateFileList();
     await logAudit(user, "create", "media", name, `Imported image from URL as "${name}"`);
   } catch (err) {
     console.error("[media] fetch-from-URL failed:", err.message);

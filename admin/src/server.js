@@ -40,79 +40,9 @@ const MIME_TYPES = {
 };
 
 const UPLOADS_DIR = path.join(__dirname, "..", "public", "uploads");
-
-const RESIZE_WIDTHS = new Set([160, 400, 800, 1200, 1600]);
-const RESIZE_CACHE_DIR = path.join(UPLOADS_DIR, ".resized");
-// Upload filenames carry a timestamp + random suffix, so a URL's content never
-// changes — safe for browsers/CDNs to cache for a long time.
-const UPLOAD_CACHE_HEADER = "public, max-age=2592000";
-
-function sendFile(res, filePath, contentType) {
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      res.writeHead(404, { "Content-Type": "text/plain" });
-      res.end("Not found");
-      return;
-    }
-    res.writeHead(200, { "Content-Type": contentType, "Cache-Control": UPLOAD_CACHE_HEADER });
-    res.end(content);
-  });
-}
-
-/**
- * /uploads/<path>        → the original file
- * /uploads/<path>?w=800  → a WebP resized to 800px wide (never upscaled),
- *                          generated once with sharp and cached under
- *                          uploads/.resized/w800/<path>.webp
- * Any failure while resizing falls back to the original file, so a page can
- * never lose an image because of this.
- */
-function serveUpload(req, res, urlPath) {
-  // urlPath is like "/uploads/tours/xyz.jpg" — strip the "/uploads" prefix
-  let rel;
-  try { rel = decodeURIComponent(urlPath.replace(/^\/uploads\//, "")); } catch (e) { rel = ""; }
-  const filePath = path.join(UPLOADS_DIR, rel);
-
-  if (!filePath.startsWith(UPLOADS_DIR + path.sep) || rel.startsWith(".resized")) {
-    res.writeHead(403);
-    res.end("Forbidden");
-    return;
-  }
-
-  const ext = path.extname(filePath).toLowerCase();
-  const contentType = MIME_TYPES[ext] || "application/octet-stream";
-  const w = Number(new URL(req.url, "http://x").searchParams.get("w"));
-  const resizable = RESIZE_WIDTHS.has(w) && [".jpg", ".jpeg", ".png", ".webp"].includes(ext);
-  if (!resizable) return sendFile(res, filePath, contentType);
-
-  const cachedPath = path.join(RESIZE_CACHE_DIR, `w${w}`, rel + ".webp");
-  fs.stat(filePath, (errOrig, origStat) => {
-    if (errOrig) return sendFile(res, filePath, contentType); // → 404
-    fs.stat(cachedPath, (errCache, cacheStat) => {
-      if (!errCache && cacheStat.mtimeMs >= origStat.mtimeMs) return sendFile(res, cachedPath, "image/webp");
-      let sharp;
-      try { sharp = require("sharp"); } catch (e) { return sendFile(res, filePath, contentType); }
-      const tmpPath = `${cachedPath}.${process.pid}.${Date.now()}.tmp`;
-      fs.mkdir(path.dirname(cachedPath), { recursive: true }, (mkErr) => {
-        if (mkErr) return sendFile(res, filePath, contentType);
-        sharp(filePath)
-          .rotate()
-          .resize({ width: w, withoutEnlargement: true })
-          .webp({ quality: 72 })
-          .toFile(tmpPath)
-          .then(() => fs.rename(tmpPath, cachedPath, (rnErr) => {
-            if (rnErr) { fs.unlink(tmpPath, () => {}); return sendFile(res, filePath, contentType); }
-            sendFile(res, cachedPath, "image/webp");
-          }))
-          .catch((e) => {
-            console.error(`[uploads] resize failed for ${rel} @${w}px: ${e.message}`);
-            fs.unlink(tmpPath, () => {});
-            sendFile(res, filePath, contentType);
-          });
-      });
-    });
-  });
-}
+// Streaming, ETag/304 and de-duplicated resizing live in lib/uploadServer.js (E6).
+const uploadServer = require("./lib/uploadServer").createUploadServer(UPLOADS_DIR);
+const serveUpload = uploadServer.serveUpload;
 
 function serveStatic(req, res, urlPath) {
   // urlPath is like "/admin/public/admin.css" — strip the "/admin/public" prefix
@@ -202,7 +132,7 @@ async function routeRequest(req, res) {
   if (method === "GET" && pathname.startsWith("/admin/public/")) {
     return serveStatic(req, res, pathname);
   }
-  if (method === "GET" && pathname.startsWith("/uploads/")) {
+  if ((method === "GET" || method === "HEAD") && pathname.startsWith("/uploads/")) {
     return serveUpload(req, res, pathname);
   }
   // Self-hosted Quill editor (npm package) — only these two files.
@@ -561,4 +491,42 @@ const HOST = process.env.HOST || "127.0.0.1";
 server.listen(PORT, HOST, () => {
   console.log(`Tripreviewall admin panel running at http://localhost:${PORT}`);
   console.log(`Log in at http://localhost:${PORT}/admin/login`);
+  if (process.send) process.send("ready"); // PM2 wait_ready (see ecosystem.config.js)
 });
+
+/* ---- Graceful shutdown (E8) ----
+   `pm2 restart` / `pm2 stop` sends SIGINT (systemd/docker send SIGTERM).
+   Instead of dying mid-request — or in the middle of rebuilding pages — we
+   stop accepting new connections, let running requests and any page rebuild
+   finish, close the database pool, then exit. Hard stop after
+   SHUTDOWN_TIMEOUT_MS in case something hangs. */
+const SHUTDOWN_TIMEOUT_MS = Number(process.env.SHUTDOWN_TIMEOUT_MS) || 8000;
+let shuttingDown = false;
+async function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`[server] ${signal} received — finishing open requests, then exiting.`);
+  setTimeout(() => {
+    console.error("[server] Shutdown took too long — forcing exit.");
+    process.exit(1);
+  }, SHUTDOWN_TIMEOUT_MS).unref();
+
+  await new Promise((resolve) => {
+    server.close(resolve);                                         // stop accepting; resolves when all requests are done
+    if (server.closeIdleConnections) server.closeIdleConnections(); // drop idle keep-alive sockets now
+  });
+  try {
+    await require("./ssr/generator").whenIdle();
+  } catch (err) {
+    console.error("[server] page rebuild failed during shutdown:", err.message);
+  }
+  try {
+    await require("./db").pool.end();
+  } catch (err) {
+    console.error("[server] closing database pool failed:", err.message);
+  }
+  console.log("[server] Clean shutdown.");
+  process.exit(0);
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

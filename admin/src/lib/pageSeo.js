@@ -76,18 +76,25 @@ async function applyToFile(filePath, metaTitle, metaDescription) {
   if (!metaTitle && !metaDescription) return { applied: false, reason: "Nothing to apply." };
   const fullPath = safeHtmlPath(filePath);
   if (!fullPath) return { applied: false, reason: `Not an .html file inside the site: ${filePath}` };
-  if (!fs.existsSync(fullPath)) return { applied: false, reason: `File not found: ${filePath}` };
-  const html = fs.readFileSync(fullPath, "utf8");
+  let html;
+  try {
+    html = await fs.promises.readFile(fullPath, "utf8");
+  } catch (err) {
+    return { applied: false, reason: `File not found: ${filePath}` };
+  }
   const updated = applyMetaTags(html, metaTitle, metaDescription);
-  if (updated !== html) fs.writeFileSync(fullPath, updated, "utf8");
+  if (updated !== html) {
+    const tmp = `${fullPath}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
+    await fs.promises.writeFile(tmp, updated, "utf8");
+    await fs.promises.rename(tmp, fullPath);
+  }
   return { applied: true };
 }
 
 /**
- * Re-applies every saved SEO override. Called after regenerateListingPages()
- * so overrides on Home/Tours-hub/Blog-hub/Destinations-hub survive being
- * regenerated from scratch — and can also be called any time to refresh
- * every registered static page.
+ * Re-applies every saved SEO override to the files on disk. The generator
+ * applies overrides itself while writing (ssr/generator.js writePage), so this
+ * is only a manual "refresh everything" helper.
  */
 async function applyAllPageSeoOverrides() {
   let rows;

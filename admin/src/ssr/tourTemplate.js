@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
-const { starsRowHtml, tourCardHtml, imgUrl, imgSrcset, jsonLdScript } = require("./sharedHtml");
+const { starsRowHtml, tourCardHtml, imgUrl, imgSrcset, jsonLdScript, absUrl } = require("./sharedHtml");
 
 const HERO_SIZES = "(min-width: 1280px) 1200px, 100vw";
 const HERO_WIDTHS = [400, 800, 1200, 1600];
@@ -163,51 +163,22 @@ function mobileBookingHtml(tour) {
 <div class="mobile-booking-bar" id="mobile-booking-bar">
   <div class="mobile-booking-price"><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">${tour.priceFrom != null ? "$" + esc(tour.priceFrom) : "On request"}</div></div>
   <div class="mobile-booking-actions">
-    ${options.length > 1 ? `<button type="button" class="btn btn-secondary mobile-more-btn" onclick="toggleBookingSheet(true)" aria-haspopup="dialog" aria-controls="booking-sheet" aria-expanded="false">${options.length} options</button>` : ""}
+    ${options.length > 1 ? `<button type="button" class="btn btn-secondary mobile-more-btn" data-booking-sheet="open" aria-haspopup="dialog" aria-controls="booking-sheet" aria-expanded="false">${options.length} options</button>` : ""}
     ${primary ? `<a href="${esc(trackingUrl(tour.slug, primary.key, primary.url))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">${primary.key === "fareharbor" ? "Check Availability" : "Book on " + esc(primary.label)}</a>` : ""}
   </div>
 </div>
 ${options.length > 1 ? `
-<div class="booking-sheet-backdrop" id="booking-sheet-backdrop" onclick="toggleBookingSheet(false)" hidden></div>
+<div class="booking-sheet-backdrop" id="booking-sheet-backdrop" data-booking-sheet="close" hidden></div>
 <div class="booking-sheet" id="booking-sheet" role="dialog" aria-modal="true" aria-labelledby="booking-sheet-title" hidden>
   <div class="booking-sheet-head">
     <h3 id="booking-sheet-title">Book this tour on</h3>
-    <button type="button" class="booking-sheet-close" onclick="toggleBookingSheet(false)" aria-label="Close">&times;</button>
+    <button type="button" class="booking-sheet-close" data-booking-sheet="close" aria-label="Close">&times;</button>
   </div>
   <div class="booking-sheet-list">
     ${options.map((o) => `<a class="booking-sheet-item${o.key === "fareharbor" ? " is-primary" : ""}" href="${esc(trackingUrl(tour.slug, o.key, o.url))}" target="_blank" rel="noopener sponsored"><span><strong>${esc(o.label)}</strong><small>${esc(o.note)}</small></span>${arrow}</a>`).join("")}
   </div>
   <p class="booking-disclosure">Tripreviewall may earn a commission if you book through these links, at no extra cost to you.</p>
-</div>
-<script>
-  var bookingSheetOpener = null;
-  function toggleBookingSheet(open) {
-    var sheet = document.getElementById('booking-sheet');
-    var backdrop = document.getElementById('booking-sheet-backdrop');
-    if (open === !sheet.hidden) return;
-    sheet.hidden = !open; backdrop.hidden = !open;
-    document.body.style.overflow = open ? 'hidden' : '';
-    var more = document.querySelector('.mobile-more-btn');
-    if (more) more.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) {
-      bookingSheetOpener = document.activeElement;
-      sheet.querySelector('.booking-sheet-close').focus();
-    } else if (bookingSheetOpener) {
-      bookingSheetOpener.focus(); // give focus back to the button that opened it
-    }
-  }
-  document.addEventListener('keydown', function (e) {
-    var sheet = document.getElementById('booking-sheet');
-    if (!sheet || sheet.hidden) return;
-    if (e.key === 'Escape') { toggleBookingSheet(false); return; }
-    if (e.key === 'Tab') { // keep keyboard focus inside the open sheet
-      var items = sheet.querySelectorAll('a[href], button');
-      var first = items[0], last = items[items.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-  });
-</script>` : ""}`;
+</div>` : ""}`;
 }
 
 /**
@@ -275,7 +246,7 @@ function jsonLd(tour) {
     name: tour.title,
     url: `${SITE_URL}/tours/${tour.slug}`,
     description: (tour.fullDescription || "").slice(0, 300),
-    image: tour.gallery && tour.gallery[0] ? `${SITE_URL}${tour.gallery[0]}` : undefined,
+    image: tour.gallery && tour.gallery[0] ? absUrl(tour.gallery[0]) : undefined,
     touristType: tour.tourType || undefined,
     provider: tour.company ? { "@type": "Organization", name: tour.company } : undefined,
     offers: tour.priceFrom ? { "@type": "Offer", price: String(tour.priceFrom), priceCurrency: "USD" } : undefined,
@@ -314,13 +285,13 @@ function renderTourPageHtml(tour, similarTours) {
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(pageTitle)} — Tripreviewall">
 <meta property="og:description" content="${esc(metaDesc)}">
-${heroImg ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImg, 1200)}">` : ""}
+${heroImg ? `<meta property="og:image" content="${esc(absUrl(imgUrl(heroImg, 1200)))}">` : ""}
 <meta property="og:url" content="${canonical}">
 <meta property="og:site_name" content="Tripreviewall">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(pageTitle)} — Tripreviewall">
 <meta name="twitter:description" content="${esc(metaDesc)}">
-${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(heroImg, 1200)}">` : ""}
+${heroImg ? `<meta name="twitter:image" content="${esc(absUrl(imgUrl(heroImg, 1200)))}">` : ""}
 ${jsonLd(tour)}
 ${heroImg ? `<link rel="preload" as="image" href="${esc(imgUrl(heroImg, 800))}"${imgSrcset(heroImg, HERO_WIDTHS) ? ` imagesrcset="${esc(imgSrcset(heroImg, HERO_WIDTHS))}" imagesizes="${HERO_SIZES}"` : ""} fetchpriority="high">` : ""}
 ${headBoilerplate(["tour-detail"])}
@@ -344,7 +315,7 @@ ${siteHeader()}
       </div>
       <h1 class="detail-h1">${esc(tour.title)}</h1>
       <div class="detail-rating-row">
-        <a href="#tab-review" class="detail-rating-link" onclick="switchDetailTab('tab-review', document.querySelector('.content-tab[data-target=&quot;tab-review&quot;]'), event);">
+        <a href="#tab-review" class="detail-rating-link" data-tab-link="tab-review">
           ${starsRowHtml(tour.aggregatedRating)}
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
           <span class="count">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews${ratingsBySourceForDisplay(tour).length > 1 ? ` across ${ratingsBySourceForDisplay(tour).length} sources` : ""})</span>
@@ -366,11 +337,11 @@ ${siteHeader()}
     <div class="quickfacts">${quickFactsHtml(tour)}</div>
 
     <div class="content-tabs" role="tablist" aria-label="Tour details">
-      <button type="button" class="content-tab active" role="tab" id="tabbtn-overview" aria-controls="tab-overview" aria-selected="true" data-target="tab-overview" onclick="switchDetailTab('tab-overview', this, event)">Overview</button>
-      <button type="button" class="content-tab" role="tab" id="tabbtn-location" aria-controls="tab-location" aria-selected="false" tabindex="-1" data-target="tab-location" onclick="switchDetailTab('tab-location', this, event)">Location</button>
-      <button type="button" class="content-tab" role="tab" id="tabbtn-review" aria-controls="tab-review" aria-selected="false" tabindex="-1" data-target="tab-review" onclick="switchDetailTab('tab-review', this, event)">Review</button>
-      <button type="button" class="content-tab" role="tab" id="tabbtn-verdict" aria-controls="tab-verdict" aria-selected="false" tabindex="-1" data-target="tab-verdict" onclick="switchDetailTab('tab-verdict', this, event)">Our Verdict</button>
-      <button type="button" class="content-tab" role="tab" id="tabbtn-contact" aria-controls="tab-contact" aria-selected="false" tabindex="-1" data-target="tab-contact" onclick="switchDetailTab('tab-contact', this, event)">Contact</button>
+      <button type="button" class="content-tab active" role="tab" id="tabbtn-overview" aria-controls="tab-overview" aria-selected="true" data-target="tab-overview">Overview</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-location" aria-controls="tab-location" aria-selected="false" tabindex="-1" data-target="tab-location">Location</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-review" aria-controls="tab-review" aria-selected="false" tabindex="-1" data-target="tab-review">Review</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-verdict" aria-controls="tab-verdict" aria-selected="false" tabindex="-1" data-target="tab-verdict">Our Verdict</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-contact" aria-controls="tab-contact" aria-selected="false" tabindex="-1" data-target="tab-contact">Contact</button>
     </div>
 
     <div class="detail-layout">
@@ -430,42 +401,7 @@ ${mobileBookingHtml(tour)}
 
 ${siteFooter()}
 
-${scriptTags(["main"])}
-<script>
-  function reduceMotion() { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
-  function switchDetailTab(targetId, clickedBtn, evt) {
-    if (evt) { evt.preventDefault(); evt.stopPropagation(); }
-    var panel = document.getElementById(targetId);
-    document.querySelectorAll('.content-tab-panel').forEach(function (p) {
-      p.style.display = p.id === targetId ? '' : 'none';
-    });
-    document.querySelectorAll('.content-tab').forEach(function (btn) {
-      var on = btn.getAttribute('data-target') === targetId;
-      btn.classList.toggle('active', on);
-      btn.setAttribute('aria-selected', on ? 'true' : 'false');
-      btn.tabIndex = on ? 0 : -1;
-    });
-    if (clickedBtn) {
-      clickedBtn.classList.add('active');
-      // Slide the tab strip sideways so the chosen tab is fully visible (mobile).
-      var strip = clickedBtn.parentElement;
-      var left = clickedBtn.offsetLeft - (strip.clientWidth - clickedBtn.offsetWidth) / 2;
-      strip.scrollTo({ left: Math.max(0, left), behavior: reduceMotion() ? 'auto' : 'smooth' });
-    }
-    // Only scroll the page when the new panel would start hidden under the
-    // sticky header + tab strip; otherwise the page stays exactly where it is.
-    var tabsBar = document.querySelector('.content-tabs');
-    if (panel && tabsBar) {
-      var barBottom = tabsBar.getBoundingClientRect().bottom;
-      var panelTop = panel.getBoundingClientRect().top;
-      if (panelTop < barBottom) {
-        window.scrollTo({ top: window.scrollY + panelTop - barBottom - 8, behavior: reduceMotion() ? 'auto' : 'smooth' });
-      }
-    }
-    return false;
-  }
-</script>
-${scriptTags(["tour-static-hydrate"])}
+${scriptTags(["main", "tour-static-hydrate"])}
 </body>
 </html>`;
 }
