@@ -112,6 +112,10 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
   const bl = d.bookingLinks || {};
   const loc = d.location || {};
   const gallery = d.gallery || [];
+  const pk = d.packages || {};
+  const pkItems = Array.isArray(pk.items) ? pk.items : [];
+  // JSON for the client-side package editor; "<" escaped so a value can never close the <script>.
+  const pkJson = JSON.stringify(pkItems.map((p) => ({ name: p.name || "", price: p.price != null ? p.price : "", features: (p.features || []).join("\n") }))).replace(/</g, "\\u003c");
 
   const islandOptions = ISLANDS.map(
     (isl) => `<option value="${isl}" ${tour.island === isl ? "selected" : ""}>${isl}</option>`
@@ -140,6 +144,7 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
       <div class="tab-nav" style="display:flex;gap:8px;margin-bottom:16px;">
         <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="basics" onclick="switchTourTab('basics')" style="background:var(--color-primary,#c1440e);color:#fff;">1. Basics</button>
         <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="content" onclick="switchTourTab('content')">2. Content &amp; Reviews</button>
+        <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="packages" onclick="switchTourTab('packages')">3. Packages</button>
       </div>
 
       <div class="tour-tab-panel" data-tab-panel="basics">
@@ -279,12 +284,65 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
       </div>
       </div>
 
+      <div class="tour-tab-panel" data-tab-panel="packages" style="display:none;">
+      <div class="form-card">
+        <h2>Packages</h2>
+        <p class="hint" style="margin:-8px 0 16px;">For tours sold in several tiers (e.g. Classic / Premium / Royal). When shown, a side-by-side comparison appears at the top of the Overview tab on the live page, above the "Overview" heading.</p>
+        <div class="form-row">
+          <div class="form-field">
+            <label><input type="checkbox" name="showPackages" value="1" ${pk.show ? "checked" : ""}> Show packages on the live page</label>
+          </div>
+          <div class="form-field">
+            <label>Number of packages</label>
+            <input type="number" id="packageCount" name="packageCount" min="0" max="10" step="1" value="${pkItems.length}" oninput="renderPackageFields()">
+            <div class="hint">Type 1, 2, 3… — that many package boxes appear below. Lowering the number removes the last boxes when you save.</div>
+          </div>
+        </div>
+        <div id="packageFields"></div>
+      </div>
+      </div>
+
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${isEdit ? "Save Changes" : "Create Tour"}</button>
         <a href="/admin/tours" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
     <script>
+      var PACKAGE_DATA = ${pkJson};
+      function escAttr(v) {
+        return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      function renderPackageFields() {
+        var box = document.getElementById('packageFields');
+        if (!box) return;
+        // Keep whatever was already typed before rebuilding the boxes.
+        box.querySelectorAll('.package-edit').forEach(function (el, i) {
+          PACKAGE_DATA[i] = {
+            name: el.querySelector('[name="pkgName_' + i + '"]').value,
+            price: el.querySelector('[name="pkgPrice_' + i + '"]').value,
+            features: el.querySelector('[name="pkgItems_' + i + '"]').value
+          };
+        });
+        var n = parseInt(document.getElementById('packageCount').value, 10);
+        if (isNaN(n) || n < 0) n = 0;
+        if (n > 10) n = 10;
+        var html = '';
+        for (var i = 0; i < n; i++) {
+          var p = PACKAGE_DATA[i] || { name: '', price: '', features: '' };
+          html += '<div class="package-edit" style="border:1px solid var(--color-border);border-radius:6px;padding:16px;margin-top:16px;">' +
+            '<h3 style="margin:0 0 12px;font-size:15px;">Package ' + (i + 1) + '</h3>' +
+            '<div class="form-row">' +
+              '<div class="form-field"><label>Package name</label><input type="text" name="pkgName_' + i + '" value="' + escAttr(p.name) + '" placeholder="e.g. Premium Package"></div>' +
+              '<div class="form-field"><label>Price (USD)</label><input type="number" step="0.01" min="0" name="pkgPrice_' + i + '" value="' + escAttr(p.price) + '" placeholder="e.g. 169"></div>' +
+            '</div>' +
+            '<div class="form-row full">' +
+              '<div class="form-field"><label>What&#39;s included (one per line)</label><textarea name="pkgItems_' + i + '" style="min-height:120px;" placeholder="Fresh flower lei greeting&#10;All-you-can-eat luau feast&#10;Front section seating">' + escAttr(p.features) + '</textarea></div>' +
+            '</div>' +
+          '</div>';
+        }
+        box.innerHTML = html;
+      }
+      renderPackageFields();
       function switchTourTab(tab) {
         document.querySelectorAll('.tour-tab-panel').forEach(function (el) {
           el.style.display = el.getAttribute('data-tab-panel') === tab ? '' : 'none';
@@ -365,6 +423,21 @@ function bodyToTourData(body, existingData = {}) {
       const lng = body.locationLng !== undefined && body.locationLng !== "" ? Number(body.locationLng) : (existingData.location ? existingData.location.lng : undefined);
       if (lat === undefined || lng === undefined || isNaN(lat) || isNaN(lng)) return existingData.location || null;
       return { lat, lng };
+    })(),
+    packages: (() => {
+      let count = parseInt(body.packageCount, 10);
+      if (isNaN(count) || count < 0) count = 0;
+      if (count > 10) count = 10;
+      const items = [];
+      for (let i = 0; i < count; i++) {
+        const name = (body[`pkgName_${i}`] || "").trim();
+        const priceRaw = (body[`pkgPrice_${i}`] || "").trim();
+        const price = priceRaw !== "" && !isNaN(Number(priceRaw)) ? Number(priceRaw) : null;
+        const features = linesToArray(body[`pkgItems_${i}`]);
+        if (!name && price === null && !features.length) continue; // fully blank box
+        items.push({ name, price, features });
+      }
+      return { show: body.showPackages === "1", items };
     })(),
     // Not edited by this form — preserved from whatever the tour already had,
     // so saving the main form never wipes out uploaded images or variants.

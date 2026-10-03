@@ -26,6 +26,7 @@ function toPublicShape(row) {
     verdict: d.verdict || {},
     googleSnapshot: d.googleSnapshot || {},
     variants: d.variants || [],
+    packages: d.packages || { show: false, items: [] },
     fareharborItemId: d.fareharborItemId || "",
     fareharborRegularLink: d.fareharborRegularLink || "",
     fareharborCalendarScript: d.fareharborCalendarScript || "",

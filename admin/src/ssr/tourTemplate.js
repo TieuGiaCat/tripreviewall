@@ -63,6 +63,29 @@ function variantSelectorHtml(variants) {
     </div>`;
 }
 
+/** Side-by-side package comparison shown at the top of the Overview tab.
+ * Only rendered when the admin ticked "Show packages" and filled at least one. */
+function packagesHtml(pk) {
+  if (!pk || !pk.show) return "";
+  const items = (pk.items || []).filter((p) => p && (p.name || (p.features && p.features.length)));
+  if (!items.length) return "";
+  const check = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  const fmt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(2));
+  return `
+          <div class="packages-block">
+            <h2 class="detail-section-title">Packages</h2>
+            <div class="package-grid">
+              ${items.map((p) => `
+              <div class="package-card">
+                <h3 class="package-name">${esc(p.name || "")}</h3>
+                ${p.price != null ? `<div class="package-price"><span class="package-price-amount">$${esc(fmt(Number(p.price)))}</span></div>` : ""}
+                ${p.features && p.features.length ? `<ul class="package-features">${p.features.map((f) => `<li>${check}<span>${esc(f)}</span></li>`).join("")}</ul>` : ""}
+              </div>`).join("")}
+            </div>
+            <p class="package-note">Prices as listed by the operator — check availability for today's rate.</p>
+          </div>`;
+}
+
 function verdictHtml(v) {
   v = v || {};
   return `
@@ -313,6 +336,7 @@ ${jsonLd(tour)}
     <div class="detail-layout">
       <div class="detail-main">
         <section class="detail-section content-tab-panel" id="tab-overview">
+          ${packagesHtml(tour.packages)}
           <h2 class="detail-section-title">Overview</h2>
           <ul class="highlight-list">${(tour.highlights || []).map((h) => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(h)}</li>`).join("")}</ul>
           <p class="detail-body-text">${esc(tour.fullDescription || "")}</p>
