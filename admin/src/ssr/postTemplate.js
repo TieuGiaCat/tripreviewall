@@ -180,7 +180,7 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
 <meta property="og:type" content="article">
 <meta property="og:title" content="${esc(metaTitle)}">
 <meta property="og:description" content="${esc(metaDesc)}">
-${post.featuredImage ? `<meta property="og:image" content="${SITE_URL}${post.featuredImage}">` : ""}
+${post.featuredImage ? `<meta property="og:image" content="${SITE_URL}${imgUrl(post.featuredImage, 1200)}">` : ""}
 <meta property="og:url" content="${canonical}">
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="article:published_time" content="${esc(String(post.publishedAt || ""))}">
@@ -189,7 +189,7 @@ ${post.author ? `<meta property="article:author" content="${esc(post.author)}">`
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(metaTitle)}">
 <meta name="twitter:description" content="${esc(metaDesc)}">
-${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${post.featuredImage}">` : ""}
+${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(post.featuredImage, 1200)}">` : ""}
 ${jsonLd(post, relatedTour)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -320,7 +320,7 @@ ${jsonLd(post, relatedTour)}
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
       </div>
     </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, TripAdvisor, GetYourGuide). This never affects which reviews we show or how we rate a tour.</div>
+    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
     <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
   </div>
 </footer>

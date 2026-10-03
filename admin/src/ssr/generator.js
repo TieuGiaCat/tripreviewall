@@ -4,9 +4,11 @@ const { query } = require("../db");
 const { toPublicShape, toPostPublicShape } = require("../routes/publicApi");
 const { renderTourPageHtml } = require("./tourTemplate");
 const { renderPostPageHtml } = require("./postTemplate");
-const { renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS } = require("./listingTemplates");
+const { TOURS_PER_PAGE, renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS } = require("./listingTemplates");
 const { renderHomeHtml } = require("./homeTemplate");
 const { applyAllPageSeoOverrides } = require("../lib/pageSeo");
+const { ensureSocialTags } = require("./sharedHtml");
+const { ASSET_V } = require("./assetVersion");
 
 const SITE_ROOT = process.env.SITE_ROOT || path.join(__dirname, "..", "..", "..", "site-not-configured");
 const TOURS_DIR = path.join(SITE_ROOT, "tours");
@@ -15,7 +17,7 @@ const POSTS_DIR = path.join(SITE_ROOT, "blog");
 // A generated file's name is `<slug>.html`. These two filenames are the
 // generic dynamic templates that already live in the same folders — never
 // let a tour/post slug collide with them.
-const RESERVED_SLUGS = new Set(["tour-detail", "post-detail", "island"]);
+const RESERVED_SLUGS = new Set(["tour-detail", "post-detail", "island", "page"]);
 
 function isReservedSlug(slug) {
   return RESERVED_SLUGS.has(slug);
@@ -35,12 +37,38 @@ function postFilePath(slug) {
  * page write, simplest way to guarantee every generated page stays in sync
  * with whatever is currently saved.
  */
+/**
+ * Makes a tracking snippet consent-gated: every executable <script> becomes
+ * <script type="text/plain" data-consent="analytics"> (inert until
+ * js/consent.js re-activates it after "Accept"), and <noscript> fallbacks —
+ * e.g. GTM's tracking iframe — are dropped, since a no-JS visitor can never
+ * give consent. Scripts that already declare a non-JS type (JSON etc.) are
+ * left as they are.
+ */
+function gateForConsent(snippet) {
+  return String(snippet || "")
+    .replace(/<noscript\b[\s\S]*?<\/noscript>/gi, "")
+    .replace(/<script\b([^>]*)>/gi, (tag, attrs) => {
+      const type = (attrs.match(/\btype\s*=\s*["']?([^"'\s>]+)/i) || [])[1];
+      if (type && !/^(text|application)\/(javascript|ecmascript)$|^module$/i.test(type)) return tag;
+      const cleaned = attrs.replace(/\btype\s*=\s*["']?[^"'\s>]+["']?/i, "");
+      return `<script type="text/plain" data-consent="analytics"${cleaned}>`;
+    });
+}
+
 async function injectTracking(html) {
+  html = ensureSocialTags(html);
   try {
     const { getTrackingScripts } = require("../routes/settingsRoutes");
     const { headScripts, bodyScripts } = await getTrackingScripts();
-    if (headScripts) html = html.replace("<head>", `<head>\n${headScripts}`);
-    if (bodyScripts) html = html.replace("<body>", `<body>\n${bodyScripts}`);
+    const head = gateForConsent(headScripts).trim();
+    const body = gateForConsent(bodyScripts).trim();
+    // Function replacers: a "$" inside a snippet must not be read as a replacement pattern.
+    if (head) html = html.replace("<head>", () => `<head>\n${head}`);
+    if (body) html = html.replace("<body>", () => `<body>\n${body}`);
+    if (head || body) {
+      html = html.replace("</body>", () => `<script src="/js/consent.js?v=${ASSET_V}" defer></script>\n</body>`);
+    }
   } catch (err) {
     console.error("[ssr] injectTracking failed (page still written without tracking scripts):", err.message);
   }
@@ -199,7 +227,16 @@ async function regenerateListingPages() {
       console.error("[ssr] regenerateListingPages: could not load destinations (using defaults):", err.message);
     }
 
-    fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), await injectTracking(renderToursIndexHtml(allTours)), "utf8");
+    fs.writeFileSync(path.join(SITE_ROOT, "tours.html"), await injectTracking(renderToursIndexHtml(allTours, 1)), "utf8");
+    // /tours/page/2, /tours/page/3 … — rebuilt from scratch so a shrinking
+    // tour count never leaves stale pages behind.
+    const pagesDir = path.join(TOURS_DIR, "page");
+    fs.rmSync(pagesDir, { recursive: true, force: true });
+    const totalTourPages = Math.ceil(allTours.length / TOURS_PER_PAGE);
+    if (totalTourPages > 1) fs.mkdirSync(pagesDir, { recursive: true });
+    for (let n = 2; n <= totalTourPages; n++) {
+      fs.writeFileSync(path.join(pagesDir, `${n}.html`), await injectTracking(renderToursIndexHtml(allTours, n)), "utf8");
+    }
     fs.writeFileSync(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts, allPosts.filter((p) => p.featuredPillar))), "utf8");
     fs.writeFileSync(path.join(SITE_ROOT, "destinations.html"), await injectTracking(renderDestinationsHubHtml(islandCounts, destinationsBySlug)), "utf8");
     fs.writeFileSync(path.join(SITE_ROOT, "index.html"), await injectTracking(renderHomeHtml(allTours, allPosts, islandCounts, destinationsBySlug)), "utf8");

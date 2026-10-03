@@ -6,6 +6,33 @@ function jsonLdScript(obj) {
   return `<script type="application/ld+json">${json}</script>`;
 }
 
+/**
+ * Every page gets a share image: pages without their own photo fall back to
+ * the branded /og-default.jpg (1200×630), and twitter:card is upgraded to the
+ * large-image layout. Run on every generated page (see generator.js).
+ */
+const SITE_URL_FOR_OG = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
+const OG_DEFAULT_IMAGE = `${SITE_URL_FOR_OG}/og-default.jpg`;
+function ensureSocialTags(html) {
+  const headEnd = html.indexOf("</head>");
+  if (headEnd === -1) return html;
+  let head = html.slice(0, headEnd);
+  const add = [];
+  if (!/property="og:image"/.test(head)) {
+    add.push(`<meta property="og:image" content="${OG_DEFAULT_IMAGE}">`, `<meta property="og:image:width" content="1200">`, `<meta property="og:image:height" content="630">`, `<meta property="og:image:alt" content="Tripreviewall — honest Hawaii tour reviews">`);
+  }
+  if (!/name="twitter:image"/.test(head)) {
+    const og = head.match(/property="og:image" content="([^"]+)"/);
+    add.push(`<meta name="twitter:image" content="${og ? og[1] : OG_DEFAULT_IMAGE}">`);
+  }
+  if (/name="twitter:card" content="summary"/.test(head)) {
+    head = head.replace(/name="twitter:card" content="summary"/, 'name="twitter:card" content="summary_large_image"');
+  } else if (!/name="twitter:card"/.test(head)) {
+    add.push(`<meta name="twitter:card" content="summary_large_image">`);
+  }
+  return head + (add.length ? add.join("\n") + "\n" : "") + html.slice(headEnd);
+}
+
 /* ---- Responsive images ----
    Locally uploaded images (/uploads/...) can be requested at a smaller width
    with ?w=N — the admin server resizes once with sharp, caches the WebP on
@@ -47,7 +74,9 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
   linkPrefix = linkPrefix === undefined ? "" : linkPrefix;
   imgPrefix = imgPrefix === undefined ? "" : imgPrefix;
   const img = tour.gallery && tour.gallery[0] ? `${imgPrefix}${tour.gallery[0]}` : null;
-  const d = tour.ratingDistribution || { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 };
+  const bl = tour.bookingLinks || {};
+  const hasFareharbor = !!tour.fareharborRegularLink && !(bl.fareharbor && bl.fareharbor.show === false);
+  const price = tour.priceFrom != null ? `From <span class="tabular">$${esc(tour.priceFrom)}</span>` : `<span class="tabular">Price on request</span>`;
   return `
     <article class="tour-card">
       <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
@@ -61,14 +90,13 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
           <span class="count tabular">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews)</span>
         </div>
-        ${histogramHtml(d)}
         <div class="tour-card-divider"></div>
         <div class="tour-card-footer">
-          <div class="tour-card-price">From <span class="tabular">$${tour.priceFrom}</span><span class="via">via FareHarbor</span></div>
+          <div class="tour-card-price">${price}${hasFareharbor ? `<span class="via">via FareHarbor</span>` : ""}</div>
           <a href="/tours/${esc(tour.slug)}" class="btn btn-primary">View Tour</a>
         </div>
       </div>
     </article>`;
 }
 
-module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript };
+module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript, ensureSocialTags };

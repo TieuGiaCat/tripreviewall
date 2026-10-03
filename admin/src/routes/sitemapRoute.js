@@ -1,6 +1,7 @@
 const { query } = require("../db");
 
-const SITE_URL = "https://tripreviewall.com";
+const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
+const TOURS_PER_PAGE = 24; // keep in sync with ssr/listingTemplates.js
 
 // Static pages that always exist, independent of DB content.
 const STATIC_PAGES = [
@@ -12,7 +13,7 @@ const STATIC_PAGES = [
   { path: "/destinations/maui", priority: "0.7" },
   { path: "/destinations/kauai", priority: "0.7" },
   { path: "/destinations/big-island", priority: "0.7" },
-  { path: "/transportation", priority: "0.6" },
+  // /transportation is temporarily noindex (placeholder content) — left out on purpose.
   { path: "/about", priority: "0.4" },
   { path: "/contact", priority: "0.4" },
   { path: "/affiliate-disclosure", priority: "0.3" },
@@ -43,6 +44,7 @@ async function generateSitemap(req, res) {
 
   const entries = [
     ...STATIC_PAGES.map((p) => urlEntry(`${SITE_URL}${p.path}`, null, p.priority)),
+    ...Array.from({ length: Math.max(0, Math.ceil(tourRows.length / TOURS_PER_PAGE) - 1) }, (_, i) => urlEntry(`${SITE_URL}/tours/page/${i + 2}`, null, "0.5")),
     ...tourRows.map((t) => urlEntry(`${SITE_URL}/tours/${t.slug}`, t.updated_at, "0.8")),
     ...postRows.map((p) => urlEntry(`${SITE_URL}/blog/${p.slug}`, p.updated_at, "0.6")),
   ];

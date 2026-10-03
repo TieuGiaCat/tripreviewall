@@ -12,3 +12,4 @@ admin/.env
 !/blog/post-detail.html
 /destinations/*.html
 !/destinations/island.html
+/tours/page/

@@ -64,8 +64,8 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
 </head>
 <body>
 
@@ -124,29 +124,35 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
       <h1 class="hero-headline">Hawaii tours, reviewed honestly — 5-star and 1-star alike.</h1>
       <p class="hero-subhead">We aggregate real reviews from TripAdvisor, GetYourGuide and verified bookings — then show you the full picture, not just the highlights.</p>
 
-      <form class="search-bar" role="search" aria-label="Search tours">
+      <form class="search-bar" role="search" aria-label="Search tours" action="/tours" method="get">
         <label class="search-field">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-          <select aria-label="Island">
-            <option>All Islands</option><option>Oahu</option><option>Maui</option><option>Kauai</option><option>Big Island</option>
+          <select name="island" aria-label="Island">
+            <option value="">All Islands</option><option value="Oahu">Oahu</option><option value="Maui">Maui</option><option value="Kauai">Kauai</option><option value="Big Island">Big Island</option>
           </select>
         </label>
         <label class="search-field">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"></path></svg>
-          <select aria-label="Tour type">
-            <option>All Types</option><option>Snorkel</option><option>Luau</option><option>Hiking</option><option>Boat Tour</option><option>Helicopter</option>
+          <select name="type" aria-label="Tour type">
+            <option value="">All Types</option><option value="Snorkel">Snorkel</option><option value="Luau">Luau</option><option value="Hiking">Hiking</option><option value="Boat Tour">Boat Tour</option><option value="Helicopter">Helicopter</option><option value="Zipline">Zipline</option><option value="Surf Lessons">Surf Lessons</option>
           </select>
         </label>
         <label class="search-field">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          <input type="text" placeholder="Any date" aria-label="Date" onfocus="this.type='date'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="search" name="q" placeholder="Keyword, e.g. sunset" aria-label="Keyword">
         </label>
         <button type="submit" class="btn btn-primary search-submit">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           Search Tours
         </button>
       </form>
-      <p class="hero-quicklinks">Popular: <a href="/tours?q=Snorkel">Snorkel tours</a> · <a href="/tours?q=Luau">Maui luau</a> · <a href="/tours?q=Helicopter">Kauai helicopter</a></p>
+      <script>
+        // Drop empty fields so the results URL stays clean (/tours?island=Maui, not ?island=Maui&type=&q=).
+        document.currentScript.previousElementSibling.addEventListener("submit", function () {
+          Array.prototype.forEach.call(this.elements, function (el) { if (el.name && !el.value) el.disabled = true; });
+        });
+      </script>
+      <p class="hero-quicklinks">Popular: <a href="/tours?type=Snorkel">Snorkel tours</a> · <a href="/tours?island=Maui&amp;type=Luau">Maui luau</a> · <a href="/tours?island=Kauai&amp;type=Helicopter">Kauai helicopter</a></p>
     </div>
   </section>
 
@@ -250,13 +256,13 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
       </div>
     </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, TripAdvisor, GetYourGuide). This never affects which reviews we show or how we rate a tour.</div>
+    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
     <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
   </div>
 </footer>
 
-<script src="js/data-loader.js?v=${ASSET_V}"></script>
-<script src="js/main.js?v=${ASSET_V}"></script>
+<script src="/js/data-loader.js?v=${ASSET_V}"></script>
+<script src="/js/main.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }

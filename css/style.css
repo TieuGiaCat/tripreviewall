@@ -310,3 +310,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   padding: 12px 20px; z-index: 200; border-radius: 0 0 var(--radius-sm) 0;
 }
 .skip-link:focus { left: 0; }
+
+/* Cards hidden by the blog filters / "Load More" */
+.blog-card[hidden] { display: none !important; }

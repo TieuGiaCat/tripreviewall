@@ -113,7 +113,6 @@ function renderStars(rating) {
    basePath: "tours/" from site root (Home, All Tours) or "" from within /tours/ folder (Similar Tours) */
 function tourCardTemplate(tour, basePath) {
   basePath = basePath === undefined ? "tours/" : basePath;
-  const d = tour.ratingDistribution;
   const badge = tour.badge ? `<span class="tour-card-badge">${tour.badge}</span>` : "";
   const linkFile = `/tours/${tour.slug}`;
   const imgSrc = tour.gallery && tour.gallery[0] ? tour.gallery[0] : null;
@@ -133,17 +132,11 @@ function tourCardTemplate(tour, basePath) {
           <span class="score tabular">${tour.aggregatedRating.toFixed(1)}</span>
           <span class="count tabular">(${tour.reviewCountTotal.toLocaleString()} reviews)</span>
         </div>
-        <div class="rating-histogram" role="img"
-             aria-label="5 stars: ${d.star5}%, 4 stars: ${d.star4}%, 3 stars: ${d.star3}%, 2 stars: ${d.star2}%, 1 star: ${d.star1}%">
-          <div class="seg-pos" style="width:${d.star5 + d.star4}%"></div>
-          <div class="seg-neu" style="width:${d.star3}%"></div>
-          <div class="seg-neg" style="width:${d.star2 + d.star1}%"></div>
-        </div>
         <div class="tour-card-divider"></div>
         <div class="tour-card-footer">
           <div class="tour-card-price">
-            From <span class="tabular">$${tour.priceFrom}</span>
-            <span class="via">via FareHarbor</span>
+            ${tour.priceFrom != null ? `From <span class="tabular">$${tour.priceFrom}</span>` : `<span class="tabular">Price on request</span>`}
+            ${tour.fareharborRegularLink && !(tour.bookingLinks && tour.bookingLinks.fareharbor && tour.bookingLinks.fareharbor.show === false) ? `<span class="via">via FareHarbor</span>` : ""}
           </div>
           <a href="${linkFile}" class="btn btn-primary">View Tour</a>
         </div>

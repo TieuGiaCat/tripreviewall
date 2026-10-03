@@ -32,7 +32,7 @@ function ratingsBySourceForDisplay(tour) {
 
 function quickFactsHtml(tour) {
   const items = [
-    { label: "From", value: `$${tour.priceFrom}` },
+    { label: "From", value: tour.priceFrom != null ? `$${tour.priceFrom}` : "On request" },
     { label: "Duration", value: tour.duration || "—" },
     { label: "Tour type", value: tour.tourType || "Tour" },
     { label: "Island", value: tour.island },
@@ -156,7 +156,7 @@ function mobileBookingHtml(tour) {
   const arrow = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
   return `
 <div class="mobile-booking-bar" id="mobile-booking-bar">
-  <div class="mobile-booking-price"><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">$${tour.priceFrom}</div></div>
+  <div class="mobile-booking-price"><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">${tour.priceFrom != null ? "$" + esc(tour.priceFrom) : "On request"}</div></div>
   <div class="mobile-booking-actions">
     ${options.length > 1 ? `<button type="button" class="btn btn-secondary mobile-more-btn" onclick="toggleBookingSheet(true)" aria-haspopup="dialog" aria-controls="booking-sheet">${options.length} options</button>` : ""}
     ${primary ? `<a href="${esc(trackingUrl(tour.slug, primary.key, primary.url))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">${primary.key === "fareharbor" ? "Check Availability" : "Book on " + esc(primary.label)}</a>` : ""}
@@ -215,17 +215,17 @@ function bookingSidebarHtml(tour) {
     <aside class="detail-sidebar-col" id="booking">
       <div class="booking-card">
         <div class="booking-price-label">From</div>
-        <div class="booking-price tabular">$${tour.priceFrom}</div>
-        <div class="booking-trust-line">
+        <div class="booking-price tabular">${tour.priceFrom != null ? "$" + esc(tour.priceFrom) : "On request"}</div>
+        ${showFareharbor && fareharborLink ? `<div class="booking-trust-line">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           Real-time availability via FareHarbor
-        </div>
+        </div>` : ""}
         ${showFareharbor && fareharborLink ? `<a href="${esc(trackingUrl(tour.slug, "fareharbor", fareharborLink))}" class="btn btn-primary btn-full" target="_blank" rel="noopener sponsored">Check Availability</a>
         <p style="font-size:var(--text-meta);color:var(--color-text-muted);margin:10px 0 0;">This is the tour operator's own booking system — no third-party markup.</p>` : ""}
-        <div class="booking-widget-frame">
+        ${showFareharbor && fareharborCalendarTag(tour.fareharborCalendarScript) ? `<div class="booking-widget-frame">
           <h4>Select a date</h4>
-          ${fareharborCalendarTag(tour.fareharborCalendarScript) || `<div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>`}
-        </div>
+          ${fareharborCalendarTag(tour.fareharborCalendarScript)}
+        </div>` : ""}
         ${enabled.length > 0 ? `
         <div class="booking-secondary-label">Also available on</div>
         <div class="booking-secondary-list">
@@ -297,13 +297,13 @@ function renderTourPageHtml(tour, similarTours) {
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(pageTitle)} — Tripreviewall">
 <meta property="og:description" content="${esc(metaDesc)}">
-${heroImg ? `<meta property="og:image" content="${SITE_URL}${heroImg}">` : ""}
+${heroImg ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImg, 1200)}">` : ""}
 <meta property="og:url" content="${canonical}">
 <meta property="og:site_name" content="Tripreviewall">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(pageTitle)} — Tripreviewall">
 <meta name="twitter:description" content="${esc(metaDesc)}">
-${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
+${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(heroImg, 1200)}">` : ""}
 ${jsonLd(tour)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -415,7 +415,7 @@ ${heroImg ? `<link rel="preload" as="image" href="${esc(imgUrl(heroImg, 800))}"$
           ${tour.location && tour.location.lat != null && tour.location.lng != null
             ? `<iframe src="https://maps.google.com/maps?q=${tour.location.lat},${tour.location.lng}&z=14&output=embed" class="map-embed" style="width:100%;height:320px;border:0;" loading="lazy" title="Map showing the approximate location of ${esc(tour.title)}"></iframe>
                <p style="margin-top:10px;"><a href="https://www.google.com/maps?q=${tour.location.lat},${tour.location.lng}" target="_blank" rel="noopener">Open in Google Maps →</a></p>`
-            : `<div class="map-embed">Map embed placeholder</div>`}
+            : ""}
           <p class="detail-body-text">${esc(tour.city ? tour.city + ", " : "")}${esc(tour.island)}, Hawaii</p>
           <p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>
         </section>
@@ -469,7 +469,7 @@ ${mobileBookingHtml(tour)}
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
       </div>
     </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, TripAdvisor, GetYourGuide). This never affects which reviews we show or how we rate a tour.</div>
+    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
     <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
   </div>
 </footer>

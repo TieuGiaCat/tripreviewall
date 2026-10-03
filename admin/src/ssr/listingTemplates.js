@@ -63,7 +63,7 @@ const FOOTER = (depth) => {
         <div class="footer-contact-row"><a href="mailto:contact@tripreviewall.com">contact@tripreviewall.com</a></div>
       </div>
     </div>
-    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, TripAdvisor, GetYourGuide). This never affects which reviews we show or how we rate a tour.</div>
+    <div class="footer-disclosure">Tripreviewall earns a commission when you book through links on this site (FareHarbor, Viator, GetYourGuide, TripAdvisor). This never affects which reviews we show or how we rate a tour.</div>
     <div class="footer-bottom"><span>© 2026 Tripreviewall, operated by Popotours. All rights reserved.</span></div>
   </div>
 </footer>`;
@@ -72,9 +72,34 @@ const FOOTER = (depth) => {
 /* ============================================================
    /tours
    ============================================================ */
-function renderToursIndexHtml(tours) {
-  const sorted = [...tours].sort((a, b) => b.reviewCountTotal - a.reviewCountTotal);
-  const firstPage = sorted.slice(0, 24);
+const TOURS_PER_PAGE = 24;
+function toursPageUrl(n) { return n <= 1 ? "/tours" : `/tours/page/${n}`; }
+
+/** Real <a href> pagination so every tour is reachable by crawlers without JS. */
+function toursPaginationHtml(page, totalPages) {
+  if (totalPages <= 1) return "";
+  const arrowL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+  const arrowR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+  let html = page > 1 ? `<a class="page-btn" href="${toursPageUrl(page - 1)}" rel="prev" aria-label="Previous page">${arrowL}</a>` : `<span class="page-btn" aria-disabled="true" style="opacity:.4;">${arrowL}</span>`;
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || Math.abs(p - page) <= 2) {
+      html += p === page ? `<span class="page-btn active" aria-current="page">${p}</span>` : `<a class="page-btn" href="${toursPageUrl(p)}">${p}</a>`;
+    } else if (Math.abs(p - page) === 3) {
+      html += `<span class="page-btn" style="border:none;background:none;">…</span>`;
+    }
+  }
+  html += page < totalPages ? `<a class="page-btn" href="${toursPageUrl(page + 1)}" rel="next" aria-label="Next page">${arrowR}</a>` : `<span class="page-btn" aria-disabled="true" style="opacity:.4;">${arrowR}</span>`;
+  return `<nav class="pagination" id="pagination" aria-label="Tour pages">${html}</nav>`;
+}
+
+function renderToursIndexHtml(tours, page = 1) {
+  const sorted = [...tours].sort((a, b) => b.reviewCountTotal - a.reviewCountTotal || a.title.localeCompare(b.title));
+  const totalPages = Math.max(1, Math.ceil(sorted.length / TOURS_PER_PAGE));
+  page = Math.min(Math.max(1, page), totalPages);
+  const start = (page - 1) * TOURS_PER_PAGE;
+  const firstPage = sorted.slice(start, start + TOURS_PER_PAGE);
+  const pageSuffix = page > 1 ? ` — Page ${page} of ${totalPages}` : "";
+  const canonicalPath = toursPageUrl(page);
   const islandCounts = {};
   tours.forEach((t) => { islandCounts[t.island] = (islandCounts[t.island] || 0) + 1; });
 
@@ -91,14 +116,16 @@ function renderToursIndexHtml(tours) {
 <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0B3B4F">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#0B3B4F">
-<title>All Hawaii Tours — Tripreviewall</title>
+<title>All Hawaii Tours${pageSuffix} — Tripreviewall</title>
 <meta name="description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide — ranked by real, honest data, updated continuously.">
-<link rel="canonical" href="${SITE_URL}/tours">
+<link rel="canonical" href="${SITE_URL}${canonicalPath}">
+${page > 1 ? `<link rel="prev" href="${SITE_URL}${toursPageUrl(page - 1)}">` : ""}
+${page < totalPages ? `<link rel="next" href="${SITE_URL}${toursPageUrl(page + 1)}">` : ""}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tripreviewall">
-<meta property="og:title" content="All Hawaii Tours — Tripreviewall">
+<meta property="og:title" content="All Hawaii Tours${pageSuffix} — Tripreviewall">
 <meta property="og:description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide.">
-<meta property="og:url" content="${SITE_URL}/tours">
+<meta property="og:url" content="${SITE_URL}${canonicalPath}">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="All Hawaii Tours — Tripreviewall">
 <meta name="twitter:description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide.">
@@ -107,9 +134,9 @@ function renderToursIndexHtml(tours) {
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/all-tours.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/all-tours.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -118,10 +145,10 @@ ${HEADER(0)}
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a href="/">Home</a><span class="sep">/</span>
-      <span class="current">All Hawaii Tours</span>
+      ${page > 1 ? `<a href="/tours">All Hawaii Tours</a><span class="sep">/</span><span class="current">Page ${page}</span>` : `<span class="current">All Hawaii Tours</span>`}
     </nav>
     <div class="page-header-block">
-      <h1 class="page-h1">All Hawaii Tours</h1>
+      <h1 class="page-h1">All Hawaii Tours${page > 1 ? ` <span style="font-weight:500;color:var(--color-text-muted);font-size:0.6em;">Page ${page}</span>` : ""}</h1>
       <p class="page-subline">${tours.length} tours compared across FareHarbor, TripAdvisor &amp; GetYourGuide — Oahu (${islandCounts.Oahu || 0}), Maui (${islandCounts.Maui || 0}), Kauai (${islandCounts.Kauai || 0}) &amp; Big Island (${islandCounts["Big Island"] || 0}), updated continuously.</p>
       <div class="at-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -130,7 +157,7 @@ ${HEADER(0)}
     </div>
     <div id="sort-bar-anchor"></div>
     <div class="sort-bar">
-      <div class="result-count" id="result-count">Showing <span class="n">1–${firstPage.length}</span> of <span class="n">${tours.length}</span> tours</div>
+      <div class="result-count" id="result-count">Showing <span class="n">${start + 1}–${start + firstPage.length}</span> of <span class="n">${tours.length}</span> tours</div>
       <div class="sort-select-wrap">
         <label for="sort-select">Sort</label>
         <select class="sort-select" id="sort-select">
@@ -141,23 +168,23 @@ ${HEADER(0)}
         </select>
       </div>
     </div>
-    <div class="tour-grid" id="all-tours-grid">${firstPage.map((t) => tourCardHtml(t, "", "")).join("")}</div>
+    <div class="tour-grid" id="all-tours-grid" data-page="${page}">${firstPage.map((t) => tourCardHtml(t, "", "")).join("")}</div>
     <div class="empty-state" id="empty-state" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <h3>No tours match this search yet.</h3>
       <p>Try a different keyword, or browse the full list.</p>
       <button class="btn btn-secondary" onclick="document.getElementById('at-search-input').value='';document.getElementById('at-search-input').dispatchEvent(new Event('input'));">Clear search</button>
     </div>
-    <div class="pagination" id="pagination"></div>
+    ${toursPaginationHtml(page, totalPages) || `<div class="pagination" id="pagination"></div>`}
     <div class="seo-block">
       <p>Hawaii's tour market spans four main islands, each with a different mix of operators and activity types. Oahu carries the largest share of listings we track (${islandCounts.Oahu || 0} tours), Big Island follows with ${islandCounts["Big Island"] || 0}, while Maui (${islandCounts.Maui || 0}) and Kauai (${islandCounts.Kauai || 0}) round out the list. We update this list continuously as new tours are added and existing ones are re-checked.</p>
     </div>
   </div>
 </main>
 ${FOOTER(0)}
-<script src="js/data-loader.js?v=${ASSET_V}"></script>
-<script src="js/main.js?v=${ASSET_V}"></script>
-<script src="js/all-tours.js?v=${ASSET_V}"></script>
+<script src="/js/data-loader.js?v=${ASSET_V}"></script>
+<script src="/js/main.js?v=${ASSET_V}"></script>
+<script src="/js/all-tours.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
@@ -165,7 +192,18 @@ ${FOOTER(0)}
 /* ============================================================
    /blog
    ============================================================ */
-function blogCardHtml(p, prefix) {
+/** Same date format the old client-side renderer used ("Sep 10, 2026"), so nothing changes on hydrate. */
+function fmtPostDate(d) {
+  if (!d) return "";
+  const date = new Date(d);
+  if (isNaN(date)) return String(d).slice(0, 10);
+  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+const BLOG_CATEGORIES = ["All", "Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
+const BLOG_INITIAL_VISIBLE = 6;
+
+function blogCardHtml(p, prefix, hidden) {
   const gradients = {
     "Real Traveler Reviews & Data": "linear-gradient(135deg,#B85C4A,#0B3B4F)",
     "Tour Reviews by Type": "linear-gradient(135deg,#D97B4F,#0B3B4F)",
@@ -175,7 +213,7 @@ function blogCardHtml(p, prefix) {
   };
   const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (gradients[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
   return `
-    <a href="/blog/${esc(p.slug)}" class="blog-card">
+    <a href="/blog/${esc(p.slug)}" class="blog-card" data-category="${esc(p.category || "")}" data-island="${esc(p.island || "")}"${hidden ? " hidden" : ""}>
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-tags">
@@ -183,7 +221,7 @@ function blogCardHtml(p, prefix) {
           ${p.island ? `<span class="blog-card-island"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>${esc(p.island)}</span>` : ""}
         </div>
         <h3 class="blog-card-title">${esc(p.title)}</h3>
-        <div class="blog-card-meta">${p.author ? esc(p.author) + " · " : ""}Last updated ${esc(String(p.updatedAt).slice(0, 10))}${p.readTime ? " · " + p.readTime + " min read" : ""}</div>
+        <div class="blog-card-meta">${p.author ? esc(p.author) + " · " : ""}Last updated ${esc(fmtPostDate(p.updatedAt))}${p.readTime ? " · " + p.readTime + " min read" : ""}</div>
       </div>
     </a>`;
 }
@@ -230,9 +268,9 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/blog.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/blog.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -255,26 +293,26 @@ ${HEADER(0)}
   </div>
 
   <div class="container">
-    <div class="layer1-tabs" id="layer1-tabs"></div>
+    <div class="layer1-tabs" id="layer1-tabs">${BLOG_CATEGORIES.map((c, i) => `<button type="button" class="layer1-tab${i === 0 ? " active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>
     <div class="layer2-row">
-      <span style="font-size:var(--text-meta);color:var(--color-text-muted);">Filter by:</span>
-      <select class="layer2-select" id="island-select"></select>
+      <label for="island-select" style="font-size:var(--text-meta);color:var(--color-text-muted);">Filter by:</label>
+      <select class="layer2-select" id="island-select">${["All", ...new Set(sorted.map((p) => p.island).filter(Boolean))].map((i) => `<option value="${esc(i)}">${i === "All" ? "Island: All" : esc(i)}</option>`).join("")}</select>
     </div>
-    <div class="blog-grid" id="blog-grid">${sorted.map((p) => blogCardHtml(p, "")).join("")}</div>
+    <div class="blog-grid" id="blog-grid">${sorted.map((p, i) => blogCardHtml(p, "", i >= BLOG_INITIAL_VISIBLE)).join("")}</div>
     <div class="empty-state" id="blog-empty" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
       <h3>No articles match these filters yet.</h3>
       <p>Try a different category, or check back soon — we're adding new reviews regularly.</p>
     </div>
     <div class="load-more-wrap">
-      <button class="btn btn-secondary" id="load-more-btn" style="display:none;">Load More</button>
+      <button type="button" class="btn btn-secondary" id="load-more-btn"${sorted.length > BLOG_INITIAL_VISIBLE ? "" : ' style="display:none;"'}>Load More</button>
     </div>
   </div>
 </main>
 ${FOOTER(0)}
-<script src="js/data-loader.js?v=${ASSET_V}"></script>
-<script src="js/main.js?v=${ASSET_V}"></script>
-<script src="js/blog.js?v=${ASSET_V}"></script>
+<script src="/js/data-loader.js?v=${ASSET_V}"></script>
+<script src="/js/main.js?v=${ASSET_V}"></script>
+<script src="/js/blog.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
@@ -309,9 +347,9 @@ function renderDestinationsHubHtml(islandCounts, destinationsBySlug = {}) {
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
-<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
-<link rel="stylesheet" href="css/pages.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="/css/pages.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -339,7 +377,7 @@ ${HEADER(0)}
   </div>
 </main>
 ${FOOTER(0)}
-<script src="js/main.js?v=${ASSET_V}"></script>
+<script src="/js/main.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
@@ -380,7 +418,7 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <meta property="og:site_name" content="Tripreviewall">
 <meta property="og:title" content="${esc(metaTitle)}">
 <meta property="og:description" content="${esc(metaDescription)}">
-${heroImage ? `<meta property="og:image" content="${SITE_URL}${heroImage}">` : ""}
+${heroImage ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImage, 1200)}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -431,4 +469,4 @@ ${FOOTER(1)}
 </html>`;
 }
 
-module.exports = { renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS };
+module.exports = { TOURS_PER_PAGE, renderToursIndexHtml, renderBlogIndexHtml, renderDestinationsHubHtml, renderIslandPageHtml, ISLANDS };
