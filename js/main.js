@@ -72,8 +72,9 @@ function initTourTabs() {
   const tabs = document.querySelectorAll(".tab-btn");
   tabs.forEach((tab) => {
     tab.addEventListener("click", async () => {
-      tabs.forEach((t) => t.classList.remove("active"));
+      tabs.forEach((t) => { t.classList.remove("active"); t.setAttribute("aria-pressed", "false"); });
       tab.classList.add("active");
+      tab.setAttribute("aria-pressed", "true");
       if ((typeof ALL_TOURS === "undefined" || !ALL_TOURS.length) && typeof loadAllTours === "function") {
         window.ALL_TOURS = await loadAllTours();
       }
@@ -90,7 +91,7 @@ function starsSvg(fillColor) {
 function renderStars(rating) {
   const full = Math.round(rating);
   let html = '<span class="stars">';
-  for (let i = 0; i < 5; i++) html += starsSvg(i < full ? "var(--color-positive)" : "var(--color-border-strong)");
+  for (let i = 0; i < 5; i++) html += starsSvg(i < full ? "var(--color-positive)" : "var(--color-star-empty)");
   return html + "</span>";
 }
 
@@ -106,13 +107,13 @@ function tourCardTemplate(tour) {
   const resized = img ? resizedImg(img, 400) : null;
   return `
     <article class="tour-card">
-      <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
+      <a class="tour-card-image-wrap" href="/tours/${encodeURIComponent(tour.slug)}" tabindex="-1" aria-hidden="true" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
         ${tour.editorsPick ? `<span class="tour-card-badge">Editor's Pick</span>` : ""}
         ${img ? `<img class="tour-photo" src="${escHtml(resized)}"${resized !== img ? ` srcset="${escHtml(resizedImg(img, 400))} 400w, ${escHtml(resizedImg(img, 800))} 800w" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${escHtml(tour.title)} — ${escHtml(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
-      </div>
+      </a>
       <div class="tour-card-body">
         <div class="tour-card-eyebrow">${escHtml((tour.island || "").toUpperCase())} · ${escHtml((tour.tourType || "").toUpperCase())}</div>
-        <h3 class="tour-card-title">${escHtml(tour.title)}</h3>
+        <h3 class="tour-card-title"><a href="/tours/${encodeURIComponent(tour.slug)}">${escHtml(tour.title)}</a></h3>
         <div class="tour-card-rating">
           ${renderStars(tour.aggregatedRating || 0)}
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>

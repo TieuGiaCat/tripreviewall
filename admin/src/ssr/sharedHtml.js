@@ -49,6 +49,25 @@ function imgSrcset(url, widths) {
   return widths.map((w) => `${imgUrl(url, w)} ${w}w`).join(", ");
 }
 
+/**
+ * <img> that fills its (position:relative) container like background-size:cover
+ * did — but lazy-loads, picks the right size from srcset, has alt text, and can
+ * be the eager/high-priority LCP image when `eager` is set (C13).
+ */
+/** <link rel="preload"> for the page's LCP image, matching coverImg()'s srcset. */
+function preloadImg(url, { widths = [800, 1200, 1600], sizes = "100vw" } = {}) {
+  if (!url) return "";
+  const srcset = imgSrcset(url, widths);
+  return `<link rel="preload" as="image" href="${esc(imgUrl(url, widths[Math.min(1, widths.length - 1)]))}"${srcset ? ` imagesrcset="${esc(srcset)}" imagesizes="${sizes}"` : ""} fetchpriority="high">`;
+}
+
+function coverImg(url, { widths = [400, 800], sizes = "100vw", alt = "", eager = false } = {}) {
+  if (!url) return "";
+  const src = imgUrl(url, widths[Math.min(1, widths.length - 1)]);
+  const srcset = imgSrcset(url, widths);
+  return `<img class="cover-img" src="${esc(src)}"${srcset ? ` srcset="${esc(srcset)}" sizes="${sizes}"` : ""} alt="${esc(alt)}" decoding="async"${eager ? ' fetchpriority="high"' : ' loading="lazy"'}>`;
+}
+
 function starsSvgHtml(fillVar) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="${fillVar}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
 }
@@ -56,7 +75,7 @@ function starsSvgHtml(fillVar) {
 function starsRowHtml(rating) {
   const full = Math.round(rating || 0);
   let html = '<span class="stars">';
-  for (let i = 0; i < 5; i++) html += starsSvgHtml(i < full ? "var(--color-positive)" : "var(--color-border-strong)");
+  for (let i = 0; i < 5; i++) html += starsSvgHtml(i < full ? "var(--color-positive)" : "var(--color-star-empty)");
   return html + "</span>";
 }
 
@@ -79,13 +98,13 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
   const price = tour.priceFrom != null ? `From <span class="tabular">$${esc(tour.priceFrom)}</span>` : `<span class="tabular">Price on request</span>`;
   return `
     <article class="tour-card">
-      <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
+      <a class="tour-card-image-wrap" href="/tours/${esc(tour.slug)}" tabindex="-1" aria-hidden="true" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
         ${tour.editorsPick ? `<span class="tour-card-badge">Editor's Pick</span>` : ""}
         ${img ? `<img class="tour-photo" src="${esc(imgUrl(img, 400))}"${imgSrcset(img, [400, 800]) ? ` srcset="${esc(imgSrcset(img, [400, 800]))}" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${esc(tour.title)} — ${esc(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
-      </div>
+      </a>
       <div class="tour-card-body">
         <div class="tour-card-eyebrow">${esc((tour.island || "").toUpperCase())} · ${esc((tour.tourType || "").toUpperCase())}</div>
-        <h3 class="tour-card-title">${esc(tour.title)}</h3>
+        <h3 class="tour-card-title"><a href="/tours/${esc(tour.slug)}">${esc(tour.title)}</a></h3>
         <div class="tour-card-rating">
           ${starsRowHtml(tour.aggregatedRating)}
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
@@ -100,4 +119,4 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
     </article>`;
 }
 
-module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript, ensureSocialTags };
+module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript, ensureSocialTags, coverImg, preloadImg };

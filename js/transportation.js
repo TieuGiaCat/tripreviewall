@@ -92,6 +92,8 @@ function initForm() {
     const form = this;
     const btn = form.querySelector("button[type=submit]");
     const originalText = btn.textContent;
+    const errorBox = document.getElementById("tp-form-error");
+    if (errorBox) errorBox.style.display = "none";
     btn.disabled = true;
     btn.textContent = "Sending...";
 
@@ -109,16 +111,22 @@ function initForm() {
           pickup: document.getElementById("tp-pickup").value,
           passengers: document.getElementById("tp-passengers").value,
           notes: document.getElementById("tp-notes").value,
+          companyWebsite: (form.querySelector('[name="companyWebsite"]') || {}).value || "",
         }),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong.");
       form.style.display = "none";
-      document.getElementById("tp-form-success").style.display = "block";
+      const ok = document.getElementById("tp-form-success");
+      ok.style.display = "block";
+      ok.focus();
     } catch (err) {
       btn.disabled = false;
       btn.textContent = originalText;
-      alert(err.message || "Something went wrong — please try again or call us directly.");
+      if (errorBox) {
+        errorBox.textContent = err.message || "Something went wrong — please try again or call us directly.";
+        errorBox.style.display = "block";
+      }
     }
   });
 }

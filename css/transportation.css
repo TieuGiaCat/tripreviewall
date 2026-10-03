@@ -77,3 +77,7 @@
 .tp-form-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
 @media (min-width: 640px) { .tp-form-grid { grid-template-columns: 1fr 1fr; } }
 .tp-form-grid .full { grid-column: 1 / -1; }
+
+/* Rate table scrolls sideways on phones instead of pushing the page wider (C19) */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 8px; }
+.table-scroll .rate-table { min-width: 560px; }

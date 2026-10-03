@@ -50,15 +50,19 @@ function quickFactsHtml(tour) {
     </div>`).join("");
 }
 
+/** The tour's variants, shown as an informational list (C11). They used to be
+ * buttons that looked clickable but changed nothing — price, availability and
+ * the exact option are picked on the booking page. */
 function variantSelectorHtml(variants) {
   const list = (variants || []).filter(Boolean);
   if (list.length <= 1) return "";
   return `
     <div class="variant-selector" id="variant-block">
-      <span class="variant-label">Options</span>
-      <div class="variant-options" id="variant-options">
-        ${list.map((v, i) => `<button class="variant-option${i === 0 ? " active" : ""}">${esc(v)}</button>`).join("")}
-      </div>
+      <h3 class="variant-label">Options available</h3>
+      <ul class="variant-list">
+        ${list.map((v) => `<li class="variant-chip">${esc(v)}</li>`).join("")}
+      </ul>
+      <p class="variant-note">Choose your option and see its price on the booking page.</p>
     </div>`;
 }
 
@@ -89,6 +93,7 @@ function verdictHtml(v) {
   v = v || {};
   return `
     <section class="detail-section">
+      <h2 class="visually-hidden">Our Verdict</h2>
       <div class="verdict-box">
         <div class="verdict-eyebrow">Tripreviewall's Take</div>
         <h3 class="verdict-headline">${esc(v.headline || "")}</h3>
@@ -158,7 +163,7 @@ function mobileBookingHtml(tour) {
 <div class="mobile-booking-bar" id="mobile-booking-bar">
   <div class="mobile-booking-price"><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">${tour.priceFrom != null ? "$" + esc(tour.priceFrom) : "On request"}</div></div>
   <div class="mobile-booking-actions">
-    ${options.length > 1 ? `<button type="button" class="btn btn-secondary mobile-more-btn" onclick="toggleBookingSheet(true)" aria-haspopup="dialog" aria-controls="booking-sheet">${options.length} options</button>` : ""}
+    ${options.length > 1 ? `<button type="button" class="btn btn-secondary mobile-more-btn" onclick="toggleBookingSheet(true)" aria-haspopup="dialog" aria-controls="booking-sheet" aria-expanded="false">${options.length} options</button>` : ""}
     ${primary ? `<a href="${esc(trackingUrl(tour.slug, primary.key, primary.url))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">${primary.key === "fareharbor" ? "Check Availability" : "Book on " + esc(primary.label)}</a>` : ""}
   </div>
 </div>
@@ -175,13 +180,33 @@ ${options.length > 1 ? `
   <p class="booking-disclosure">Tripreviewall may earn a commission if you book through these links, at no extra cost to you.</p>
 </div>
 <script>
+  var bookingSheetOpener = null;
   function toggleBookingSheet(open) {
     var sheet = document.getElementById('booking-sheet');
     var backdrop = document.getElementById('booking-sheet-backdrop');
+    if (open === !sheet.hidden) return;
     sheet.hidden = !open; backdrop.hidden = !open;
     document.body.style.overflow = open ? 'hidden' : '';
+    var more = document.querySelector('.mobile-more-btn');
+    if (more) more.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      bookingSheetOpener = document.activeElement;
+      sheet.querySelector('.booking-sheet-close').focus();
+    } else if (bookingSheetOpener) {
+      bookingSheetOpener.focus(); // give focus back to the button that opened it
+    }
   }
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggleBookingSheet(false); });
+  document.addEventListener('keydown', function (e) {
+    var sheet = document.getElementById('booking-sheet');
+    if (!sheet || sheet.hidden) return;
+    if (e.key === 'Escape') { toggleBookingSheet(false); return; }
+    if (e.key === 'Tab') { // keep keyboard focus inside the open sheet
+      var items = sheet.querySelectorAll('a[href], button');
+      var first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
 </script>` : ""}`;
 }
 
@@ -340,17 +365,17 @@ ${siteHeader()}
 
     <div class="quickfacts">${quickFactsHtml(tour)}</div>
 
-    <div class="content-tabs">
-      <button class="content-tab active" data-target="tab-overview" onclick="switchDetailTab('tab-overview', this, event)">Overview</button>
-      <button class="content-tab" data-target="tab-location" onclick="switchDetailTab('tab-location', this, event)">Location</button>
-      <button class="content-tab" data-target="tab-review" onclick="switchDetailTab('tab-review', this, event)">Review</button>
-      <button class="content-tab" data-target="tab-verdict" onclick="switchDetailTab('tab-verdict', this, event)">Our Verdict</button>
-      <button class="content-tab" data-target="tab-contact" onclick="switchDetailTab('tab-contact', this, event)">Contact</button>
+    <div class="content-tabs" role="tablist" aria-label="Tour details">
+      <button type="button" class="content-tab active" role="tab" id="tabbtn-overview" aria-controls="tab-overview" aria-selected="true" data-target="tab-overview" onclick="switchDetailTab('tab-overview', this, event)">Overview</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-location" aria-controls="tab-location" aria-selected="false" tabindex="-1" data-target="tab-location" onclick="switchDetailTab('tab-location', this, event)">Location</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-review" aria-controls="tab-review" aria-selected="false" tabindex="-1" data-target="tab-review" onclick="switchDetailTab('tab-review', this, event)">Review</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-verdict" aria-controls="tab-verdict" aria-selected="false" tabindex="-1" data-target="tab-verdict" onclick="switchDetailTab('tab-verdict', this, event)">Our Verdict</button>
+      <button type="button" class="content-tab" role="tab" id="tabbtn-contact" aria-controls="tab-contact" aria-selected="false" tabindex="-1" data-target="tab-contact" onclick="switchDetailTab('tab-contact', this, event)">Contact</button>
     </div>
 
     <div class="detail-layout">
       <div class="detail-main">
-        <section class="detail-section content-tab-panel" id="tab-overview">
+        <section class="detail-section content-tab-panel" id="tab-overview" role="tabpanel" aria-labelledby="tabbtn-overview" tabindex="0">
           ${packagesHtml(tour.packages)}
           <h2 class="detail-section-title">Overview</h2>
           <ul class="highlight-list">${(tour.highlights || []).map((h) => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(h)}</li>`).join("")}</ul>
@@ -358,7 +383,7 @@ ${siteHeader()}
           ${variantSelectorHtml(tour.variants)}
         </section>
 
-        <section class="detail-section content-tab-panel" id="tab-location" style="display:none;">
+        <section class="detail-section content-tab-panel" id="tab-location" role="tabpanel" aria-labelledby="tabbtn-location" tabindex="0" style="display:none;">
           <h2 class="detail-section-title">Location</h2>
           ${tour.location && tour.location.lat != null && tour.location.lng != null
             ? `<iframe src="https://maps.google.com/maps?q=${tour.location.lat},${tour.location.lng}&z=14&output=embed" class="map-embed" style="width:100%;height:320px;border:0;" loading="lazy" title="Map showing the approximate location of ${esc(tour.title)}"></iframe>
@@ -368,15 +393,15 @@ ${siteHeader()}
           <p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>
         </section>
 
-        <div class="content-tab-panel" id="tab-review" style="display:none;">
+        <div class="content-tab-panel" id="tab-review" role="tabpanel" aria-labelledby="tabbtn-review" tabindex="0" style="display:none;">
           ${ratingsSectionHtml(tour)}
         </div>
 
-        <div class="content-tab-panel" id="tab-verdict" style="display:none;">
+        <div class="content-tab-panel" id="tab-verdict" role="tabpanel" aria-labelledby="tabbtn-verdict" tabindex="0" style="display:none;">
           ${verdictHtml(tour.verdict)}
         </div>
 
-        <section class="detail-section content-tab-panel" id="tab-contact" style="display:none;">
+        <section class="detail-section content-tab-panel" id="tab-contact" role="tabpanel" aria-labelledby="tabbtn-contact" tabindex="0" style="display:none;">
           <h2 class="detail-section-title">Contact</h2>
           ${tour.contactPhone || tour.contactEmail ? `
           <ul class="highlight-list">
@@ -407,6 +432,7 @@ ${siteFooter()}
 
 ${scriptTags(["main"])}
 <script>
+  function reduceMotion() { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
   function switchDetailTab(targetId, clickedBtn, evt) {
     if (evt) { evt.preventDefault(); evt.stopPropagation(); }
     var panel = document.getElementById(targetId);
@@ -414,14 +440,17 @@ ${scriptTags(["main"])}
       p.style.display = p.id === targetId ? '' : 'none';
     });
     document.querySelectorAll('.content-tab').forEach(function (btn) {
-      btn.classList.remove('active');
+      var on = btn.getAttribute('data-target') === targetId;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      btn.tabIndex = on ? 0 : -1;
     });
     if (clickedBtn) {
       clickedBtn.classList.add('active');
       // Slide the tab strip sideways so the chosen tab is fully visible (mobile).
       var strip = clickedBtn.parentElement;
       var left = clickedBtn.offsetLeft - (strip.clientWidth - clickedBtn.offsetWidth) / 2;
-      strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      strip.scrollTo({ left: Math.max(0, left), behavior: reduceMotion() ? 'auto' : 'smooth' });
     }
     // Only scroll the page when the new panel would start hidden under the
     // sticky header + tab strip; otherwise the page stays exactly where it is.
@@ -430,7 +459,7 @@ ${scriptTags(["main"])}
       var barBottom = tabsBar.getBoundingClientRect().bottom;
       var panelTop = panel.getBoundingClientRect().top;
       if (panelTop < barBottom) {
-        window.scrollTo({ top: window.scrollY + panelTop - barBottom - 8, behavior: 'smooth' });
+        window.scrollTo({ top: window.scrollY + panelTop - barBottom - 8, behavior: reduceMotion() ? 'auto' : 'smooth' });
       }
     }
     return false;

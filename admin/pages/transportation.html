@@ -53,10 +53,12 @@ scripts: transportation
         <h2 class="section-title">Transparent Rate Table</h2>
         <p class="section-subtext">Every published rate, in one place — no "contact for pricing" games.</p>
       </div>
+      <div class="table-scroll" role="region" aria-label="Rates by vehicle" tabindex="0">
       <table class="rate-table">
         <thead><tr><th>Vehicle Type</th><th>Seating</th><th class="num">Standard Rate</th><th>Minimum Booking</th><th></th></tr></thead>
         <tbody id="rate-table-body"></tbody>
       </table>
+      </div>
       <p class="rate-footnote">Rates exclude applicable taxes and a standard gratuity guideline of 18–20%. A minimum booking window applies to hourly charters. Confirm exact figures with the operator — table shown is illustrative pending real rate sheet.</p>
     </div>
   </section>
@@ -147,8 +149,10 @@ scripts: transportation
         <p style="font-size:var(--text-meta);opacity:0.75;font-style:italic;">Tripreviewall is affiliated with this transport provider and may earn a commission if you book, at no extra cost to you.</p>
       </div>
       <div class="tp-form-card">
-        <div class="form-success" id="tp-form-success">Thanks — your trip request has been received. We'll follow up within 2 business hours with pricing and availability.</div>
+        <div class="form-success" id="tp-form-success" role="status" tabindex="-1">Thanks — your trip request has been received. We'll follow up within 2 business hours with pricing and availability.</div>
+        <div class="form-error" id="tp-form-error" role="alert"></div>
         <form id="tp-inquiry-form">
+          <div class="hp-field" aria-hidden="true"><label>Company website (leave empty)<input type="text" name="companyWebsite" tabindex="-1" autocomplete="off"></label></div>
           <div class="tp-form-grid">
             <div class="form-group"><label for="tp-name">Full Name</label><input type="text" id="tp-name" required></div>
             <div class="form-group"><label for="tp-phone">Phone Number</label><input type="tel" id="tp-phone" required></div>

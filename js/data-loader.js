@@ -7,7 +7,7 @@
 
 async function loadAllTours() {
   try {
-    const res = await fetch("/api/tours");
+    const res = await fetch("/api/tours?fields=card"); // card fields only — much smaller download
     if (!res.ok) throw new Error("API responded with " + res.status);
     const data = await res.json();
     return Array.isArray(data) ? data : [];

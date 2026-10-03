@@ -9,7 +9,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   initGalleryThumbs();
   initTabScrollSpy();
-  initVariantSelector();
 });
 
 function initGalleryThumbs() {
@@ -28,13 +27,20 @@ function initGalleryThumbs() {
 /* Tabs are handled by switchDetailTab() inline in the page (show one panel,
    no page jump). The old scroll-spy was removed: with hidden panels it
    scrolled panels under the sticky header and highlighted the wrong tab. */
-function initTabScrollSpy() {}
-
-function initVariantSelector() {
-  document.querySelectorAll(".variant-option").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".variant-option").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
+function initTabScrollSpy() {
+  // Keyboard support for the tab strip (WAI-ARIA tabs pattern): ← → Home End.
+  const tabs = Array.from(document.querySelectorAll('.content-tab[role="tab"]'));
+  tabs.forEach((tab, i) => {
+    tab.addEventListener("keydown", (e) => {
+      let next = null;
+      if (e.key === "ArrowRight") next = tabs[(i + 1) % tabs.length];
+      else if (e.key === "ArrowLeft") next = tabs[(i - 1 + tabs.length) % tabs.length];
+      else if (e.key === "Home") next = tabs[0];
+      else if (e.key === "End") next = tabs[tabs.length - 1];
+      if (!next) return;
+      e.preventDefault();
+      next.focus();
+      if (typeof switchDetailTab === "function") switchDetailTab(next.dataset.target, next);
     });
   });
 }

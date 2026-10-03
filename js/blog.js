@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       blogState.layer1 = btn.dataset.cat;
       blogState.visibleCount = BLOG_PAGE_STEP;
-      document.querySelectorAll(".layer1-tab").forEach((b) => b.classList.toggle("active", b === btn));
+      document.querySelectorAll(".layer1-tab").forEach((b) => { b.classList.toggle("active", b === btn); b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
       applyBlogFilters();
     });
   });

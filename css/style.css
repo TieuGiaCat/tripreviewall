@@ -4,7 +4,7 @@
    ============================================================ */
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
   background: var(--color-bg);
@@ -319,3 +319,17 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .breadcrumb a:hover { color: var(--color-primary); }
 .breadcrumb .sep { margin: 0 6px; color: var(--color-border-strong); }
 .breadcrumb .current { color: var(--color-text); }
+
+/* ---- Cover images (<img> filling a box, replaces background-image) ---- */
+.blog-card-image, .dest-card, .pillar-card-img, .inline-tour-img, .sidebar-affiliate-img, .article-hero-img, .author-photo, .dest-hero { position: relative; overflow: hidden; }
+.cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 0; }
+
+/* Tour card: title and photo link to the tour too, not just the button */
+a.tour-card-image-wrap { display: block; }
+.tour-card-title a { color: inherit; text-decoration: none; }
+.tour-card-title a:hover { color: var(--color-primary); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Respect "reduce motion" (C18): no smooth scrolling, no transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

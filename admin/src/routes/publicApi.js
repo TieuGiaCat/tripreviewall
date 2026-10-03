@@ -43,12 +43,25 @@ function toPublicShape(row) {
   };
 }
 
+/** Only what a tour card needs (C8) — ~10× smaller than the full shape. */
+function toCardShape(row) {
+  const t = toPublicShape(row);
+  return {
+    slug: t.slug, title: t.title, company: t.company, island: t.island, tourType: t.tourType,
+    gallery: t.gallery.slice(0, 1), priceFrom: t.priceFrom, aggregatedRating: t.aggregatedRating,
+    reviewCountTotal: t.reviewCountTotal, editorsPick: t.editorsPick,
+    fareharborRegularLink: t.fareharborRegularLink ? "1" : "", // only "is there one?" matters for the card
+    bookingLinks: { fareharbor: { show: !(t.bookingLinks.fareharbor && t.bookingLinks.fareharbor.show === false) } },
+  };
+}
+
 async function listPublishedTours(req, res) {
+  const cardsOnly = new URL(req.url, "http://x").searchParams.get("fields") === "card";
   try {
     const result = await query(
       `SELECT slug, island, price_from, data FROM tours WHERE status = 'published' ORDER BY updated_at DESC`
     );
-    const body = JSON.stringify(result.rows.map(toPublicShape));
+    const body = JSON.stringify(result.rows.map(cardsOnly ? toCardShape : toPublicShape));
     res.writeHead(200, {
       "Content-Type": "application/json; charset=utf-8",
       "Cache-Control": "public, max-age=60", // light caching — data changes only when an editor publishes

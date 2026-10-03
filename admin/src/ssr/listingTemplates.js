@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
-const { tourCardHtml, imgUrl } = require("./sharedHtml");
+const { tourCardHtml, imgUrl, coverImg, preloadImg } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
 const { SITE_URL, CATEGORY_GRADIENTS, DEFAULT_GRADIENT, BLOG_CATEGORIES: CATEGORY_LIST } = require("../siteConfig");
@@ -89,6 +89,7 @@ ${siteHeader()}
         </select>
       </div>
     </div>
+    <h2 class="visually-hidden">Tour list</h2>
     <div class="tour-grid" id="all-tours-grid" data-page="${page}">${firstPage.map((t) => tourCardHtml(t, "", "")).join("")}</div>
     <div class="empty-state" id="empty-state" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -123,10 +124,9 @@ const BLOG_CATEGORIES = ["All", ...CATEGORY_LIST];
 const BLOG_INITIAL_VISIBLE = 6;
 
 function blogCardHtml(p, prefix, hidden) {
-  const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (CATEGORY_GRADIENTS[p.category] || DEFAULT_GRADIENT);
   return `
     <a href="/blog/${esc(p.slug)}" class="blog-card" data-category="${esc(p.category || "")}" data-island="${esc(p.island || "")}"${hidden ? " hidden" : ""}>
-      <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
+      <div class="blog-card-image" style="background:${CATEGORY_GRADIENTS[p.category] || DEFAULT_GRADIENT};">${coverImg(p.featuredImage, { sizes: "(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" })}</div>
       <div class="blog-card-body">
         <div class="blog-card-tags">
           ${p.category ? `<span class="blog-card-cat" style="margin-bottom:0;">${esc(p.category)}</span>` : ""}
@@ -143,7 +143,7 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
   const pillarCards = pillarPosts
     .map((p) => `
       <a class="pillar-card" href="/blog/${esc(p.slug)}">
-        <div class="pillar-card-img" style="background-image:${p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};"></div>
+        <div class="pillar-card-img" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);">${coverImg(p.featuredImage, { sizes: "(min-width: 1024px) 300px, 60vw" })}</div>
         <div class="pillar-card-title">${esc(p.title)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </div>
@@ -181,7 +181,7 @@ ${siteHeader()}
     <p class="page-subline">Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.</p>
   </div>
 
-  <div class="pillar-band" id="pillar-band"${pillarCards ? "" : ' style="display:none;"'} aria-label="Island and topic guides">
+  <div class="pillar-band" id="pillar-band"${pillarCards ? "" : ' style="display:none;"'} role="region" aria-label="Island and topic guides">
     <div class="container">
       <div class="pillar-eyebrow">Start Here: Island &amp; Topic Guides</div>
       <div class="pillar-row" id="pillar-row">${pillarCards}</div>
@@ -189,11 +189,12 @@ ${siteHeader()}
   </div>
 
   <div class="container">
-    <div class="layer1-tabs" id="layer1-tabs">${BLOG_CATEGORIES.map((c, i) => `<button type="button" class="layer1-tab${i === 0 ? " active" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+    <div class="layer1-tabs" id="layer1-tabs" role="group" aria-label="Filter articles by category">${BLOG_CATEGORIES.map((c, i) => `<button type="button" class="layer1-tab${i === 0 ? " active" : ""}" data-cat="${esc(c)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(c)}</button>`).join("")}</div>
     <div class="layer2-row">
       <label for="island-select" style="font-size:var(--text-meta);color:var(--color-text-muted);">Filter by:</label>
       <select class="layer2-select" id="island-select">${["All", ...new Set(sorted.map((p) => p.island).filter(Boolean))].map((i) => `<option value="${esc(i)}">${i === "All" ? "Island: All" : esc(i)}</option>`).join("")}</select>
     </div>
+    <h2 class="visually-hidden">Articles</h2>
     <div class="blog-grid" id="blog-grid">${sorted.map((p, i) => blogCardHtml(p, "", i >= BLOG_INITIAL_VISIBLE)).join("")}</div>
     <div class="empty-state" id="blog-empty" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -241,12 +242,13 @@ ${siteHeader()}
       <h1 class="page-h1">Explore Hawaii by Island</h1>
       <p class="page-subline">Four islands, one honest rating system. Pick an island to see every tour we track there.</p>
     </div>
+    <h2 class="visually-hidden">Islands</h2>
     <div class="dest-grid" style="margin-bottom:96px;">
       ${ISLANDS.map((isl) => {
         const heroImage = destinationsBySlug[isl.slug] && destinationsBySlug[isl.slug].heroImage;
-        const bg = heroImage ? `url('${esc(imgUrl(heroImage, 800))}')` : isl.gradient;
         return `
-      <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${bg}; background-size:cover; background-position:center;">
+      <a class="dest-card" href="/destinations/${isl.slug}" style="background:${isl.gradient};">
+        ${coverImg(heroImage, { sizes: "(min-width: 1024px) 300px, 50vw" })}
         <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
         <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
       </a>`;
@@ -290,6 +292,7 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 <meta property="og:description" content="${esc(metaDescription)}">
 ${heroImage ? `<meta property="og:image" content="${SITE_URL}${imgUrl(heroImage, 1200)}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
+${preloadImg(heroImage, { sizes: "(min-width: 1280px) 1200px, 100vw" })}
 ${headBoilerplate(["pages"])}
 </head>
 <body>
@@ -306,7 +309,8 @@ ${siteHeader()}
       ${ISLANDS.map((i) => `<a class="dest-island-tab${i.slug === island.slug ? " active" : ""}" href="/destinations/${i.slug}">${i.name}</a>`).join("")}
     </div>
 
-    <div class="dest-hero" style="background-image:${heroImage ? `url('${esc(imgUrl(heroImage, 1600))}')` : island.gradient}; background-size:cover; background-position:center;">
+    <div class="dest-hero" style="background:${island.gradient};">
+      ${coverImg(heroImage, { widths: [800, 1200, 1600], sizes: "(min-width: 1280px) 1200px, 100vw", alt: `${island.name}, Hawaii`, eager: true })}
       <div class="dest-hero-content">
         <h1>${island.name}</h1>
         <p>${islandTours.length} tours tracked</p>

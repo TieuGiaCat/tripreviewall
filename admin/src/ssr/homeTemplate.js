@@ -1,15 +1,14 @@
 const { esc } = require("../utils");
 const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
-const { tourCardHtml, imgUrl } = require("./sharedHtml");
+const { tourCardHtml, imgUrl, coverImg } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
 const { SITE_URL, CATEGORY_GRADIENTS, DEFAULT_GRADIENT } = require("../siteConfig");
 
 function blogCardHtml(p) {
-  const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (CATEGORY_GRADIENTS[p.category] || DEFAULT_GRADIENT);
   return `
     <a href="/blog/${esc(p.slug)}" class="blog-card">
-      <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
+      <div class="blog-card-image" style="background:${CATEGORY_GRADIENTS[p.category] || DEFAULT_GRADIENT};">${coverImg(p.featuredImage, { sizes: "(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" })}</div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${esc(p.category || "")}</div>
         <h3 class="blog-card-title">${esc(p.title)}</h3>
@@ -117,8 +116,8 @@ ${siteHeader()}
         </div>
       </div>
       <div class="tab-row">
-        <button class="tab-btn active" data-tab="top-rated">Top Rated</button>
-        <button class="tab-btn" data-tab="most-reviewed">Most Reviewed</button>
+        <button type="button" class="tab-btn active" data-tab="top-rated" aria-pressed="true">Top Rated</button>
+        <button type="button" class="tab-btn" data-tab="most-reviewed" aria-pressed="false">Most Reviewed</button>
       </div>
       <div class="tour-grid" id="tour-grid">${featured.map((t) => tourCardHtml(t, "", "")).join("")}</div>
       <div class="view-all-wrap"><a href="/tours" class="btn btn-secondary">View All Tours</a></div>
@@ -154,9 +153,9 @@ ${siteHeader()}
       <div class="dest-grid">
         ${ISLANDS.map((isl) => {
           const heroImage = destinationsBySlug[isl.slug] && destinationsBySlug[isl.slug].heroImage;
-          const bg = heroImage ? `url('${esc(imgUrl(heroImage, 800))}')` : isl.gradient;
           return `
-        <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${bg}; background-size:cover; background-position:center;">
+        <a class="dest-card" href="/destinations/${isl.slug}" style="background:${isl.gradient};">
+          ${coverImg(heroImage, { sizes: "(min-width: 1024px) 300px, 50vw" })}
           <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
           <div class="dest-card-count">${islandCounts[isl.name] || 0} tours tracked</div></div>
         </a>`;

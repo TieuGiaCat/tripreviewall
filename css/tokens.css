@@ -35,6 +35,8 @@
   /* Structure */
   --color-border: #D8D2C4;
   --color-border-strong: #B9B0A0;
+  /* Empty star outline — darker than border-strong so it reaches 3:1 contrast */
+  --color-star-empty: #958B78;
 
   /* Radii */
   --radius-sm: 4px;

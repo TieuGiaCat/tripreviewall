@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layout");
-const { imgUrl, jsonLdScript } = require("./sharedHtml");
+const { imgUrl, jsonLdScript, coverImg, preloadImg } = require("./sharedHtml");
 const { sanitizeHtml } = require("../lib/sanitizeHtml");
 
 const { SITE_URL } = require("../siteConfig");
@@ -17,7 +17,7 @@ function inlineTourCardHtml(tour) {
   const img = tour.gallery && tour.gallery[0];
   return `
     <div class="inline-tour-card">
-      <div class="inline-tour-img" style="${img ? `background-image:url('${esc(imgUrl(img, 400))}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
+      <div class="inline-tour-img" style="background:linear-gradient(135deg,#5C8A72,#0B3B4F);">${coverImg(img, { widths: [400, 800], sizes: "(min-width: 640px) 200px, 100vw", alt: tour.title })}</div>
       <div style="flex:1;">
         <div class="inline-tour-eyebrow">Featured Tour</div>
         <h3 class="inline-tour-title">${esc(tour.title)}</h3>
@@ -38,7 +38,7 @@ function sidebarTourCardInner(tour) {
   const img = tour.gallery && tour.gallery[0];
   return `
         <div class="sidebar-affiliate-label">Featured Tour</div>
-        <div class="sidebar-affiliate-img" style="${img ? `background-image:url('${esc(imgUrl(img, 400))}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
+        <div class="sidebar-affiliate-img" style="background:linear-gradient(135deg,#5C8A72,#0B3B4F);">${coverImg(img, { widths: [400, 800], sizes: "300px", alt: tour.title })}</div>
         <h4 class="sidebar-affiliate-title">${esc(tour.title)}</h4>
         <div style="font-size:var(--text-meta);">${(tour.aggregatedRating || 0).toFixed(1)}★ (${(tour.reviewCountTotal || 0).toLocaleString()})</div>
         <ul class="sidebar-affiliate-bullets">
@@ -64,7 +64,7 @@ function relatedArticlesHtml(related) {
   if (related.length === 0) return `<p style="color:var(--color-text-muted);">More articles coming soon.</p>`;
   return related.map((p) => `
     <a href="/blog/${esc(p.slug)}" class="blog-card">
-      <div class="blog-card-image" style="${p.featuredImage ? `background:url('${esc(imgUrl(p.featuredImage, 800))}')` : "background:linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
+      <div class="blog-card-image" style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);">${coverImg(p.featuredImage, { sizes: "(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw" })}</div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${esc(p.category || "")}</div>
         <h3 class="blog-card-title">${esc(p.title)}</h3>
@@ -189,6 +189,7 @@ ${post.author ? `<meta property="article:author" content="${esc(post.author)}">`
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${imgUrl(post.featuredImage, 1200)}">` : ""}
 ${jsonLd(post, relatedTour)}
+${preloadImg(post.featuredImage, { sizes: "(min-width: 1280px) 1200px, 100vw" })}
 ${headBoilerplate(["blog-detail"])}
 </head>
 <body>
@@ -216,7 +217,7 @@ ${siteHeader()}
       <span>${esc(post.disclosureText)}</span>
     </div>` : ""}
 
-    ${post.featuredImage ? `<div class="article-hero-img" style="background-image:url('..${esc(imgUrl(post.featuredImage, 1600))}')"></div><p class="article-hero-caption">Photo: Operator</p>` : ""}
+    ${post.featuredImage ? `<div class="article-hero-img">${coverImg(post.featuredImage, { widths: [800, 1200, 1600], sizes: "(min-width: 1280px) 1200px, 100vw", alt: post.title, eager: true })}</div><p class="article-hero-caption">Photo: Operator</p>` : ""}
 
     <div class="article-body-grid">
       <div class="article-body-main">
@@ -229,7 +230,7 @@ ${siteHeader()}
         <div class="author-box">
           ${author ? `
           <div class="author-card">
-            <div class="author-photo"${author.photoUrl ? ` style="background-image:url('..${esc(imgUrl(author.photoUrl, 160))}');background-size:cover;background-position:center;"` : ""}></div>
+            <div class="author-photo">${coverImg(author.photoUrl, { widths: [160], sizes: "64px", alt: author.name || "" })}</div>
             <div>
               <p class="author-name">${esc(author.name)}</p>
               ${author.roleTitle ? `<p class="author-role">${esc(author.roleTitle)}</p>` : ""}
