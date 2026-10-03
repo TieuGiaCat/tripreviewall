@@ -1,7 +1,11 @@
 const { query } = require("../db");
-const { readFormBody, esc } = require("../utils");
+const { readFormBody, esc, parseCookies } = require("../utils");
 const { layout } = require("../render");
-const { hashPassword } = require("../auth");
+const { hashPassword, destroyUserSessions, SESSION_COOKIE_NAME } = require("../auth");
+
+function currentSessionToken(req) {
+  return parseCookies(req)[SESSION_COOKIE_NAME] || null;
+}
 const { logAudit } = require("../auditLog");
 
 const ROLES = ["admin", "editor"];
@@ -274,6 +278,16 @@ async function updateUser(req, res, user, id) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
     res.end(layout({ title: "Edit User", activeNav: "users", user, body: renderUserForm({ target: { ...existing, email, role, status, data: { name: body.name } }, errors: dbErrors, formAction: `/admin/users/${id}/edit`, isEdit: true }) }));
     return;
+  }
+
+  // Role/status/password changed → end that user's other sessions so the
+  // change applies immediately (the editing admin keeps their own session).
+  if (existing.role !== role || existing.status !== status || body.password) {
+    try {
+      await destroyUserSessions(id, id === user.userId ? currentSessionToken(req) : null);
+    } catch (err) {
+      console.error("[users] could not end sessions:", err.message);
+    }
   }
 
   const changeNotes = [];

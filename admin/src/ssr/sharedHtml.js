@@ -1,5 +1,11 @@
 const { esc } = require("../utils");
 
+/** JSON for <script type="application/ld+json">: "<" escaped so a title containing "</script>" can't break out. */
+function jsonLdScript(obj) {
+  const json = JSON.stringify(obj).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  return `<script type="application/ld+json">${json}</script>`;
+}
+
 /* ---- Responsive images ----
    Locally uploaded images (/uploads/...) can be requested at a smaller width
    with ?w=N — the admin server resizes once with sharp, caches the WebP on
@@ -65,4 +71,4 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
     </article>`;
 }
 
-module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS };
+module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS, jsonLdScript };

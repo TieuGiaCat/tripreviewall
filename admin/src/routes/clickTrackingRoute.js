@@ -7,18 +7,18 @@ const PLATFORMS = new Set(["fareharbor", "tripadvisor", "getyourguide", "viator"
 // whitelist it would be an open redirect (a spammer could craft a link like
 // tripreviewall.com/api/track-click?url=https://evil.com and use our
 // trusted domain to mask a phishing link).
-const ALLOWED_HOST_SUFFIXES = [
-  ".fareharbor.com", "fareharbor.com",
-  ".tripadvisor.com", "tripadvisor.com",
-  ".getyourguide.com", "getyourguide.com",
-  ".viator.com", "viator.com",
-];
+// Exact registrable domains. A host is allowed only if it IS one of these or
+// a real subdomain of one ("www.viator.com"). The old check used a bare
+// endsWith("viator.com"), which also let "evilviator.com" through.
+const ALLOWED_DOMAINS = ["fareharbor.com", "tripadvisor.com", "getyourguide.com", "viator.com"];
 
 function isAllowedDestination(urlStr) {
   try {
     const u = new URL(urlStr);
     if (u.protocol !== "https:") return false;
-    return ALLOWED_HOST_SUFFIXES.some((suffix) => u.hostname === suffix.replace(/^\./, "") || u.hostname.endsWith(suffix));
+    if (u.username || u.password) return false; // no "https://viator.com@evil.com" tricks
+    const host = u.hostname.toLowerCase().replace(/\.$/, "");
+    return ALLOWED_DOMAINS.some((d) => host === d || host.endsWith("." + d));
   } catch (err) {
     return false;
   }

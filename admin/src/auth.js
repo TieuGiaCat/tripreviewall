@@ -44,16 +44,26 @@ async function createSession(user) {
   return token;
 }
 
+/**
+ * Looks the session up together with the user's CURRENT account row, so
+ * disabling a user, changing their role or deleting them takes effect on
+ * their very next request (previously the role copied at login stayed valid
+ * until the session expired, up to 12 h later).
+ */
 async function getSession(token) {
   if (!token) return null;
   const result = await query(
-    `SELECT user_id, email, role, name, expires_at FROM admin_sessions WHERE token = $1 LIMIT 1`,
+    `SELECT s.user_id, s.expires_at, u.email, u.role, u.status, u.data->>'name' AS name
+       FROM admin_sessions s
+       JOIN admin_users u ON u.id = s.user_id
+      WHERE s.token = $1
+      LIMIT 1`,
     [token]
   );
   const row = result.rows[0];
   if (!row) return null;
-  if (Date.now() > new Date(row.expires_at).getTime()) {
-    // Expired — clean it up lazily and report as logged out.
+  if (Date.now() > new Date(row.expires_at).getTime() || row.status !== "active") {
+    // Expired or account disabled — clean it up and report as logged out.
     query(`DELETE FROM admin_sessions WHERE token = $1`, [token]).catch(() => {});
     return null;
   }
@@ -64,6 +74,16 @@ async function getSession(token) {
     name: row.name,
     expiresAt: new Date(row.expires_at).getTime(),
   };
+}
+
+/** Signs a user out everywhere (used after disable / role change / password change). */
+async function destroyUserSessions(userId, exceptToken) {
+  if (!userId) return;
+  if (exceptToken) {
+    await query(`DELETE FROM admin_sessions WHERE user_id = $1 AND token <> $2`, [userId, exceptToken]);
+  } else {
+    await query(`DELETE FROM admin_sessions WHERE user_id = $1`, [userId]);
+  }
 }
 
 async function destroySession(token) {
@@ -86,4 +106,5 @@ module.exports = {
   createSession,
   getSession,
   destroySession,
+  destroyUserSessions,
 };

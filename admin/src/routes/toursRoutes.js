@@ -450,6 +450,9 @@ function ratingsFromBody(body, existingData) {
 
 function bodyToTourData(body, existingData = {}) {
   return {
+    // Keep every existing field the form doesn't edit (anything imported or
+    // added later) — the form only overwrites the keys listed below.
+    ...existingData,
     name: (body.name || "").trim(),
     company: (body.company || "").trim(),
     contactPhone: (body.contactPhone || "").trim() || null,

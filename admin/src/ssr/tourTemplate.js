@@ -1,6 +1,6 @@
 const { esc } = require("../utils");
 const { ASSET_V } = require("./assetVersion");
-const { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset } = require("./sharedHtml");
+const { starsRowHtml, tourCardHtml, imgUrl, imgSrcset, jsonLdScript } = require("./sharedHtml");
 
 const HERO_SIZES = "(min-width: 1280px) 1200px, 100vw";
 const HERO_WIDTHS = [400, 800, 1200, 1600];
@@ -185,6 +185,20 @@ ${options.length > 1 ? `
 </script>` : ""}`;
 }
 
+/**
+ * The calendar embed is pasted by editors / imported from CSV. Instead of
+ * printing that raw HTML, pull out the script URL and only accept FareHarbor's
+ * own calendar embed — anything else (or extra tags) renders nothing.
+ */
+function fareharborCalendarTag(raw) {
+  const m = String(raw || "").match(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i);
+  if (!m) return "";
+  let u;
+  try { u = new URL(m[1].replace(/&amp;/g, "&")); } catch (e) { return ""; }
+  if (u.protocol !== "https:" || u.hostname !== "fareharbor.com" || !u.pathname.startsWith("/embeds/script/calendar/")) return "";
+  return `<script src="${esc(u.toString())}"></script>`;
+}
+
 function bookingSidebarHtml(tour) {
   const bl = tour.bookingLinks || {};
   const showFareharbor = !bl.fareharbor || bl.fareharbor.show !== false;
@@ -210,7 +224,7 @@ function bookingSidebarHtml(tour) {
         <p style="font-size:var(--text-meta);color:var(--color-text-muted);margin:10px 0 0;">This is the tour operator's own booking system — no third-party markup.</p>` : ""}
         <div class="booking-widget-frame">
           <h4>Select a date</h4>
-          ${tour.fareharborCalendarScript ? tour.fareharborCalendarScript : `<div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>`}
+          ${fareharborCalendarTag(tour.fareharborCalendarScript) || `<div class="booking-widget-placeholder">FareHarbor calendar widget renders here</div>`}
         </div>
         ${enabled.length > 0 ? `
         <div class="booking-secondary-label">Also available on</div>
@@ -250,7 +264,7 @@ function jsonLd(tour) {
       { "@type": "ListItem", position: 3, name: tour.title },
     ],
   };
-  return `<script type="application/ld+json">${JSON.stringify(data)}</script>\n<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`;
+  return `${jsonLdScript(data)}\n${jsonLdScript(breadcrumb)}`;
 }
 
 /**

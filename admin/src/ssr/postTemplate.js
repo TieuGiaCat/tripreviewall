@@ -1,6 +1,7 @@
 const { esc } = require("../utils");
 const { ASSET_V } = require("./assetVersion");
-const { imgUrl } = require("./sharedHtml");
+const { imgUrl, jsonLdScript } = require("./sharedHtml");
+const { sanitizeHtml } = require("../lib/sanitizeHtml");
 
 const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
 
@@ -111,8 +112,8 @@ function jsonLd(post, relatedTour) {
     ],
   };
   const scripts = [
-    `<script type="application/ld+json">${JSON.stringify(article)}</script>`,
-    `<script type="application/ld+json">${JSON.stringify(breadcrumb)}</script>`,
+    jsonLdScript(article),
+    jsonLdScript(breadcrumb),
   ];
 
   // No Review schema: the only rating available is the tour's aggregate from
@@ -128,10 +129,13 @@ function jsonLd(post, relatedTour) {
  * `relatedPosts` — up to 3 other published posts, already fetched by the caller.
  */
 function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
-  const canonical = post.canonicalUrl || `${SITE_URL}/blog/${post.slug}`;
+  // Override only if it's a real https URL; escaped wherever it's printed.
+  const canonical = esc(/^https:\/\/[^\s"'<>]+$/.test(post.canonicalUrl || "") ? post.canonicalUrl : `${SITE_URL}/blog/${post.slug}`);
   const metaTitle = post.metaTitle || post.title;
   const metaDesc = (post.metaDescription || post.excerpt || post.title).slice(0, 155);
-  const { processedBody, headings } = injectTOC(post.body || "");
+  // Body is editor HTML — rebuilt through an allow-list so no script/handler
+  // pasted into the editor can ever reach the public page.
+  const { processedBody, headings } = injectTOC(sanitizeHtml(post.body || ""));
 
   const tags = [];
   if (post.category) tags.push(`<span class="tag-pill tag-category">${esc(post.category)}</span>`);

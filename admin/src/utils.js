@@ -96,7 +96,7 @@ function parseCookies(req) {
     if (idx === -1) return;
     const key = pair.slice(0, idx).trim();
     const val = pair.slice(idx + 1).trim();
-    out[key] = decodeURIComponent(val);
+    try { out[key] = decodeURIComponent(val); } catch (e) { out[key] = val; } // malformed cookie must not 500 every page
   });
   return out;
 }

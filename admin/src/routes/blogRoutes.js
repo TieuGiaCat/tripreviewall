@@ -373,6 +373,9 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
 
 function bodyToPostData(body, existingData = {}) {
   return {
+    // Keep every existing field the form doesn't edit (anything imported or
+    // added later) — the form only overwrites the keys listed below.
+    ...existingData,
     title: (body.title || "").trim(),
     excerpt: (body.excerpt || "").trim(),
     authorSlug: (body.authorSlug || "").trim() || null,
@@ -384,7 +387,7 @@ function bodyToPostData(body, existingData = {}) {
     relatedTourSlug: (body.relatedTourSlug || "").trim(),
     metaTitle: (body.metaTitle || "").trim() || null,
     metaDescription: (body.metaDescription || "").trim() || null,
-    canonicalUrl: (body.canonicalUrl || "").trim() || null,
+    canonicalUrl: /^https:\/\/[^\s"'<>]+$/.test((body.canonicalUrl || "").trim()) ? body.canonicalUrl.trim() : null,
     featuredPillar: body.featuredPillar === "1",
     // Not edited by this form — preserved so uploading a featured image
     // never gets wiped out by an unrelated content edit.
