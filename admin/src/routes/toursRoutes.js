@@ -12,6 +12,14 @@ const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
 async function listTours(req, res, user, urlObj) {
   const search = (urlObj.searchParams.get("q") || "").trim();
   const statusFilter = urlObj.searchParams.get("status") || "";
+  const islandFilter = urlObj.searchParams.get("island") || "";
+  const SORTS = {
+    updated_desc: { label: "Updated — newest first", sql: "updated_at DESC" },
+    updated_asc: { label: "Updated — oldest first", sql: "updated_at ASC" },
+    name_asc: { label: "Name A → Z", sql: "lower(coalesce(data->>'name', slug)) ASC" },
+    name_desc: { label: "Name Z → A", sql: "lower(coalesce(data->>'name', slug)) DESC" },
+  };
+  const sort = SORTS[urlObj.searchParams.get("sort")] ? urlObj.searchParams.get("sort") : "updated_desc";
   const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
   const PAGE_SIZE = 10;
 
@@ -25,6 +33,12 @@ async function listTours(req, res, user, urlObj) {
     params.push(statusFilter);
     conditions.push(`status = $${params.length}`);
   }
+  if (ISLANDS.includes(islandFilter)) {
+    params.push(islandFilter);
+    conditions.push(`island = $${params.length}`);
+  } else if (islandFilter === "none") {
+    conditions.push(`(island IS NULL OR island = '')`);
+  }
   const whereClause = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   let rows = [];
@@ -37,7 +51,7 @@ async function listTours(req, res, user, urlObj) {
     const result = await query(
       `SELECT id, slug, status, island, price_from, updated_at, data
        FROM tours ${whereClause}
-       ORDER BY updated_at DESC
+       ORDER BY ${SORTS[sort].sql}, id ASC
        LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       params
     );
@@ -47,6 +61,12 @@ async function listTours(req, res, user, urlObj) {
     dbError = err.message;
   }
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  // Clickable column headers: keep the current search/filters, flip the sort.
+  const sortLink = (label, nextSort, arrow) => {
+    const qs = new URLSearchParams({ q: search, status: statusFilter, island: islandFilter, sort: nextSort });
+    return `<a href="/admin/tours?${esc(qs.toString())}" style="color:inherit;text-decoration:none;">${label}${arrow}</a>`;
+  };
 
   const tableRows = rows
     .map((t) => {
@@ -73,7 +93,7 @@ async function listTours(req, res, user, urlObj) {
 
   const body = `
     <h1 class="page-title">Tours</h1>
-    <p class="page-sub">${totalCount} tour${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}. Search and status filter run against the live database.</p>
+    <p class="page-sub">${totalCount} tour${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}. Search, filters and sorting run against the live database.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Check DATABASE_URL and that migrations have run.</div>` : ""}
 
     <div class="toolbar">
@@ -84,6 +104,14 @@ async function listTours(req, res, user, urlObj) {
           <option value="published" ${statusFilter === "published" ? "selected" : ""}>Published</option>
           <option value="draft" ${statusFilter === "draft" ? "selected" : ""}>Draft</option>
         </select>
+        <select name="island" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">
+          <option value="">All islands</option>
+          ${ISLANDS.map((isl) => `<option value="${isl}" ${islandFilter === isl ? "selected" : ""}>${isl}</option>`).join("")}
+          <option value="none" ${islandFilter === "none" ? "selected" : ""}>No island set</option>
+        </select>
+        <select name="sort" style="padding:8px 12px;border:1px solid var(--color-border);border-radius:4px;">
+          ${Object.entries(SORTS).map(([key, o]) => `<option value="${key}" ${sort === key ? "selected" : ""}>${o.label}</option>`).join("")}
+        </select>
         <button type="submit" class="btn btn-secondary">Filter</button>
       </form>
       <a href="/admin/tours/new" class="btn btn-primary">+ New Tour</a>
@@ -91,10 +119,10 @@ async function listTours(req, res, user, urlObj) {
     </div>
 
     <table class="data-table">
-      <thead><tr><th>Name</th><th>Island</th><th>Status</th><th>Price</th><th>Rating</th><th>Updated</th><th>Actions</th></tr></thead>
+      <thead><tr><th>${sortLink("Name", sort === "name_asc" ? "name_desc" : "name_asc", sort.startsWith("name_") ? (sort === "name_asc" ? " ▲" : " ▼") : "")}</th><th>Island</th><th>Status</th><th>Price</th><th>Rating</th><th>${sortLink("Updated", sort === "updated_desc" ? "updated_asc" : "updated_desc", sort.startsWith("updated_") ? (sort === "updated_desc" ? " ▼" : " ▲") : "")}</th><th>Actions</th></tr></thead>
       <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:32px;">No tours match this search yet.</td></tr>`}</tbody>
     </table>
-    ${paginationHtml(page, totalPages, "/admin/tours", { q: search, status: statusFilter })}
+    ${paginationHtml(page, totalPages, "/admin/tours", { q: search, status: statusFilter, island: islandFilter, sort })}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -255,22 +283,19 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
       </div>
 
       <div class="form-card">
-        <h2>Ratings (manual entry — see tripreviewall-tour-detail-brief.md §7)</h2>
-        <div class="form-row">
-          <div class="form-field"><label>Aggregated Rating (0–5)</label><input type="number" step="0.1" min="0" max="5" name="aggregatedRating" value="${esc(d.aggregatedRating != null ? d.aggregatedRating : "")}"></div>
-          <div class="form-field"><label>Total Review Count</label><input type="number" min="0" name="reviewCountTotal" value="${esc(d.reviewCountTotal != null ? d.reviewCountTotal : "")}"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-field"><label>5★ %</label><input type="number" min="0" max="100" name="star5" value="${esc(rd.star5 != null ? rd.star5 : "")}"></div>
-          <div class="form-field"><label>4★ %</label><input type="number" min="0" max="100" name="star4" value="${esc(rd.star4 != null ? rd.star4 : "")}"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-field"><label>3★ %</label><input type="number" min="0" max="100" name="star3" value="${esc(rd.star3 != null ? rd.star3 : "")}"></div>
-          <div class="form-field"><label>2★ %</label><input type="number" min="0" max="100" name="star2" value="${esc(rd.star2 != null ? rd.star2 : "")}"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-field"><label>1★ %</label><input type="number" min="0" max="100" name="star1" value="${esc(rd.star1 != null ? rd.star1 : "")}"></div>
-        </div>
+        <h2>Ratings by Platform</h2>
+        <p class="hint" style="margin:-8px 0 16px;">Tick a platform to show its card in the "Review" tab of the live page, then enter that platform's star rating (0–5) and review count. The overall rating and total review count at the top of the page are calculated automatically from the ticked platforms (weighted by review count).</p>
+        ${RATING_PLATFORMS.map((p) => {
+          const r = (d.ratingsBySource || {})[p.key] || {};
+          const shown = ratingShown(d.ratingsBySource || {}, p.key);
+          return `
+        <div class="form-row" style="align-items:end;border-top:1px solid var(--color-border);padding-top:12px;margin-top:4px;">
+          <div class="form-field" style="max-width:220px;"><label><input type="checkbox" name="rating_${p.key}_show" value="1" ${shown ? "checked" : ""}> Show ${p.label}</label></div>
+          <div class="form-field"><label>${p.label} stars (0–5)</label><input type="number" step="0.1" min="0" max="5" name="rating_${p.key}_avg" value="${esc(r.avg != null ? r.avg : "")}" placeholder="e.g. 4.7"></div>
+          <div class="form-field"><label>${p.label} review count</label><input type="number" step="1" min="0" name="rating_${p.key}_count" value="${esc(r.count != null ? r.count : "")}" placeholder="e.g. 1250"></div>
+        </div>`;
+        }).join("")}
+        <p class="hint" style="margin-top:12px;">Current overall: ${d.aggregatedRating != null ? esc(d.aggregatedRating) + "★" : "—"} from ${d.reviewCountTotal != null ? esc(d.reviewCountTotal) : "—"} reviews.</p>
       </div>
 
       <div class="form-card">
@@ -376,6 +401,53 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
   `;
 }
 
+/* ---- Ratings by platform ----
+   data.ratingsBySource = { google|tripadvisor|getyourguide|viator: { avg, count, show } }
+   Older tours have no "show" flag yet: there, a platform counts as shown when
+   it has a rating (same as the page behaved before), Google defaults hidden. */
+const RATING_PLATFORMS = [
+  { key: "google", label: "Google Maps" },
+  { key: "tripadvisor", label: "TripAdvisor" },
+  { key: "getyourguide", label: "GetYourGuide" },
+  { key: "viator", label: "Viator" },
+];
+function ratingShown(rbs, key) {
+  const r = (rbs || {})[key];
+  if (!r) return false;
+  if (typeof r.show === "boolean") return r.show;
+  return key !== "google" && r.avg != null;
+}
+/** Overall rating = review-count-weighted average of the shown platforms. */
+function computeAggregate(rbs) {
+  let total = 0, weighted = 0, plain = [], n = 0;
+  RATING_PLATFORMS.forEach((p) => {
+    const r = rbs[p.key];
+    if (!ratingShown(rbs, p.key) || r.avg == null) return;
+    n++;
+    const c = Number(r.count) || 0;
+    total += c; weighted += Number(r.avg) * c; plain.push(Number(r.avg));
+  });
+  if (!n) return null;
+  const avg = total > 0 ? weighted / total : plain.reduce((a, b) => a + b, 0) / plain.length;
+  return { aggregatedRating: Math.round(avg * 10) / 10, reviewCountTotal: total };
+}
+function ratingsFromBody(body, existingData) {
+  const rbs = { ...(existingData.ratingsBySource || {}) };
+  RATING_PLATFORMS.forEach((p) => {
+    const avgRaw = (body[`rating_${p.key}_avg`] || "").trim();
+    const countRaw = (body[`rating_${p.key}_count`] || "").trim();
+    const avg = avgRaw !== "" && !isNaN(Number(avgRaw)) ? Math.min(5, Math.max(0, Number(avgRaw))) : null;
+    const count = countRaw !== "" && !isNaN(Number(countRaw)) ? Math.max(0, Math.round(Number(countRaw))) : null;
+    rbs[p.key] = { avg, count, show: body[`rating_${p.key}_show`] === "1" };
+  });
+  const agg = computeAggregate(rbs);
+  return {
+    ratingsBySource: rbs,
+    aggregatedRating: agg ? agg.aggregatedRating : (existingData.aggregatedRating != null ? existingData.aggregatedRating : null),
+    reviewCountTotal: agg ? agg.reviewCountTotal : (existingData.reviewCountTotal != null ? existingData.reviewCountTotal : null),
+  };
+}
+
 function bodyToTourData(body, existingData = {}) {
   return {
     name: (body.name || "").trim(),
@@ -403,15 +475,9 @@ function bodyToTourData(body, existingData = {}) {
       summaryText: (body.googleSummary || "").trim(),
       lastCheckedDate: body.googleLastChecked || null,
     },
-    aggregatedRating: body.aggregatedRating !== "" ? Number(body.aggregatedRating) : null,
-    reviewCountTotal: body.reviewCountTotal !== "" ? Number(body.reviewCountTotal) : null,
-    ratingDistribution: {
-      star5: Number(body.star5) || 0,
-      star4: Number(body.star4) || 0,
-      star3: Number(body.star3) || 0,
-      star2: Number(body.star2) || 0,
-      star1: Number(body.star1) || 0,
-    },
+    ...ratingsFromBody(body, existingData),
+    // No longer edited in the form — kept so tour cards' bar still has data.
+    ratingDistribution: existingData.ratingDistribution || { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 },
     bookingLinks: {
       fareharbor: { show: body.showFareharbor === "1" },
       tripadvisor: { url: (body.tripadvisorUrl || "").trim(), show: body.showTripadvisor === "1" },
@@ -844,10 +910,10 @@ const EXPORT_COLUMNS = [
   "getyourguideUrl", "showGetyourguide",
   "viatorUrl", "showViator",
   "aggregatedRating", "reviewCountTotal", "star5", "star4", "star3", "star2", "star1",
-  "fareharbor_rating", "fareharbor_count",
-  "tripadvisor_rating", "tripadvisor_count",
-  "getyourguide_rating", "getyourguide_count",
-  "viator_rating", "viator_count",
+  "google_rating", "google_count", "google_show",
+  "tripadvisor_rating", "tripadvisor_count", "tripadvisor_show",
+  "getyourguide_rating", "getyourguide_count", "getyourguide_show",
+  "viator_rating", "viator_count", "viator_show",
 ];
 const REFERENCE_ONLY_COLUMNS = new Set(["slug", "name", "island", "status"]);
 
@@ -883,10 +949,11 @@ async function exportToursCsv(req, res, user) {
       star5: dist.star5 != null ? dist.star5 : "", star4: dist.star4 != null ? dist.star4 : "",
       star3: dist.star3 != null ? dist.star3 : "", star2: dist.star2 != null ? dist.star2 : "",
       star1: dist.star1 != null ? dist.star1 : "",
-      fareharbor_rating: rbs.fareharbor ? rbs.fareharbor.avg : "", fareharbor_count: rbs.fareharbor ? rbs.fareharbor.count : "",
-      tripadvisor_rating: rbs.tripadvisor ? rbs.tripadvisor.avg : "", tripadvisor_count: rbs.tripadvisor ? rbs.tripadvisor.count : "",
-      getyourguide_rating: rbs.getyourguide ? rbs.getyourguide.avg : "", getyourguide_count: rbs.getyourguide ? rbs.getyourguide.count : "",
-      viator_rating: rbs.viator ? rbs.viator.avg : "", viator_count: rbs.viator ? rbs.viator.count : "",
+      ...Object.fromEntries(RATING_PLATFORMS.flatMap((p) => [
+        [`${p.key}_rating`, rbs[p.key] && rbs[p.key].avg != null ? rbs[p.key].avg : ""],
+        [`${p.key}_count`, rbs[p.key] && rbs[p.key].count != null ? rbs[p.key].count : ""],
+        [`${p.key}_show`, ratingShown(rbs, p.key) ? "TRUE" : "FALSE"],
+      ])),
       location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
       fareharborItemId: d.fareharborItemId || "",
       metaTitle: d.metaTitle || "",
@@ -954,7 +1021,7 @@ function renderImportForm({ report = null, backfillReport = null } = {}) {
 
     <div class="form-card">
       <h2>Columns this tool updates</h2>
-      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, metaTitle, metaDescription, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
+      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, metaTitle, metaDescription, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, google/tripadvisor/getyourguide/viator _rating, _count and _show (TRUE/FALSE = show that platform's card on the live page). When platform ratings are present, the overall rating and total count are recalculated from the shown platforms.
       The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect. <strong>fareharborItemId is the match key</strong> — it must be present and correct for a row to update anything.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Meta Title / Meta Description:</strong> aim for ≤ 60 characters (title) and ≤ 160 characters (description). Longer values are still saved but Google will cut them off in search results. A blank cell keeps the current value.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
@@ -1102,15 +1169,25 @@ async function importToursCsv(req, res, user) {
     data.ratingDistribution = dist;
 
     const rbs = { ...(data.ratingsBySource || {}) };
-    ["fareharbor", "tripadvisor", "getyourguide", "viator"].forEach((platform) => {
+    ["fareharbor", ...RATING_PLATFORMS.map((p) => p.key)].forEach((platform) => {
       const avg = numOrUndefined(csvRow[`${platform}_rating`]);
       const count = numOrUndefined(csvRow[`${platform}_count`]);
+      const showCell = csvRow[`${platform}_show`];
       if (avg !== undefined || count !== undefined) {
         rbs[platform] = { ...(rbs[platform] || {}), ...(avg !== undefined ? { avg } : {}), ...(count !== undefined ? { count } : {}) };
         changed = true;
       }
+      if (showCell !== undefined && showCell !== "") {
+        rbs[platform] = { ...(rbs[platform] || {}), show: csvTruthy(showCell) };
+        changed = true;
+      }
     });
     data.ratingsBySource = rbs;
+    // Overall rating follows the shown platforms (an explicit aggregatedRating
+    // cell in the same row still wins, for tours with no platform data).
+    const aggFromPlatforms = computeAggregate(rbs);
+    if (aggFromPlatforms && aggregatedRating === undefined) data.aggregatedRating = aggFromPlatforms.aggregatedRating;
+    if (aggFromPlatforms && reviewCountTotal === undefined) data.reviewCountTotal = aggFromPlatforms.reviewCountTotal;
 
     const lat = numOrUndefined(csvRow.location_lat);
     const lng = numOrUndefined(csvRow.location_lng);

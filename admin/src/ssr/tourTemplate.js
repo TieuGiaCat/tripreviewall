@@ -7,32 +7,27 @@ const HERO_WIDTHS = [400, 800, 1200, 1600];
 
 const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
 
+/**
+ * Platform cards for the "Review" tab — only the platforms ticked in admin
+ * (Edit Tour → Ratings by Platform). Older tours without "show" flags keep
+ * their previous behavior: any platform with a rating is shown (Google off).
+ * No invented numbers: if nothing is entered, the tab says so instead.
+ */
+const RATING_PLATFORMS = [
+  { key: "google", name: "Google Maps" },
+  { key: "tripadvisor", name: "TripAdvisor" },
+  { key: "getyourguide", name: "GetYourGuide" },
+  { key: "viator", name: "Viator" },
+];
 function ratingsBySourceForDisplay(tour) {
-  const real = tour.ratingsBySource || {};
-  const platformMap = [
-    { key: "fareharbor", name: "FareHarbor" },
-    { key: "tripadvisor", name: "TripAdvisor" },
-    { key: "getyourguide", name: "GetYourGuide" },
-    { key: "viator", name: "Viator" },
-  ];
-  const hasAnyReal = platformMap.some((p) => real[p.key] && real[p.key].avg != null);
-  if (hasAnyReal) {
-    // Use real per-platform numbers wherever we have them; only fall back
-    // to the aggregate for a platform that hasn't been researched yet.
-    return platformMap
-      .filter((p) => real[p.key] && real[p.key].avg != null)
-      .map((p) => ({ name: p.name, avg: Number(real[p.key].avg), count: Number(real[p.key].count) || 0 }));
-  }
-  // Nothing real entered yet — fall back to the illustrative split so the
-  // page still looks complete rather than empty.
-  const c = tour.reviewCountTotal || 0;
-  const r = tour.aggregatedRating || 0;
-  return [
-    { name: "Tripreviewall", avg: r, count: Math.round(c * 0.35) },
-    { name: "TripAdvisor", avg: r, count: Math.round(c * 0.35) },
-    { name: "GetYourGuide", avg: r, count: Math.round(c * 0.2) },
-    { name: "Viator", avg: r, count: Math.round(c * 0.1) },
-  ];
+  const rbs = tour.ratingsBySource || {};
+  return RATING_PLATFORMS
+    .filter((p) => {
+      const r = rbs[p.key];
+      if (!r || r.avg == null) return false;
+      return typeof r.show === "boolean" ? r.show : p.key !== "google";
+    })
+    .map((p) => ({ name: p.name, avg: Number(rbs[p.key].avg), count: Number(rbs[p.key].count) || 0 }));
 }
 
 function quickFactsHtml(tour) {
@@ -118,8 +113,7 @@ function ratingsSectionHtml(tour) {
   return `
     <section class="detail-section" id="ratings">
       <h2 class="detail-section-title">Ratings from every source we could find</h2>
-      ${histogramHtml(tour.ratingDistribution, 10)}
-      <div class="source-cards">
+      ${sources.length ? `<div class="source-cards">
         ${sources.map((s) => `
           <div class="source-card">
             <div class="source-card-name">${esc(s.name)}</div>
@@ -127,7 +121,7 @@ function ratingsSectionHtml(tour) {
             <div class="source-card-score tabular">${s.avg.toFixed(1)}</div>
             <div class="source-card-count tabular">${s.count.toLocaleString()} reviews</div>
           </div>`).join("")}
-      </div>
+      </div>` : `<p class="detail-body-text">We haven't collected platform ratings for this tour yet.</p>`}
       ${gs.summaryText ? `
       <div class="google-panel">
         <div class="google-panel-label">Google Maps — Summarized by Our Team</div>
@@ -366,7 +360,7 @@ ${heroImg ? `<link rel="preload" as="image" href="${esc(imgUrl(heroImg, 800))}"$
         <a href="#tab-review" class="detail-rating-link" onclick="switchDetailTab('tab-review', document.querySelector('.content-tab[data-target=&quot;tab-review&quot;]'), event);">
           ${starsRowHtml(tour.aggregatedRating)}
           <span class="score tabular">${(tour.aggregatedRating || 0).toFixed(1)}</span>
-          <span class="count">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews across 4 sources)</span>
+          <span class="count">(${(tour.reviewCountTotal || 0).toLocaleString()} reviews${ratingsBySourceForDisplay(tour).length > 1 ? ` across ${ratingsBySourceForDisplay(tour).length} sources` : ""})</span>
         </a>
       </div>
     </div>
