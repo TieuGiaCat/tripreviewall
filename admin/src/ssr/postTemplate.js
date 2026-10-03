@@ -236,7 +236,7 @@ ${siteHeader()}
               ${author.experienceStatement ? `<p class="author-experience">${esc(author.experienceStatement)}</p>` : ""}
               ${author.statsLine ? `<p class="author-stats">${esc(author.statsLine)}</p>` : ""}
               ${author.postCount != null ? `<p class="author-stats">${author.postCount} article${author.postCount === 1 ? "" : "s"} published on Tripreviewall</p>` : ""}
-              ${author.profileLink ? `<a class="author-profile-link" href="${esc(author.profileLink)}">Full profile →</a>` : ""}
+              ${/^https?:\/\//i.test(author.profileLink || "") ? `<a class="author-profile-link" href="${esc(author.profileLink)}" rel="noopener">Full profile →</a>` : ""}
             </div>
           </div>` : `
           <div class="author-card"${post.author ? "" : ' style="display:none;"'}>

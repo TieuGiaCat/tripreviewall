@@ -1,4 +1,5 @@
 const { query } = require("../db");
+const { logAudit } = require("../auditLog");
 const { readFormBody, esc } = require("../utils");
 const { layout } = require("../render");
 
@@ -167,6 +168,7 @@ async function updateDestination(req, res, user, id) {
 
   try {
     await query("UPDATE destinations SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+    await logAudit(user, "update", "destination", String(id), `Updated destination "${data.islandName || id}"`);
     await regenerateListingPages();
   } catch (err) {
     console.error("[destinations] update failed:", err.message);
@@ -216,6 +218,7 @@ async function uploadDestinationImage(req, res, user, id) {
     data.heroImage = uploadResult.urls[0];
     try {
       await query("UPDATE destinations SET data = $1, updated_at = now() WHERE id = $2", [JSON.stringify(data), id]);
+      await logAudit(user, "update", "destination", String(id), `Changed hero image for "${data.islandName || id}"`);
       await regenerateListingPages();
     } catch (err) {
       console.error("[destinations] saving hero image url failed:", err.message);

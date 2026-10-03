@@ -1,5 +1,6 @@
 const { query } = require("../db");
-const { readFormBody, slugify, esc, linesToArray } = require("../utils");
+const { logAudit } = require("../auditLog");
+const { readFormBody, slugify, esc, linesToArray, httpUrlOrEmpty } = require("../utils");
 const { layout } = require("../render");
 
 /* ============================================================
@@ -136,7 +137,7 @@ function bodyToAuthorData(body, existingData = {}) {
     roleTitle: (body.roleTitle || "").trim(),
     experienceStatement: (body.experienceStatement || "").trim(),
     statsLine: (body.statsLine || "").trim(),
-    profileLink: (body.profileLink || "").trim() || null,
+    profileLink: httpUrlOrEmpty(body.profileLink) || null,
     // Not edited by this form — preserved so uploading a photo never gets
     // wiped out by an unrelated content edit (same pattern as Tours gallery).
     photoUrl: existingData.photoUrl || null,
@@ -185,6 +186,7 @@ async function createAuthor(req, res, user) {
 
   try {
     await query(`INSERT INTO authors (slug, status, data) VALUES ($1, $2, $3)`, [slug, status, JSON.stringify(data)]);
+    await logAudit(user, "create", "author", slug, `Created author "${data.name || slug}"`);
   } catch (err) {
     console.error("[authors] create failed:", err.message);
     const dbErrors = err.code === "23505" ? ["An author with this slug already exists."] : [`Database error: ${err.message}`];
@@ -275,6 +277,7 @@ async function updateAuthor(req, res, user, id) {
 
   try {
     await query(`UPDATE authors SET slug = $1, status = $2, data = $3, updated_at = now() WHERE id = $4`, [slug, status, JSON.stringify(data), id]);
+    await logAudit(user, "update", "author", slug, `Updated author "${data.name || slug}"`);
   } catch (err) {
     console.error("[authors] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another author already uses this slug."] : [`Database error: ${err.message}`];
@@ -297,6 +300,7 @@ async function updateAuthor(req, res, user, id) {
 async function deleteAuthor(req, res, user, id) {
   try {
     await query("DELETE FROM authors WHERE id = $1", [id]);
+    await logAudit(user, "delete", "author", String(id), "Deleted an author");
   } catch (err) {
     console.error("[authors] delete failed:", err.message);
   }

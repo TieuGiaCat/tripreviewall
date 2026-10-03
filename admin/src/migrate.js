@@ -12,6 +12,38 @@ async function runSchema() {
   console.log("✓ Schema applied (tables created if they didn't already exist).");
 }
 
+/**
+ * Versioned migrations (B7): admin/sql/migrations/NNN_name.sql, applied once
+ * each, in order, inside a transaction, and recorded in schema_migrations.
+ */
+async function runMigrations() {
+  await query(`CREATE TABLE IF NOT EXISTS schema_migrations (
+    name TEXT PRIMARY KEY,
+    applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+  const dir = path.join(__dirname, "..", "sql", "migrations");
+  let files = [];
+  try { files = fs.readdirSync(dir).filter((f) => /^\d+_.+\.sql$/.test(f)).sort(); } catch (e) { return; }
+  const done = new Set((await query("SELECT name FROM schema_migrations")).rows.map((r) => r.name));
+  for (const file of files) {
+    if (done.has(file)) continue;
+    const sql = fs.readFileSync(path.join(dir, file), "utf8");
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(sql);
+      await client.query("INSERT INTO schema_migrations (name) VALUES ($1)", [file]);
+      await client.query("COMMIT");
+      console.log(`✓ Migration applied: ${file}`);
+    } catch (err) {
+      await client.query("ROLLBACK").catch(() => {});
+      throw new Error(`migration ${file} failed (nothing from it was applied): ${err.message}`);
+    } finally {
+      client.release();
+    }
+  }
+}
+
 async function seedAdmin() {
   const email = (process.env.SEED_ADMIN_EMAIL || "").trim().toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD || "";
@@ -81,6 +113,7 @@ async function main() {
   const shouldSeed = process.argv.includes("--seed-admin");
   try {
     await runSchema();
+    await runMigrations();
     await seedDestinations();
     await seedCategories();
     if (shouldSeed) await seedAdmin();

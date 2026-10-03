@@ -101,18 +101,48 @@ module.exports = { parseImageUpload, parseCsvUpload, fetchAndConvertToWebp, UPLO
    ============================================================ */
 const MAX_FETCH_BYTES = 15 * 1024 * 1024; // 15MB — generous, since we decode it in memory before shrinking to webp
 
-function isPrivateOrLocalHost(hostname) {
-  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "0.0.0.0") return true;
-  const m = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-  if (m) {
-    const a = Number(m[1]), b = Number(m[2]);
-    if (a === 10) return true;
-    if (a === 172 && b >= 16 && b <= 31) return true;
-    if (a === 192 && b === 168) return true;
-    if (a === 169 && b === 254) return true;
-    if (a === 127) return true;
+/* ---- SSRF protection (A11) ----
+   The check happens inside the socket's DNS lookup: every address the
+   hostname resolves to is checked against private / loopback / link-local /
+   metadata ranges (IPv4 and IPv6), and the connection is made to that vetted
+   address. So "evil.example → 127.0.0.1", "http://2130706433/",
+   "[::ffff:127.0.0.1]" and DNS-rebinding tricks are all refused — including
+   on every redirect hop. */
+const dns = require("dns");
+const net = require("net");
+
+const BLOCKED = new net.BlockList();
+[
+  ["0.0.0.0", 8], ["10.0.0.0", 8], ["100.64.0.0", 10], ["127.0.0.0", 8], ["169.254.0.0", 16],
+  ["172.16.0.0", 12], ["192.0.0.0", 24], ["192.168.0.0", 16], ["198.18.0.0", 15], ["224.0.0.0", 4], ["240.0.0.0", 4],
+].forEach(([addr, prefix]) => BLOCKED.addSubnet(addr, prefix, "ipv4"));
+[
+  ["::", 128], ["::1", 128], ["fc00::", 7], ["fe80::", 10], ["ff00::", 8], ["64:ff9b::", 96],
+].forEach(([addr, prefix]) => BLOCKED.addSubnet(addr, prefix, "ipv6"));
+
+function isBlockedAddress(address, family) {
+  if (family === 6 || net.isIPv6(address)) {
+    const mapped = address.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i); // IPv4-mapped IPv6
+    if (mapped) return BLOCKED.check(mapped[1], "ipv4");
+    return BLOCKED.check(address, "ipv6");
   }
-  return false;
+  return BLOCKED.check(address, "ipv4");
+}
+
+/** Drop-in for dns.lookup used by http(s).get: resolves, vets, then hands the safe address to the socket. */
+function safeLookup(hostname, options, callback) {
+  if (typeof options === "function") { callback = options; options = {}; }
+  dns.lookup(hostname, { all: true }, (err, addresses) => {
+    if (err) return callback(err);
+    if (!addresses.length || addresses.some((a) => isBlockedAddress(a.address, a.family))) {
+      const e = new Error("Refusing to fetch from a private/internal address.");
+      e.code = "EBLOCKED";
+      return callback(e);
+    }
+    const pick = addresses[0];
+    if (options && options.all) return callback(null, addresses);
+    callback(null, pick.address, pick.family);
+  });
 }
 
 /** Fetches a URL's raw bytes, following redirects, refusing non-image responses and private/internal hosts. */
@@ -124,10 +154,10 @@ function fetchImageBuffer(url, redirectsLeft) {
     let parsed;
     try { parsed = new URL(url); } catch (e) { reject(new Error("That doesn't look like a valid URL.")); return; }
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") { reject(new Error("URL must start with http:// or https://")); return; }
-    if (isPrivateOrLocalHost(parsed.hostname)) { reject(new Error("Refusing to fetch from a private/internal address.")); return; }
+    if (net.isIP(parsed.hostname.replace(/^\[|\]$/g, "")) && isBlockedAddress(parsed.hostname.replace(/^\[|\]$/g, ""))) { reject(new Error("Refusing to fetch from a private/internal address.")); return; }
 
     const lib = parsed.protocol === "https:" ? require("https") : require("http");
-    const req = lib.get(url, { timeout: 15000, headers: { "User-Agent": "Mozilla/5.0 (Tripreviewall Media Fetcher)" } }, (res) => {
+    const req = lib.get(url, { timeout: 15000, lookup: safeLookup, headers: { "User-Agent": "Mozilla/5.0 (Tripreviewall Media Fetcher)" } }, (res) => {
       if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
         res.resume();
         let nextUrl;
@@ -150,7 +180,7 @@ function fetchImageBuffer(url, redirectsLeft) {
       res.on("end", () => resolve(Buffer.concat(chunks)));
       res.on("error", reject);
     });
-    req.on("error", (err) => reject(new Error(`Could not reach that URL: ${err.message}`)));
+    req.on("error", (err) => reject(err.code === "EBLOCKED" ? err : new Error(`Could not reach that URL: ${err.message}`)));
     req.on("timeout", () => { req.destroy(); reject(new Error("Request to that URL timed out.")); });
   });
 }

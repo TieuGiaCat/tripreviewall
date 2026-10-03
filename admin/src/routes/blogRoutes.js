@@ -12,6 +12,18 @@ const FORMATS = ["listicle", "comparison", "deep_dive_review", "honest_take"];
 /* ============================================================
    List
    ============================================================ */
+/* B5: if the public page couldn't be written, say so after saving. */
+function collectGenErrors(list, result) {
+  if (!result) return;
+  if (result.error) list.push(result.error);
+  if (Array.isArray(result.errors)) list.push(...result.errors);
+}
+function postsRedirect(genErrors) {
+  return genErrors.length
+    ? "/admin/posts?warn=" + encodeURIComponent("Saved, but the public page wasn't fully updated: " + genErrors.slice(0, 3).join(" · ") + " — check SITE_ROOT / disk space, then run npm run regenerate-all.")
+    : "/admin/posts";
+}
+
 async function listPosts(req, res, user, urlObj) {
   const search = (urlObj.searchParams.get("q") || "").trim();
   const statusFilter = urlObj.searchParams.get("status") || "";
@@ -77,6 +89,7 @@ async function listPosts(req, res, user, urlObj) {
     <h1 class="page-title">Blog Posts</h1>
     <p class="page-sub">${totalCount} post${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Run <code>npm run migrate</code> if the "posts" table doesn't exist yet.</div>` : ""}
+    ${urlObj.searchParams.get("warn") ? `<div class="alert alert-error">⚠ ${esc(urlObj.searchParams.get("warn"))}</div>` : ""}
 
     <div class="toolbar">
       <form method="GET" action="/admin/posts" style="display:flex;gap:8px;">
@@ -106,8 +119,20 @@ async function listPosts(req, res, user, urlObj) {
 /* ============================================================
    Form (shared between New and Edit)
    ============================================================ */
-const QUILL_CDN_CSS = '<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">';
-const QUILL_CDN_JS = "https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js";
+// Quill is served from our own server (npm package "quill", route
+// /admin/vendor/quill/* in server.js) so the admin doesn't run third-party
+// CDN code. Falls back to the CDN only if the package isn't installed yet.
+function quillLocal() {
+  try { require.resolve("quill/dist/quill.min.js"); return true; } catch (e) { return false; }
+}
+function quillCss() {
+  return quillLocal()
+    ? '<link href="/admin/vendor/quill/quill.snow.css" rel="stylesheet">'
+    : '<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet" crossorigin="anonymous">';
+}
+function quillJsSrc() {
+  return quillLocal() ? "/admin/vendor/quill/quill.min.js" : "https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js";
+}
 
 /**
  * Builds the <head> link + end-of-body <script> needed for the Quill
@@ -116,9 +141,9 @@ const QUILL_CDN_JS = "https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js
  */
 function quillAssets(postId, initialBodyHtml) {
   const b64 = Buffer.from(initialBodyHtml || "", "utf8").toString("base64");
-  const head = QUILL_CDN_CSS;
+  const head = quillCss();
   const scripts = `
-<script src="${QUILL_CDN_JS}"></script>
+<script src="${quillJsSrc()}"></script>
 <script>
 (function () {
   function b64DecodeUnicode(str) {
@@ -447,6 +472,7 @@ async function createPost(req, res, user) {
     return;
   }
 
+  const genErrors = [];
   try {
     await query(
       `INSERT INTO posts (slug, status, category, island_tag, content_format, published_at, created_by, data)
@@ -454,8 +480,8 @@ async function createPost(req, res, user) {
       [slug, status, category, islandTag, contentFormat, status === "published" ? new Date() : null, user.userId, JSON.stringify(data)]
     );
     if (status === "published") {
-      await generatePostFile({ slug, status, category, island_tag: islandTag, content_format: contentFormat, published_at: new Date(), updated_at: new Date(), data });
-      await regenerateListingPages();
+      collectGenErrors(genErrors, await generatePostFile({ slug, status, category, island_tag: islandTag, content_format: contentFormat, published_at: new Date(), updated_at: new Date(), data }));
+      collectGenErrors(genErrors, await regenerateListingPages());
     }
   } catch (err) {
     console.error("[posts] create failed:", err.message);
@@ -477,7 +503,7 @@ async function createPost(req, res, user) {
 
   await logAudit(user, "create", "post", slug, `Created post "${data.title || slug}"`);
 
-  res.writeHead(302, { Location: "/admin/posts" });
+  res.writeHead(302, { Location: postsRedirect(genErrors) });
   res.end();
 }
 
@@ -561,6 +587,7 @@ async function updatePost(req, res, user, id) {
     return;
   }
 
+  const genErrors = [];
   try {
     await query(
       `UPDATE posts SET slug = $1, status = $2, category = $3, island_tag = $4, content_format = $5,
@@ -573,11 +600,11 @@ async function updatePost(req, res, user, id) {
     if (existing.slug !== slug) removePostFile(existing.slug);
     if (status === "published") {
       const fresh = await query("SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE id = $1", [id]);
-      await generatePostFile(fresh.rows[0]);
+      collectGenErrors(genErrors, await generatePostFile(fresh.rows[0]));
     } else {
       removePostFile(slug);
     }
-    await regenerateListingPages();
+    collectGenErrors(genErrors, await regenerateListingPages());
   } catch (err) {
     console.error("[posts] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another post already uses this slug."] : [`Database error: ${err.message}`];
@@ -598,7 +625,7 @@ async function updatePost(req, res, user, id) {
 
   await logAudit(user, "update", "post", slug, `Updated post "${data.title || slug}"`);
 
-  res.writeHead(302, { Location: "/admin/posts" });
+  res.writeHead(302, { Location: postsRedirect(genErrors) });
   res.end();
 }
 

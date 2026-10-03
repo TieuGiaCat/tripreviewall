@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { query } = require("../db");
+const { logAudit } = require("../auditLog");
 const { esc } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { UPLOAD_ROOT } = require("../upload");
@@ -220,6 +221,7 @@ async function uploadGeneralImage(req, res, user) {
   const { parseImageUpload } = require("../upload");
   try {
     const result = await parseImageUpload(req, "media", "general");
+    if (result.urls.length) await logAudit(user, "create", "media", result.urls.join(", ").slice(0, 200), `Uploaded ${result.urls.length} image(s)`);
     if (result.urls.length === 0) {
       // Nothing valid uploaded — just bounce back, the list page has no
       // dedicated error slot for this minor case.
@@ -287,6 +289,7 @@ async function deleteMediaFile(req, res, user) {
     const fullPath = path.join(UPLOAD_ROOT, kind, filename);
     if (!fullPath.startsWith(UPLOAD_ROOT)) throw new Error("Path escapes upload root.");
     if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+    await logAudit(user, "delete", "media", url, `Deleted image ${url}`);
   } catch (err) {
     console.error("[media] delete failed:", err.message);
   }
@@ -324,6 +327,7 @@ async function fetchImageFromUrl(req, res, user) {
 
   try {
     await fetchAndConvertToWebp(url, name);
+    await logAudit(user, "create", "media", name, `Imported image from URL as "${name}"`);
   } catch (err) {
     console.error("[media] fetch-from-URL failed:", err.message);
     res.writeHead(302, { Location: "/admin/media?fetchError=" + encodeURIComponent(err.message) });

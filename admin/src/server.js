@@ -145,10 +145,58 @@ function serveStatic(req, res, urlPath) {
  * `return handler()` inside try/catch let async errors escape the catch and an
  * unhandled rejection crashed the whole process.)
  */
+/* ---- Security headers (A8) ----
+   Every response gets nosniff + a referrer policy. Admin pages additionally
+   can't be framed (clickjacking), aren't cached by shared caches, and get a
+   Content-Security-Policy that only allows our own scripts plus the Quill
+   editor CDN. (Inline scripts are still allowed — the admin uses them.) */
+const ADMIN_CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "connect-src 'self'",
+  "frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+].join("; ");
+
+function applySecurityHeaders(res, pathname) {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/public/")) {
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Content-Security-Policy", ADMIN_CSP);
+    res.setHeader("Cache-Control", "no-store");
+  }
+}
+
+/* ---- CSRF protection (A7) ----
+   A state-changing request to /admin must come from one of our own pages.
+   Browsers always send Origin on cross-site POSTs (and Referer otherwise),
+   so a POST whose Origin/Referer host isn't ours — or that carries neither —
+   is rejected. No per-form token needed. */
+function isSameOriginRequest(req) {
+  const host = String(req.headers["x-forwarded-host"] || req.headers.host || "").toLowerCase();
+  const source = req.headers.origin || req.headers.referer;
+  if (!host || !source || source === "null") return false;
+  try { return new URL(source).host.toLowerCase() === host; } catch (e) { return false; }
+}
+
 async function routeRequest(req, res) {
   const urlObj = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = urlObj.pathname;
   const method = req.method;
+
+  applySecurityHeaders(res, pathname);
+  if (method !== "GET" && method !== "HEAD" && pathname.startsWith("/admin") && !isSameOriginRequest(req)) {
+    console.warn(`[csrf] blocked ${method} ${pathname} (origin: ${req.headers.origin || "-"}, referer: ${req.headers.referer || "-"})`);
+    res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+    return res.end("Request blocked: it didn't come from the Tripreviewall admin. Reload the page and try again.");
+  }
 
   // ---- Static assets ----
   if (method === "GET" && pathname.startsWith("/admin/public/")) {
@@ -156,6 +204,17 @@ async function routeRequest(req, res) {
   }
   if (method === "GET" && pathname.startsWith("/uploads/")) {
     return serveUpload(req, res, pathname);
+  }
+  // Self-hosted Quill editor (npm package) — only these two files.
+  const quillMatch = method === "GET" && pathname.match(/^\/admin\/vendor\/quill\/(quill\.min\.js|quill\.snow\.css)$/);
+  if (quillMatch) {
+    let file;
+    try { file = require.resolve(`quill/dist/${quillMatch[1]}`); } catch (e) { res.writeHead(404); return res.end("Not found"); }
+    return fs.readFile(file, (err, content) => {
+      if (err) { res.writeHead(404); return res.end("Not found"); }
+      res.writeHead(200, { "Content-Type": quillMatch[1].endsWith(".js") ? "application/javascript; charset=utf-8" : "text/css; charset=utf-8", "Cache-Control": "public, max-age=604800" });
+      res.end(content);
+    });
   }
 
   // ---- Root ----
@@ -167,7 +226,13 @@ async function routeRequest(req, res) {
   // ---- Auth (no session required) ----
   if (method === "GET" && pathname === "/admin/login") return authRoutes.handleLoginGet(req, res);
   if (method === "POST" && pathname === "/admin/login") return authRoutes.handleLoginPost(req, res);
-  if (method === "GET" && pathname === "/admin/logout") return authRoutes.handleLogout(req, res);
+  // Logout is a POST (from the sidebar button) so a link or image on another
+  // site can't sign you out; a plain GET just shows a confirm button.
+  if (method === "POST" && pathname === "/admin/logout") return authRoutes.handleLogout(req, res);
+  if (method === "GET" && pathname === "/admin/logout") {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    return res.end(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Log out</title><link rel="stylesheet" href="/admin/public/admin.css"></head><body style="display:flex;align-items:center;justify-content:center;min-height:100vh;"><form method="POST" action="/admin/logout"><button type="submit" class="btn btn-primary">Log out of Tripreviewall Admin</button></form></body></html>`);
+  }
 
   // ---- Public read-only API (no session required) — the public website
   // fetches from these to render tours live from the database. ----
@@ -490,7 +555,10 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-server.listen(PORT, () => {
+// Listen on loopback only: the public reaches the admin through nginx
+// (which proxies to 127.0.0.1:4000). Set HOST=0.0.0.0 in .env to expose it.
+const HOST = process.env.HOST || "127.0.0.1";
+server.listen(PORT, HOST, () => {
   console.log(`Tripreviewall admin panel running at http://localhost:${PORT}`);
   console.log(`Log in at http://localhost:${PORT}/admin/login`);
 });

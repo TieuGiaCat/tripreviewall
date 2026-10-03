@@ -1,5 +1,5 @@
 const { query } = require("../db");
-const { readJsonBody } = require("../utils");
+const { readJsonBody, getClientIp } = require("../utils");
 const mailer = require("../lib/mailer");
 
 // Simple in-memory per-IP rate limit — mirrors the sessions Map pattern in
@@ -25,11 +25,7 @@ setInterval(() => {
   }
 }, 15 * 60 * 1000).unref();
 
-function getClientIp(req) {
-  const fwd = req.headers["x-forwarded-for"];
-  if (fwd) return fwd.split(",")[0].trim();
-  return req.socket.remoteAddress || "unknown";
-}
+// getClientIp() lives in utils.js (trusts nginx's X-Real-IP only from loopback).
 
 function sendJson(res, statusCode, obj) {
   res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });

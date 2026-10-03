@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS tours (
   published_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_by UUID REFERENCES admin_users(id),
+  created_by UUID REFERENCES admin_users(id) ON DELETE SET NULL,
   data JSONB NOT NULL DEFAULT '{}'::jsonb
   -- data shape (subset implemented in this MVP module — see
   -- tripreviewall-tour-detail-brief.md §13 for the full future shape):
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS posts (
   published_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_by UUID REFERENCES admin_users(id),
+  created_by UUID REFERENCES admin_users(id) ON DELETE SET NULL,
   data JSONB NOT NULL DEFAULT '{}'::jsonb
   -- data shape (MVP subset — see tripreviewall-blog-details-brief.md §5 for
   -- the full future shape, e.g. TOC entries, inline tour embeds):

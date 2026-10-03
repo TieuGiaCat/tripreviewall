@@ -2,7 +2,7 @@ const { esc } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { listAuditLog } = require("../auditLog");
 
-const TARGET_TYPES = ["tour", "post", "user", "settings"];
+const TARGET_TYPES = ["tour", "post", "user", "settings", "page_seo", "author", "destination", "category", "lead", "media"];
 
 function actionBadge(action) {
   const colors = { create: "#2e7d32", update: "#1565c0", delete: "#c62828" };

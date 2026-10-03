@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+# Booking-link redirects and JSON endpoints — not pages, and bots following
+# them would inflate click analytics.
+Disallow: /api/
 
 Sitemap: https://tripreviewall.com/sitemap.xml

@@ -101,6 +101,7 @@ async function createPageSeo(req, res, user) {
   if (!label) errors.push("Label is required.");
   if (!filePath) errors.push("File Path is required.");
   if (filePath.includes("..")) errors.push("File Path can't contain \"..\".");
+  else if (!/\.html$/i.test(filePath)) errors.push("File Path must be an .html page (e.g. about.html).");
 
   const pageKey = slugify(label) || slugify(filePath);
   if (!pageKey) errors.push("Could not generate a valid identifier from that label.");

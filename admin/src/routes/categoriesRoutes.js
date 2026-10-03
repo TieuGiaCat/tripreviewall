@@ -1,4 +1,5 @@
 const { query } = require("../db");
+const { logAudit } = require("../auditLog");
 const { readFormBody, esc } = require("../utils");
 const { layout } = require("../render");
 
@@ -101,6 +102,7 @@ async function createCategory(req, res, user) {
 
   try {
     await query(`INSERT INTO categories (name, status) VALUES ($1, 'active')`, [name]);
+    await logAudit(user, "create", "category", name, `Created category "${name}"`);
   } catch (err) {
     const dbErrors = err.code === "23505" ? ["A category with this name already exists."] : [`Database error: ${err.message}`];
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
@@ -139,6 +141,7 @@ async function updateCategory(req, res, user, id) {
 
   try {
     await query(`UPDATE categories SET name = $1, status = $2 WHERE id = $3`, [name, status, id]);
+    await logAudit(user, "update", "category", name, `Updated category "${name}" (${status})`);
   } catch (err) {
     const dbErrors = err.code === "23505" ? ["Another category already uses this name."] : [`Database error: ${err.message}`];
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
@@ -151,7 +154,7 @@ async function updateCategory(req, res, user, id) {
 }
 
 async function deleteCategory(req, res, user, id) {
-  try { await query("DELETE FROM categories WHERE id = $1", [id]); }
+  try { await query("DELETE FROM categories WHERE id = $1", [id]); await logAudit(user, "delete", "category", String(id), "Deleted a category"); }
   catch (err) { console.error("[categories] delete failed:", err.message); }
   res.writeHead(302, { Location: "/admin/categories" });
   res.end();

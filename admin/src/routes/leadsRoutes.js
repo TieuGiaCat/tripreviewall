@@ -1,5 +1,6 @@
 const { query } = require("../db");
-const { layout } = require("../render");
+const { logAudit } = require("../auditLog");
+const { layout, paginationHtml } = require("../render");
 const { esc, readFormBody } = require("../utils");
 
 function fmtDate(d) {
@@ -10,6 +11,8 @@ function fmtDate(d) {
 async function listLeads(req, res, user, urlObj) {
   const statusFilter = urlObj.searchParams.get("status") || "";
   const sourceFilter = urlObj.searchParams.get("source") || "";
+  const page = Math.max(1, parseInt(urlObj.searchParams.get("page"), 10) || 1);
+  const PAGE_SIZE = 50;
 
   const conditions = [];
   const params = [];
@@ -24,10 +27,12 @@ async function listLeads(req, res, user, urlObj) {
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
   let rows = [];
+  let totalCount = 0;
   let dbError = null;
   try {
+    totalCount = (await query(`SELECT count(*)::int AS n FROM leads ${where}`, params)).rows[0].n;
     const result = await query(
-      `SELECT id, source, status, created_at, data FROM leads ${where} ORDER BY created_at DESC LIMIT 200`,
+      `SELECT id, source, status, created_at, data FROM leads ${where} ORDER BY created_at DESC LIMIT ${PAGE_SIZE} OFFSET ${(page - 1) * PAGE_SIZE}`,
       params
     );
     rows = result.rows;
@@ -53,7 +58,7 @@ async function listLeads(req, res, user, urlObj) {
 
   const body = `
     <h1 class="page-title">Leads</h1>
-    <p class="page-sub">${rows.length} lead${rows.length === 1 ? "" : "s"} shown (max 200). Contact and Transportation form submissions land here automatically.</p>
+    <p class="page-sub">${totalCount} lead${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}. Contact and Transportation form submissions land here automatically.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Run <code>npm run migrate</code> if the "leads" table doesn't exist yet.</div>` : ""}
 
     <div class="toolbar">
@@ -77,6 +82,7 @@ async function listLeads(req, res, user, urlObj) {
       <thead><tr><th>Received</th><th>Source</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:32px;">No leads yet.</td></tr>`}</tbody>
     </table>
+    ${paginationHtml(page, Math.max(1, Math.ceil(totalCount / PAGE_SIZE)), "/admin/leads", { status: statusFilter, source: sourceFilter })}
   `;
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -180,6 +186,7 @@ async function updateLeadStatus(req, res, user, id) {
   const status = ["new", "contacted", "closed"].includes(body.status) ? body.status : "new";
   try {
     await query("UPDATE leads SET status = $1, updated_at = now() WHERE id = $2", [status, id]);
+    await logAudit(user, "update", "lead", String(id), `Lead marked "${status}"`);
   } catch (err) {
     console.error("[leads] status update failed:", err.message);
   }
@@ -190,6 +197,7 @@ async function updateLeadStatus(req, res, user, id) {
 async function deleteLead(req, res, user, id) {
   try {
     await query("DELETE FROM leads WHERE id = $1", [id]);
+    await logAudit(user, "delete", "lead", String(id), "Deleted a lead");
   } catch (err) {
     console.error("[leads] delete failed:", err.message);
   }

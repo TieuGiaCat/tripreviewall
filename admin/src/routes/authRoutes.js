@@ -1,5 +1,5 @@
 const { query } = require("../db");
-const { readFormBody, parseCookies } = require("../utils");
+const { readFormBody, parseCookies, getClientIp } = require("../utils");
 const { verifyPassword, createSession, destroySession, SESSION_COOKIE_NAME, SESSION_TTL_MS } = require("../auth");
 const { loginPage } = require("../render");
 
@@ -13,11 +13,7 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const LOGIN_LOCKOUT_MS = 15 * 60 * 1000;
 const loginAttempts = new Map(); // ip -> { failures: [timestamps], lockedUntil: number }
 
-function getClientIp(req) {
-  const fwd = req.headers["x-forwarded-for"];
-  if (fwd) return fwd.split(",")[0].trim();
-  return req.socket.remoteAddress || "unknown";
-}
+// getClientIp() lives in utils.js (trusts nginx's X-Real-IP only from loopback).
 
 function loginLockRemainingMs(ip) {
   const entry = loginAttempts.get(ip);
@@ -102,7 +98,10 @@ async function handleLoginPost(req, res) {
   // password" — never reveal which one it was (prevents user enumeration).
   const genericError = "Invalid email or password.";
 
-  if (!row || row.status !== "active" || !verifyPassword(password, row.password_hash)) {
+  // Always run the password check (against a dummy hash when there's no such
+  // user) so response time doesn't reveal which emails have accounts.
+  const passwordOk = verifyPassword(password, row ? row.password_hash : null);
+  if (!row || row.status !== "active" || !passwordOk) {
     recordFailedLogin(ip);
     res.writeHead(401, { "Content-Type": "text/html; charset=utf-8" });
     res.end(loginPage({ error: genericError }));
@@ -124,7 +123,8 @@ async function handleLoginPost(req, res) {
     "Path=/",
     "SameSite=Lax",
     `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`,
-    process.env.NODE_ENV === "production" ? "Secure" : "",
+    // Secure whenever the visitor is on HTTPS (nginx tells us via X-Forwarded-Proto) or the site is configured as https.
+    (req.headers["x-forwarded-proto"] === "https" || /^https:/.test(process.env.SITE_URL || "")) ? "Secure" : "",
   ]
     .filter(Boolean)
     .join("; ");
@@ -143,7 +143,7 @@ async function handleLogout(req, res) {
 
   res.writeHead(302, {
     Location: "/admin/login",
-    "Set-Cookie": `${SESSION_COOKIE_NAME}=; Path=/; Max-Age=0`,
+    "Set-Cookie": `${SESSION_COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`,
   });
   res.end();
 }

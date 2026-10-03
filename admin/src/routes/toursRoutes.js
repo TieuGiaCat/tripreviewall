@@ -1,12 +1,24 @@
 const { query } = require("../db");
-const { readFormBody, slugify, esc, linesToArray } = require("../utils");
+const { readFormBody, slugify, esc, linesToArray, httpUrlOrEmpty } = require("../utils");
 const { layout, paginationHtml } = require("../render");
 const { generateTourFile, removeTourFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 const { logAudit } = require("../auditLog");
 const { LEGACY_EDITORS_PICK_SLUGS } = require("../siteConfig");
 const { tourAffiliateIssues, SQL_HAS_AFFILIATE_ISSUE, clientRulesJson } = require("../lib/affiliateLinks");
 
-const ISLANDS = ["Oahu", "Maui", "Kauai", "Big Island"];
+const ISLANDS = require("../ssr/islands").ISLANDS.map((i) => i.name); // single source: ssr/islands.js
+
+/* B5: if the public page couldn't be written, say so after saving. */
+function collectGenErrors(list, result) {
+  if (!result) return;
+  if (result.error) list.push(result.error);
+  if (Array.isArray(result.errors)) list.push(...result.errors);
+}
+function listRedirect(genErrors) {
+  return genErrors.length
+    ? "/admin/tours?warn=" + encodeURIComponent("Saved, but the public page wasn't fully updated: " + genErrors.slice(0, 3).join(" · ") + " — check SITE_ROOT / disk space, then run npm run regenerate-all.")
+    : "/admin/tours";
+}
 
 /* ============================================================
    List
@@ -100,6 +112,7 @@ async function listTours(req, res, user, urlObj) {
     <h1 class="page-title">Tours</h1>
     <p class="page-sub">${totalCount} tour${totalCount === 1 ? "" : "s"} total — showing ${rows.length ? (page - 1) * PAGE_SIZE + 1 : 0}–${(page - 1) * PAGE_SIZE + rows.length}. Search, filters and sorting run against the live database.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Check DATABASE_URL and that migrations have run.</div>` : ""}
+    ${urlObj.searchParams.get("warn") ? `<div class="alert alert-error">⚠ ${esc(urlObj.searchParams.get("warn"))}</div>` : ""}
 
     <div class="toolbar">
       <form method="GET" action="/admin/tours" style="display:flex;gap:8px;">
@@ -526,7 +539,7 @@ function bodyToTourData(body, existingData = {}) {
     city: (body.city || "").trim(),
     tourType: (body.tourType || "").trim(),
     durationLabel: (body.durationLabel || "").trim(),
-    fareharborRegularLink: (body.fareharborRegularLink || "").trim(),
+    fareharborRegularLink: httpUrlOrEmpty(body.fareharborRegularLink),
     fareharborCalendarScript: (body.fareharborCalendarScript || "").trim(),
     fareharborItemId: (body.fareharborItemId || "").trim() || null,
     editorsPick: body.editorsPick === "1",
@@ -550,9 +563,9 @@ function bodyToTourData(body, existingData = {}) {
     ratingDistribution: existingData.ratingDistribution || { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 },
     bookingLinks: {
       fareharbor: { show: body.showFareharbor === "1" },
-      tripadvisor: { url: (body.tripadvisorUrl || "").trim(), show: body.showTripadvisor === "1" },
-      getyourguide: { url: (body.getyourguideUrl || "").trim(), show: body.showGetyourguide === "1" },
-      viator: { url: (body.viatorUrl || "").trim(), show: body.showViator === "1" },
+      tripadvisor: { url: httpUrlOrEmpty(body.tripadvisorUrl), show: body.showTripadvisor === "1" },
+      getyourguide: { url: httpUrlOrEmpty(body.getyourguideUrl), show: body.showGetyourguide === "1" },
+      viator: { url: httpUrlOrEmpty(body.viatorUrl), show: body.showViator === "1" },
     },
     location: (() => {
       const lat = body.locationLat !== undefined && body.locationLat !== "" ? Number(body.locationLat) : (existingData.location ? existingData.location.lat : undefined);
@@ -637,6 +650,7 @@ async function createTour(req, res, user) {
   const island = ISLANDS.includes(body.island) ? body.island : null;
   const priceFrom = body.priceFrom !== "" ? Number(body.priceFrom) : null;
 
+  const genErrors = [];
   try {
     await query(
       `INSERT INTO tours (slug, status, island, price_from, published_at, created_by, data)
@@ -644,8 +658,8 @@ async function createTour(req, res, user) {
       [slug, status, island, priceFrom, status === "published" ? new Date() : null, user.userId, JSON.stringify(data)]
     );
     if (status === "published") {
-      await generateTourFile({ slug, status, island, price_from: priceFrom, data });
-      await regenerateListingPages();
+      collectGenErrors(genErrors, await generateTourFile({ slug, status, island, price_from: priceFrom, data }));
+      collectGenErrors(genErrors, await regenerateListingPages());
     }
   } catch (err) {
     console.error("[tours] create failed:", err.message);
@@ -664,7 +678,7 @@ async function createTour(req, res, user) {
 
   await logAudit(user, "create", "tour", slug, `Created tour "${data.name || slug}"`);
 
-  res.writeHead(302, { Location: "/admin/tours" });
+  res.writeHead(302, { Location: listRedirect(genErrors) });
   res.end();
 }
 
@@ -741,6 +755,7 @@ async function updateTour(req, res, user, id) {
     return;
   }
 
+  const genErrors = [];
   try {
     await query(
       `UPDATE tours SET slug = $1, status = $2, island = $3, price_from = $4,
@@ -754,11 +769,11 @@ async function updateTour(req, res, user, id) {
     // Slug can change on edit, so always clean up the old file first.
     if (existing.slug !== slug) removeTourFile(existing.slug);
     if (status === "published") {
-      await generateTourFile({ slug, status, island, price_from: priceFrom, data });
+      collectGenErrors(genErrors, await generateTourFile({ slug, status, island, price_from: priceFrom, data }));
     } else {
       removeTourFile(slug);
     }
-    await regenerateListingPages();
+    collectGenErrors(genErrors, await regenerateListingPages());
   } catch (err) {
     console.error("[tours] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another tour already uses this slug."] : [`Database error: ${err.message}`];
@@ -776,7 +791,7 @@ async function updateTour(req, res, user, id) {
 
   await logAudit(user, "update", "tour", slug, `Updated tour "${data.name || slug}"`);
 
-  res.writeHead(302, { Location: "/admin/tours" });
+  res.writeHead(302, { Location: listRedirect(genErrors) });
   res.end();
 }
 
@@ -1266,7 +1281,7 @@ async function importToursCsv(req, res, user) {
       changed = true;
     }
 
-    const fareharborRegularLink = (csvRow.fareharborRegularLink || "").trim();
+    const fareharborRegularLink = httpUrlOrEmpty(csvRow.fareharborRegularLink);
     if (fareharborRegularLink) { data.fareharborRegularLink = fareharborRegularLink; changed = true; }
     const fareharborCalendarScript = (csvRow.fareharborCalendarScript || "").trim();
     if (fareharborCalendarScript) { data.fareharborCalendarScript = fareharborCalendarScript; changed = true; }
@@ -1288,7 +1303,7 @@ async function importToursCsv(req, res, user) {
       changed = true;
     }
     [["tripadvisor", "Tripadvisor"], ["getyourguide", "Getyourguide"], ["viator", "Viator"]].forEach(([key, label]) => {
-      const url = (csvRow[`${key}Url`] || "").trim();
+      const url = httpUrlOrEmpty(csvRow[`${key}Url`]);
       const showCell = csvRow[`show${label}`];
       if (url) { blImport[key] = { ...(blImport[key] || {}), url }; changed = true; }
       if (showCell !== undefined && showCell !== "") { blImport[key] = { ...(blImport[key] || {}), show: csvTruthy(showCell) }; changed = true; }

@@ -46,7 +46,7 @@ ${extraHead || ""}
     <nav class="sidebar-nav">${nav}</nav>
     <div class="sidebar-user">
       Signed in as <strong>${esc(user.name || user.email)}</strong> (${esc(user.role)})<br>
-      <a href="/admin/logout">Log out</a>
+      <form method="POST" action="/admin/logout" style="display:inline;margin:0;"><button type="submit" style="background:none;border:none;padding:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;">Log out</button></form>
     </div>
   </aside>
   <main class="main-content">

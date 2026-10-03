@@ -24,6 +24,62 @@ function isAllowedDestination(urlStr) {
   }
 }
 
+/* ---- Keeping click analytics honest (A9) ----
+   A click is only recorded when: the tour slug is a real published tour, the
+   visitor isn't a known bot, and the same IP hasn't already logged more than
+   CLICK_LIMIT clicks in the last minute. The visitor is ALWAYS redirected —
+   these checks only decide whether the click is counted. */
+const { getClientIp } = require("../utils");
+
+const CLICK_LIMIT = 20;
+const CLICK_WINDOW_MS = 60 * 1000;
+const clickHits = new Map(); // ip -> [timestamps]
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, hits] of clickHits) {
+    const fresh = hits.filter((t) => now - t < CLICK_WINDOW_MS);
+    if (fresh.length) clickHits.set(ip, fresh); else clickHits.delete(ip);
+  }
+}, 5 * 60 * 1000).unref();
+
+let slugCache = { set: null, at: 0 };
+async function isPublishedSlug(slug) {
+  if (!slug) return false;
+  if (!slugCache.set || Date.now() - slugCache.at > 5 * 60 * 1000) {
+    try {
+      const r = await query(`SELECT slug FROM tours WHERE status = 'published'`);
+      slugCache = { set: new Set(r.rows.map((x) => x.slug)), at: Date.now() };
+    } catch (err) {
+      console.error("[click-tracking] could not load slugs:", err.message);
+      return true; // DB hiccup: don't drop real clicks
+    }
+  }
+  return slugCache.set.has(slug);
+}
+
+const BOT_UA = /bot|crawl|spider|slurp|facebookexternalhit|preview|headless|python-requests|curl|wget|httpclient|monitor/i;
+
+async function shouldCount(req, tourSlug) {
+  if (BOT_UA.test(req.headers["user-agent"] || "")) return false;
+  const ip = getClientIp(req);
+  const now = Date.now();
+  const hits = (clickHits.get(ip) || []).filter((t) => now - t < CLICK_WINDOW_MS);
+  if (hits.length >= CLICK_LIMIT) return false;
+  hits.push(now);
+  clickHits.set(ip, hits);
+  return isPublishedSlug(tourSlug);
+}
+
+async function recordClick(req, tourSlug, platform) {
+  try {
+    if (await shouldCount(req, tourSlug)) {
+      await query(`INSERT INTO click_logs (tour_slug, platform) VALUES ($1, $2)`, [tourSlug, platform]);
+    }
+  } catch (err) {
+    console.error("[click-tracking] failed to log click:", err.message);
+  }
+}
+
 /**
  * GET /api/track-click?tour=<slug>&platform=<fareharbor|tripadvisor|getyourguide|viator>&url=<encoded destination>
  * Public, unauthenticated. Logs the click (best-effort — never blocks the
@@ -42,13 +98,9 @@ async function trackClick(req, res, urlObj) {
     return;
   }
 
-  try {
-    await query(`INSERT INTO click_logs (tour_slug, platform) VALUES ($1, $2)`, [tourSlug, platform]);
-  } catch (err) {
-    console.error("[click-tracking] failed to log click (redirecting anyway):", err.message);
-  }
+  await recordClick(req, tourSlug, platform);
 
-  res.writeHead(302, { Location: destination });
+  res.writeHead(302, { Location: destination, "X-Robots-Tag": "noindex", "Cache-Control": "no-store" });
   res.end();
 }
 
@@ -70,11 +122,7 @@ async function logClick(req, res, urlObj) {
     return;
   }
 
-  try {
-    await query(`INSERT INTO click_logs (tour_slug, platform) VALUES ($1, $2)`, [tourSlug, platform]);
-  } catch (err) {
-    console.error("[click-tracking] failed to log click:", err.message);
-  }
+  await recordClick(req, tourSlug, platform);
 
   res.writeHead(204);
   res.end();

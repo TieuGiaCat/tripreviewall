@@ -15,8 +15,17 @@ function hashPassword(plain) {
   return `scrypt:${salt}:${hash}`;
 }
 
+// Hash of a random password, used so a login for an email that doesn't exist
+// takes the same time as one with a wrong password (no user enumeration by timing).
+const DUMMY_HASH = hashPassword(crypto.randomBytes(16).toString("hex"));
+
 function verifyPassword(plain, stored) {
-  if (!stored || !stored.startsWith("scrypt:")) return false;
+  if (!stored || !stored.startsWith("scrypt:")) {
+    stored = DUMMY_HASH;
+    const [, salt, hashHex] = stored.split(":");
+    crypto.timingSafeEqual(crypto.scryptSync(String(plain || ""), salt, 64), Buffer.from(hashHex, "hex"));
+    return false;
+  }
   const [, salt, hashHex] = stored.split(":");
   const candidate = crypto.scryptSync(plain, salt, 64);
   const expected = Buffer.from(hashHex, "hex");
@@ -33,13 +42,21 @@ function verifyPassword(plain, stored) {
 
 const { query } = require("./db");
 
+/* Only a SHA-256 hash of each session token is stored (A12): a leaked DB
+   dump or backup can't be used to log in as anyone. The raw token lives only
+   in the visitor's cookie. (Sessions created before this change no longer
+   match, so everyone is asked to sign in once after the update.) */
+function hashToken(token) {
+  return crypto.createHash("sha256").update(String(token)).digest("hex");
+}
+
 async function createSession(user) {
   const token = crypto.randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
   await query(
     `INSERT INTO admin_sessions (token, user_id, email, role, name, expires_at)
      VALUES ($1, $2, $3, $4, $5, $6)`,
-    [token, user.id, user.email, user.role, user.name, expiresAt]
+    [hashToken(token), user.id, user.email, user.role, user.name, expiresAt]
   );
   return token;
 }
@@ -58,13 +75,13 @@ async function getSession(token) {
        JOIN admin_users u ON u.id = s.user_id
       WHERE s.token = $1
       LIMIT 1`,
-    [token]
+    [hashToken(token)]
   );
   const row = result.rows[0];
   if (!row) return null;
   if (Date.now() > new Date(row.expires_at).getTime() || row.status !== "active") {
     // Expired or account disabled — clean it up and report as logged out.
-    query(`DELETE FROM admin_sessions WHERE token = $1`, [token]).catch(() => {});
+    query(`DELETE FROM admin_sessions WHERE token = $1`, [hashToken(token)]).catch(() => {});
     return null;
   }
   return {
@@ -80,7 +97,7 @@ async function getSession(token) {
 async function destroyUserSessions(userId, exceptToken) {
   if (!userId) return;
   if (exceptToken) {
-    await query(`DELETE FROM admin_sessions WHERE user_id = $1 AND token <> $2`, [userId, exceptToken]);
+    await query(`DELETE FROM admin_sessions WHERE user_id = $1 AND token <> $2`, [userId, hashToken(exceptToken)]);
   } else {
     await query(`DELETE FROM admin_sessions WHERE user_id = $1`, [userId]);
   }
@@ -88,7 +105,7 @@ async function destroyUserSessions(userId, exceptToken) {
 
 async function destroySession(token) {
   if (!token) return;
-  await query(`DELETE FROM admin_sessions WHERE token = $1`, [token]);
+  await query(`DELETE FROM admin_sessions WHERE token = $1`, [hashToken(token)]);
 }
 
 // Periodically sweep expired session rows so the table doesn't grow forever.

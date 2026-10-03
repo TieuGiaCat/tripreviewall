@@ -83,7 +83,7 @@ async function generateTourFile(tourRow) {
   await ensureSiteInfo();
   if (isReservedSlug(tourRow.slug)) {
     console.error(`[ssr] Refusing to generate a tour file for reserved slug "${tourRow.slug}".`);
-    return;
+    return { ok: false, error: `"${tourRow.slug}" is a reserved name — page not generated.` };
   }
   try {
     fs.mkdirSync(TOURS_DIR, { recursive: true });
@@ -103,8 +103,10 @@ async function generateTourFile(tourRow) {
     let html = renderTourPageHtml(tour, similar);
     html = await injectTracking(html);
     fs.writeFileSync(tourFilePath(tourRow.slug), html, "utf8");
+    return { ok: true };
   } catch (err) {
     console.error(`[ssr] Failed to generate tour page for "${tourRow.slug}":`, err.message);
+    return { ok: false, error: `Tour page "${tourRow.slug}" could not be written: ${err.message}` };
   }
 }
 
@@ -179,8 +181,10 @@ async function generatePostFile(postRow) {
     let html = renderPostPageHtml(post, relatedTour, relatedPosts, author);
     html = await injectTracking(html);
     fs.writeFileSync(postFilePath(postRow.slug), html, "utf8");
+    return { ok: true };
   } catch (err) {
     console.error(`[ssr] Failed to generate post page for "${postRow.slug}":`, err.message);
+    return { ok: false, error: `Article page "${postRow.slug}" could not be written: ${err.message}` };
   }
 }
 
@@ -220,12 +224,22 @@ async function generateStaticPages(allTours, allPosts) {
       written.push(page.output);
     } catch (err) {
       console.error(`[ssr] static page ${path.relative(PAGES_DIR, file)} failed:`, err.message);
+      generationErrors.push(`Page ${path.relative(PAGES_DIR, file)}: ${err.message}`);
     }
   }
   return written;
 }
 
+// Errors collected during the current regenerateListingPages() run.
+let generationErrors = [];
+
+/**
+ * Rebuilds home, /tours (+ pages), /blog, /destinations, island pages and the
+ * hand-written pages. Returns { ok, errors } so callers can tell the admin
+ * when something couldn't be written (B5) instead of failing silently.
+ */
 async function regenerateListingPages() {
+  generationErrors = [];
   try {
     await ensureSiteInfo();
     fs.mkdirSync(path.join(SITE_ROOT, "destinations"), { recursive: true });
@@ -283,7 +297,9 @@ async function regenerateListingPages() {
     await applyAllPageSeoOverrides();
   } catch (err) {
     console.error("[ssr] regenerateListingPages failed:", err.message);
+    generationErrors.push(`Listing pages could not be rebuilt: ${err.message}`);
   }
+  return { ok: generationErrors.length === 0, errors: generationErrors.slice() };
 }
 
 /**
@@ -293,17 +309,22 @@ async function regenerateListingPages() {
  * immediately, without needing to SSH in and run the script by hand).
  */
 async function regenerateAllPages() {
+  const errors = [];
   const toursResult = await query(`SELECT slug, status, island, price_from, data FROM tours WHERE status = 'published'`);
   for (const row of toursResult.rows) {
-    await generateTourFile(row);
+    const r = await generateTourFile(row);
+    if (r && !r.ok) errors.push(r.error);
   }
   const postsResult = await query(
     `SELECT slug, status, category, island_tag, content_format, published_at, updated_at, data FROM posts WHERE status = 'published'`
   );
   for (const row of postsResult.rows) {
-    await generatePostFile(row);
+    const r = await generatePostFile(row);
+    if (r && !r.ok) errors.push(r.error);
   }
-  await regenerateListingPages();
+  const listing = await regenerateListingPages();
+  errors.push(...listing.errors);
+  return { ok: errors.length === 0, errors, tours: toursResult.rows.length, posts: postsResult.rows.length };
 }
 
 module.exports = {

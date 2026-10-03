@@ -324,6 +324,13 @@ async function deleteUser(req, res, user, id) {
     if (target.rows[0]) await logAudit(user, "delete", "user", target.rows[0].email, `Deleted user "${target.rows[0].email}"`);
   } catch (err) {
     console.error("[users] delete failed:", err.message);
+    // Tell the admin instead of pretending it worked.
+    const msg = err.code === "23503"
+      ? "This user still owns content in the database. Run \"npm run migrate\" on the server once (it lets their tours/posts stay with no owner), then try again — or disable the account instead."
+      : `Could not delete this user: ${err.message}`;
+    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(layout({ title: "Error", activeNav: "users", user, body: `<div class="alert alert-error">${esc(msg)}</div><a href="/admin/users" class="btn btn-secondary">Back to Users</a>` }));
+    return;
   }
   res.writeHead(302, { Location: "/admin/users" });
   res.end();

@@ -101,4 +101,32 @@ function parseCookies(req) {
   return out;
 }
 
-module.exports = { slugify, esc, linesToArray, readFormBody, readJsonBody, parseCookies };
+/**
+ * The visitor's real IP. Nginx (our only front door) sends it in X-Real-IP
+ * and connects from loopback, so that header is only trusted when the TCP
+ * connection itself comes from 127.0.0.1 / ::1. X-Forwarded-For is ignored:
+ * its first value is whatever the client typed, which made the login lockout
+ * and lead-form limits trivially bypassable.
+ */
+function getClientIp(req) {
+  const socketIp = (req.socket && req.socket.remoteAddress) || "unknown";
+  const fromLoopback = socketIp === "127.0.0.1" || socketIp === "::1" || socketIp === "::ffff:127.0.0.1";
+  const realIp = req.headers["x-real-ip"];
+  if (fromLoopback && realIp && /^[0-9a-fA-F:.]{3,45}$/.test(realIp.trim())) return realIp.trim();
+  // Fallback when nginx doesn't set X-Real-IP: with $proxy_add_x_forwarded_for
+  // nginx APPENDS the real address, so the LAST entry is the trustworthy one.
+  const fwd = req.headers["x-forwarded-for"];
+  if (fromLoopback && fwd) {
+    const last = fwd.split(",").pop().trim();
+    if (/^[0-9a-fA-F:.]{3,45}$/.test(last)) return last;
+  }
+  return socketIp;
+}
+
+/** Keeps a URL only if it's http(s) — blocks javascript:, data: and other schemes in link fields. */
+function httpUrlOrEmpty(value) {
+  const v = String(value || "").trim();
+  return /^https?:\/\/[^\s"'<>]+$/i.test(v) ? v : "";
+}
+
+module.exports = { slugify, esc, linesToArray, readFormBody, readJsonBody, parseCookies, getClientIp, httpUrlOrEmpty };

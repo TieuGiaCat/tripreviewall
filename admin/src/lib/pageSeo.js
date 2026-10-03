@@ -24,7 +24,8 @@ function applyMetaTags(html, metaTitle, metaDescription) {
   if (metaTitle) {
     const titleTag = `<title>${esc(metaTitle)}</title>`;
     if (/<title[^>]*>[\s\S]*?<\/title>/i.test(headSection)) {
-      headSection = headSection.replace(/<title[^>]*>[\s\S]*?<\/title>/i, titleTag);
+      // Function replacer: a "$" in the title must not be read as a regex replacement pattern.
+      headSection = headSection.replace(/<title[^>]*>[\s\S]*?<\/title>/i, () => titleTag);
     } else {
       headSection = headSection.replace(/<head[^>]*>/i, (m) => `${m}\n${titleTag}`);
     }
@@ -35,11 +36,19 @@ function applyMetaTags(html, metaTitle, metaDescription) {
     // Matches <meta ... name="description" ...> regardless of attribute order/quote style.
     const descRe = /<meta\b[^>]*\bname\s*=\s*["']description["'][^>]*>/i;
     if (descRe.test(headSection)) {
-      headSection = headSection.replace(descRe, descTag);
+      headSection = headSection.replace(descRe, () => descTag);
     } else {
       headSection = headSection.replace(/<head[^>]*>/i, (m) => `${m}\n${descTag}`);
     }
   }
+
+  // Keep the social-share titles in step with the SEO override.
+  const setMeta = (attr, name, value) => {
+    const re = new RegExp(`<meta\\b[^>]*\\b${attr}\\s*=\\s*["']${name}["'][^>]*>`, "i");
+    if (re.test(headSection)) headSection = headSection.replace(re, () => `<meta ${attr}="${name}" content="${esc(value)}">`);
+  };
+  if (metaTitle) { setMeta("property", "og:title", metaTitle); setMeta("name", "twitter:title", metaTitle); }
+  if (metaDescription) { setMeta("property", "og:description", metaDescription); setMeta("name", "twitter:description", metaDescription); }
 
   // Splice the (possibly modified) head section back into the full document,
   // replacing only the original <head>...</head> span.
@@ -54,13 +63,23 @@ async function applyPageSeoOverride(pageKey) {
   return applyToFile(row.file_path, row.meta_title, row.meta_description);
 }
 
+/** Only .html files inside the site root can ever be rewritten (never images, JS, or anything outside). */
+function safeHtmlPath(filePath) {
+  const rel = String(filePath || "").replace(/^\/+/, "");
+  if (!/\.html$/i.test(rel)) return null;
+  const root = path.resolve(SITE_ROOT);
+  const full = path.resolve(root, rel);
+  return full.startsWith(root + path.sep) ? full : null;
+}
+
 async function applyToFile(filePath, metaTitle, metaDescription) {
   if (!metaTitle && !metaDescription) return { applied: false, reason: "Nothing to apply." };
-  const fullPath = path.join(SITE_ROOT, filePath);
+  const fullPath = safeHtmlPath(filePath);
+  if (!fullPath) return { applied: false, reason: `Not an .html file inside the site: ${filePath}` };
   if (!fs.existsSync(fullPath)) return { applied: false, reason: `File not found: ${filePath}` };
   const html = fs.readFileSync(fullPath, "utf8");
   const updated = applyMetaTags(html, metaTitle, metaDescription);
-  fs.writeFileSync(fullPath, updated, "utf8");
+  if (updated !== html) fs.writeFileSync(fullPath, updated, "utf8");
   return { applied: true };
 }
 
@@ -88,4 +107,4 @@ async function applyAllPageSeoOverrides() {
   }
 }
 
-module.exports = { applyMetaTags, applyPageSeoOverride, applyAllPageSeoOverrides };
+module.exports = { applyMetaTags, applyPageSeoOverride, applyAllPageSeoOverrides, safeHtmlPath };
