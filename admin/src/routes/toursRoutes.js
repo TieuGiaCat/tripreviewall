@@ -765,6 +765,7 @@ const EXPORT_COLUMNS = [
   "priceFrom",
   "location_lat", "location_lng",
   "fareharborItemId",
+  "metaTitle", "metaDescription",
   "fareharborRegularLink", "fareharborCalendarScript", "showFareharbor",
   "tripadvisorUrl", "showTripadvisor",
   "getyourguideUrl", "showGetyourguide",
@@ -779,7 +780,7 @@ const REFERENCE_ONLY_COLUMNS = new Set(["slug", "name", "island", "status"]);
 
 function csvEscape(value) {
   const s = value === null || value === undefined ? "" : String(value);
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
 
@@ -815,6 +816,8 @@ async function exportToursCsv(req, res, user) {
       viator_rating: rbs.viator ? rbs.viator.avg : "", viator_count: rbs.viator ? rbs.viator.count : "",
       location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
       fareharborItemId: d.fareharborItemId || "",
+      metaTitle: d.metaTitle || "",
+      metaDescription: d.metaDescription || "",
       fareharborRegularLink: d.fareharborRegularLink || "",
       fareharborCalendarScript: d.fareharborCalendarScript || "",
       showFareharbor: bl.fareharbor && bl.fareharbor.show === false ? "FALSE" : "TRUE",
@@ -832,7 +835,9 @@ async function exportToursCsv(req, res, user) {
     "Content-Type": "text/csv; charset=utf-8",
     "Content-Disposition": `attachment; filename="tours-export-${new Date().toISOString().slice(0, 10)}.csv"`,
   });
-  res.end(lines.join("\n"));
+  // Leading BOM so Excel opens the file as UTF-8 (em dashes, accents in meta
+  // text would otherwise show as garbage). parseCsv strips it on re-import.
+  res.end("\uFEFF" + lines.join("\n"));
 }
 
 function renderImportForm({ report = null, backfillReport = null } = {}) {
@@ -863,7 +868,8 @@ function renderImportForm({ report = null, backfillReport = null } = {}) {
           ${report.notice ? esc(report.notice) + "<br>" : `${report.updated} tour${report.updated === 1 ? "" : "s"} updated. `}
           ${report.unchanged ? `${report.unchanged} row(s) had no changes.` : ""}
           ${report.errors.length ? `<br>${report.errors.map(esc).join("<br>")}` : ""}
-        </div>` : ""}
+        </div>
+        ${report.warnings && report.warnings.length ? `<div class="alert" style="background:#fff8e1;border:1px solid #f0c36d;color:#7a5a00;">⚠ ${report.warnings.map(esc).join("<br>⚠ ")}</div>` : ""}` : ""}
       <form method="POST" action="/admin/tours/import" enctype="multipart/form-data">
         <div class="form-field">
           <label>CSV file (must include the "fareharborItemId" column — everything else is optional)</label>
@@ -875,8 +881,9 @@ function renderImportForm({ report = null, backfillReport = null } = {}) {
 
     <div class="form-card">
       <h2>Columns this tool updates</h2>
-      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
+      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, metaTitle, metaDescription, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, fareharbor/tripadvisor/getyourguide/viator rating+count.
       The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect. <strong>fareharborItemId is the match key</strong> — it must be present and correct for a row to update anything.</p>
+      <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Meta Title / Meta Description:</strong> aim for ≤ 60 characters (title) and ≤ 160 characters (description). Longer values are still saved but Google will cut them off in search results. A blank cell keeps the current value.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
     </div>
 
@@ -976,6 +983,7 @@ async function importToursCsv(req, res, user) {
 
   let updated = 0, unchanged = 0;
   const errors = [];
+  const warnings = [];
   let anyPublishedTouched = false;
 
   // Look tours up by fareharborItemId now (not slug) — build the lookup once.
@@ -1043,6 +1051,17 @@ async function importToursCsv(req, res, user) {
     const fareharborCalendarScript = (csvRow.fareharborCalendarScript || "").trim();
     if (fareharborCalendarScript) { data.fareharborCalendarScript = fareharborCalendarScript; changed = true; }
 
+    // SEO meta — blank cell = keep current value. Whitespace/newlines collapsed
+    // because a title/description must be a single line in <head>.
+    const metaWarnings = [];
+    [["metaTitle", 60], ["metaDescription", 160]].forEach(([key, limit]) => {
+      const v = String(csvRow[key] || "").replace(/\s+/g, " ").trim();
+      if (!v) return;
+      if (v.length > limit) metaWarnings.push(`${key} is ${v.length} chars (recommended ≤ ${limit})`);
+      if (v !== (data[key] || "")) { data[key] = v; changed = true; }
+    });
+    if (metaWarnings.length) warnings.push(`${fhId} (${slug}): saved, but ${metaWarnings.join("; ")} — Google may truncate it.`);
+
     const blImport = { ...(data.bookingLinks || {}) };
     if (csvRow.showFareharbor !== undefined && csvRow.showFareharbor !== "") {
       blImport.fareharbor = { ...(blImport.fareharbor || {}), show: csvTruthy(csvRow.showFareharbor) };
@@ -1080,5 +1099,5 @@ async function importToursCsv(req, res, user) {
   }
 
   res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated, unchanged, errors } }) }));
+  res.end(layout({ title: "Import Tours", activeNav: "tours", user, body: renderImportForm({ report: { updated, unchanged, errors, warnings } }) }));
 }
