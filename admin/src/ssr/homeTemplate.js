@@ -1,5 +1,6 @@
 const { esc } = require("../utils");
-const { tourCardHtml } = require("./sharedHtml");
+const { ASSET_V } = require("./assetVersion");
+const { tourCardHtml, imgUrl } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
 const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
@@ -14,7 +15,7 @@ const CAT_GRADIENTS = {
 };
 
 function blogCardHtml(p) {
-  const bg = p.featuredImage ? `url('${esc(p.featuredImage)}')` : (CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
+  const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
   return `
     <a href="/blog/${esc(p.slug)}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
@@ -59,9 +60,12 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
 <meta name="twitter:title" content="Tripreviewall — Honest Hawaii Tour Reviews">
 <meta name="twitter:description" content="We aggregate real Hawaii tour reviews — then show you the full picture, 5-star and 1-star alike.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
 </head>
 <body>
 
@@ -211,7 +215,7 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
       <div class="dest-grid">
         ${ISLANDS.map((isl) => {
           const heroImage = destinationsBySlug[isl.slug] && destinationsBySlug[isl.slug].heroImage;
-          const bg = heroImage ? `url('${esc(heroImage)}')` : isl.gradient;
+          const bg = heroImage ? `url('${esc(imgUrl(heroImage, 800))}')` : isl.gradient;
           return `
         <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${bg}; background-size:cover; background-position:center;">
           <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
@@ -251,8 +255,8 @@ function renderHomeHtml(tours, posts, islandCounts, destinationsBySlug = {}) {
   </div>
 </footer>
 
-<script src="js/data-loader.js"></script>
-<script src="js/main.js"></script>
+<script src="js/data-loader.js?v=${ASSET_V}"></script>
+<script src="js/main.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }

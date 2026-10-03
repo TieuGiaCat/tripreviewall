@@ -1,4 +1,5 @@
 const { esc } = require("./utils");
+const ADMIN_CSS_V = Date.now().toString(36); // changes on every pm2 restart → fresh admin.css after deploys
 
 const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", href: "/admin/dashboard" },
@@ -35,7 +36,7 @@ function layout({ title, activeNav, user, body, extraHead, extraScripts }) {
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#0B3B4F">
 <title>${esc(title)} — Tripreviewall Admin</title>
-<link rel="stylesheet" href="/admin/public/admin.css">
+<link rel="stylesheet" href="/admin/public/admin.css?v=${ADMIN_CSS_V}">
 ${extraHead || ""}
 </head>
 <body>
@@ -95,7 +96,7 @@ function loginPage({ error } = {}) {
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#0B3B4F">
 <title>Log in — Tripreviewall Admin</title>
-<link rel="stylesheet" href="/admin/public/admin.css">
+<link rel="stylesheet" href="/admin/public/admin.css?v=${ADMIN_CSS_V}">
 </head>
 <body>
 <div class="login-wrap">

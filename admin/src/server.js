@@ -40,29 +40,76 @@ const MIME_TYPES = {
 
 const UPLOADS_DIR = path.join(__dirname, "..", "public", "uploads");
 
-function serveUpload(req, res, urlPath) {
-  // urlPath is like "/uploads/tours/xyz.jpg" — strip the "/uploads" prefix
-  const rel = urlPath.replace(/^\/uploads\//, "");
-  const filePath = path.join(UPLOADS_DIR, rel);
+const RESIZE_WIDTHS = new Set([160, 400, 800, 1200, 1600]);
+const RESIZE_CACHE_DIR = path.join(UPLOADS_DIR, ".resized");
+// Upload filenames carry a timestamp + random suffix, so a URL's content never
+// changes — safe for browsers/CDNs to cache for a long time.
+const UPLOAD_CACHE_HEADER = "public, max-age=2592000";
 
-  if (!filePath.startsWith(UPLOADS_DIR)) {
-    res.writeHead(403);
-    res.end("Forbidden");
-    return;
-  }
-
+function sendFile(res, filePath, contentType) {
   fs.readFile(filePath, (err, content) => {
     if (err) {
       res.writeHead(404, { "Content-Type": "text/plain" });
       res.end("Not found");
       return;
     }
-    const ext = path.extname(filePath);
-    res.writeHead(200, {
-      "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
-      "Cache-Control": "public, max-age=86400",
-    });
+    res.writeHead(200, { "Content-Type": contentType, "Cache-Control": UPLOAD_CACHE_HEADER });
     res.end(content);
+  });
+}
+
+/**
+ * /uploads/<path>        → the original file
+ * /uploads/<path>?w=800  → a WebP resized to 800px wide (never upscaled),
+ *                          generated once with sharp and cached under
+ *                          uploads/.resized/w800/<path>.webp
+ * Any failure while resizing falls back to the original file, so a page can
+ * never lose an image because of this.
+ */
+function serveUpload(req, res, urlPath) {
+  // urlPath is like "/uploads/tours/xyz.jpg" — strip the "/uploads" prefix
+  let rel;
+  try { rel = decodeURIComponent(urlPath.replace(/^\/uploads\//, "")); } catch (e) { rel = ""; }
+  const filePath = path.join(UPLOADS_DIR, rel);
+
+  if (!filePath.startsWith(UPLOADS_DIR + path.sep) || rel.startsWith(".resized")) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
+
+  const ext = path.extname(filePath).toLowerCase();
+  const contentType = MIME_TYPES[ext] || "application/octet-stream";
+  const w = Number(new URL(req.url, "http://x").searchParams.get("w"));
+  const resizable = RESIZE_WIDTHS.has(w) && [".jpg", ".jpeg", ".png", ".webp"].includes(ext);
+  if (!resizable) return sendFile(res, filePath, contentType);
+
+  const cachedPath = path.join(RESIZE_CACHE_DIR, `w${w}`, rel + ".webp");
+  fs.stat(filePath, (errOrig, origStat) => {
+    if (errOrig) return sendFile(res, filePath, contentType); // → 404
+    fs.stat(cachedPath, (errCache, cacheStat) => {
+      if (!errCache && cacheStat.mtimeMs >= origStat.mtimeMs) return sendFile(res, cachedPath, "image/webp");
+      let sharp;
+      try { sharp = require("sharp"); } catch (e) { return sendFile(res, filePath, contentType); }
+      const tmpPath = `${cachedPath}.${process.pid}.${Date.now()}.tmp`;
+      fs.mkdir(path.dirname(cachedPath), { recursive: true }, (mkErr) => {
+        if (mkErr) return sendFile(res, filePath, contentType);
+        sharp(filePath)
+          .rotate()
+          .resize({ width: w, withoutEnlargement: true })
+          .webp({ quality: 72 })
+          .toFile(tmpPath)
+          .then(() => fs.rename(tmpPath, cachedPath, (rnErr) => {
+            if (rnErr) { fs.unlink(tmpPath, () => {}); return sendFile(res, filePath, contentType); }
+            sendFile(res, cachedPath, "image/webp");
+          }))
+          .catch((e) => {
+            console.error(`[uploads] resize failed for ${rel} @${w}px: ${e.message}`);
+            fs.unlink(tmpPath, () => {});
+            sendFile(res, filePath, contentType);
+          });
+      });
+    });
   });
 }
 

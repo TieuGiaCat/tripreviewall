@@ -1,5 +1,21 @@
 const { esc } = require("../utils");
 
+/* ---- Responsive images ----
+   Locally uploaded images (/uploads/...) can be requested at a smaller width
+   with ?w=N — the admin server resizes once with sharp, caches the WebP on
+   disk and serves the cached copy afterwards (see server.js serveUpload).
+   External URLs and SVGs are returned untouched. */
+const IMG_WIDTHS = [160, 400, 800, 1200, 1600];
+function imgUrl(url, w) {
+  if (!url) return url;
+  if (!/\/uploads\//.test(url) || /\.svg$/i.test(url) || url.includes("?")) return url;
+  return `${url}?w=${w}`;
+}
+function imgSrcset(url, widths) {
+  if (!url || imgUrl(url, 1) === url) return "";
+  return widths.map((w) => `${imgUrl(url, w)} ${w}w`).join(", ");
+}
+
 function starsSvgHtml(fillVar) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="${fillVar}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
 }
@@ -29,7 +45,7 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
   return `
     <article class="tour-card">
       <div class="tour-card-image-wrap" style="background:${img ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
-        ${img ? `<img class="tour-photo" src="${esc(img)}" alt="${esc(tour.title)} — ${esc(tour.company)}" style="opacity:0;transition:opacity 0.35s ease;" onload="this.style.opacity='1';" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
+        ${img ? `<img class="tour-photo" src="${esc(imgUrl(img, 400))}"${imgSrcset(img, [400, 800]) ? ` srcset="${esc(imgSrcset(img, [400, 800]))}" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""} width="400" height="300" loading="lazy" decoding="async" alt="${esc(tour.title)} — ${esc(tour.company)}" onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
       </div>
       <div class="tour-card-body">
         <div class="tour-card-eyebrow">${esc((tour.island || "").toUpperCase())} · ${esc((tour.tourType || "").toUpperCase())}</div>
@@ -49,4 +65,4 @@ function tourCardHtml(tour, linkPrefix, imgPrefix) {
     </article>`;
 }
 
-module.exports = { starsRowHtml, histogramHtml, tourCardHtml };
+module.exports = { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset, IMG_WIDTHS };

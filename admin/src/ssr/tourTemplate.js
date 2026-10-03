@@ -1,5 +1,9 @@
 const { esc } = require("../utils");
-const { starsRowHtml, histogramHtml, tourCardHtml } = require("./sharedHtml");
+const { ASSET_V } = require("./assetVersion");
+const { starsRowHtml, histogramHtml, tourCardHtml, imgUrl, imgSrcset } = require("./sharedHtml");
+
+const HERO_SIZES = "(min-width: 1280px) 1200px, 100vw";
+const HERO_WIDTHS = [400, 800, 1200, 1600];
 
 const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
 
@@ -138,6 +142,55 @@ function trackingUrl(tourSlug, platform, realUrl) {
   return `/api/track-click?tour=${encodeURIComponent(tourSlug)}&platform=${platform}&url=${encodeURIComponent(realUrl)}`;
 }
 
+/** Every booking option that is switched on for this tour, FareHarbor first. */
+function bookingOptions(tour) {
+  const bl = tour.bookingLinks || {};
+  const list = [];
+  if ((!bl.fareharbor || bl.fareharbor.show !== false) && tour.fareharborRegularLink) {
+    list.push({ key: "fareharbor", label: "FareHarbor", note: "Operator's own booking system — no third-party markup", url: tour.fareharborRegularLink });
+  }
+  [["viator", "Viator"], ["getyourguide", "GetYourGuide"], ["tripadvisor", "TripAdvisor"]].forEach(([key, label]) => {
+    if (bl[key] && bl[key].show && bl[key].url) list.push({ key, label, note: "Book on " + label, url: bl[key].url });
+  });
+  return list;
+}
+
+/** Sticky bottom bar on phones/tablets + a bottom sheet listing every booking site. */
+function mobileBookingHtml(tour) {
+  const options = bookingOptions(tour);
+  const primary = options[0];
+  const arrow = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+  return `
+<div class="mobile-booking-bar" id="mobile-booking-bar">
+  <div class="mobile-booking-price"><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">$${tour.priceFrom}</div></div>
+  <div class="mobile-booking-actions">
+    ${options.length > 1 ? `<button type="button" class="btn btn-secondary mobile-more-btn" onclick="toggleBookingSheet(true)" aria-haspopup="dialog" aria-controls="booking-sheet">${options.length} options</button>` : ""}
+    ${primary ? `<a href="${esc(trackingUrl(tour.slug, primary.key, primary.url))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">${primary.key === "fareharbor" ? "Check Availability" : "Book on " + esc(primary.label)}</a>` : ""}
+  </div>
+</div>
+${options.length > 1 ? `
+<div class="booking-sheet-backdrop" id="booking-sheet-backdrop" onclick="toggleBookingSheet(false)" hidden></div>
+<div class="booking-sheet" id="booking-sheet" role="dialog" aria-modal="true" aria-labelledby="booking-sheet-title" hidden>
+  <div class="booking-sheet-head">
+    <h3 id="booking-sheet-title">Book this tour on</h3>
+    <button type="button" class="booking-sheet-close" onclick="toggleBookingSheet(false)" aria-label="Close">&times;</button>
+  </div>
+  <div class="booking-sheet-list">
+    ${options.map((o) => `<a class="booking-sheet-item${o.key === "fareharbor" ? " is-primary" : ""}" href="${esc(trackingUrl(tour.slug, o.key, o.url))}" target="_blank" rel="noopener sponsored"><span><strong>${esc(o.label)}</strong><small>${esc(o.note)}</small></span>${arrow}</a>`).join("")}
+  </div>
+  <p class="booking-disclosure">Tripreviewall may earn a commission if you book through these links, at no extra cost to you.</p>
+</div>
+<script>
+  function toggleBookingSheet(open) {
+    var sheet = document.getElementById('booking-sheet');
+    var backdrop = document.getElementById('booking-sheet-backdrop');
+    sheet.hidden = !open; backdrop.hidden = !open;
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggleBookingSheet(false); });
+</script>` : ""}`;
+}
+
 function bookingSidebarHtml(tour) {
   const bl = tour.bookingLinks || {};
   const showFareharbor = !bl.fareharbor || bl.fareharbor.show !== false;
@@ -151,7 +204,7 @@ function bookingSidebarHtml(tour) {
   const enabled = platforms.filter((p) => bl[p.key] && bl[p.key].show && bl[p.key].url);
 
   return `
-    <aside class="detail-sidebar-col">
+    <aside class="detail-sidebar-col" id="booking">
       <div class="booking-card">
         <div class="booking-price-label">From</div>
         <div class="booking-price tabular">$${tour.priceFrom}</div>
@@ -245,10 +298,14 @@ ${heroImg ? `<meta property="og:image" content="${SITE_URL}${heroImg}">` : ""}
 ${heroImg ? `<meta name="twitter:image" content="${SITE_URL}${heroImg}">` : ""}
 ${jsonLd(tour)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../css/tour-detail.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+${heroImg ? `<link rel="preload" as="image" href="${esc(imgUrl(heroImg, 800))}"${imgSrcset(heroImg, HERO_WIDTHS) ? ` imagesrcset="${esc(imgSrcset(heroImg, HERO_WIDTHS))}" imagesizes="${HERO_SIZES}"` : ""} fetchpriority="high">` : ""}
+<link rel="stylesheet" href="../css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="../css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="../css/tour-detail.css?v=${ASSET_V}">
 </head>
 <body>
 
@@ -315,11 +372,13 @@ ${jsonLd(tour)}
     </div>
 
     <div class="gallery">
-      <div class="gallery-main tour-photo" id="gallery-main" ${heroImg ? `style="background-image:url('${heroImg}')"` : `style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"`}></div>
+      <div class="gallery-main tour-photo" id="gallery-main"${heroImg ? "" : ` style="background:linear-gradient(135deg,#0B3B4F,#5C8A72);"`}>
+        ${heroImg ? `<img id="gallery-main-img" src="${esc(imgUrl(heroImg, 800))}"${imgSrcset(heroImg, HERO_WIDTHS) ? ` srcset="${esc(imgSrcset(heroImg, HERO_WIDTHS))}" sizes="${HERO_SIZES}"` : ""} width="1600" height="900" fetchpriority="high" decoding="async" alt="${esc(tour.title)} — ${esc(tour.company)}">` : ""}
+      </div>
     </div>
     ${(tour.gallery || []).length > 1 ? `
     <div class="gallery-thumbs" id="gallery-thumbs">
-      ${tour.gallery.map((url, i) => `<div class="gallery-thumb tour-photo${i === 0 ? " active" : ""}" data-url="${esc(url)}" style="background-image:url('${esc(url)}')"></div>`).join("")}
+      ${tour.gallery.map((url, i) => `<button type="button" class="gallery-thumb tour-photo${i === 0 ? " active" : ""}" data-src="${esc(imgUrl(url, 800))}" data-srcset="${esc(imgSrcset(url, HERO_WIDTHS))}" aria-label="Show photo ${i + 1} of ${tour.gallery.length}"><img src="${esc(imgUrl(url, 160))}" width="160" height="120" loading="lazy" decoding="async" alt=""></button>`).join("")}
     </div>` : ""}
     <p class="gallery-caption">Photo: Operator</p>
 
@@ -386,10 +445,7 @@ ${jsonLd(tour)}
   </div>
 </main>
 
-<div class="mobile-booking-bar" id="mobile-booking-bar">
-  <div><div style="font-size:11px;color:var(--color-text-muted);">From</div><div class="price tabular">$${tour.priceFrom}</div></div>
-  ${tour.fareharborRegularLink ? `<a href="${esc(trackingUrl(tour.slug, "fareharbor", tour.fareharborRegularLink))}" class="btn btn-primary" target="_blank" rel="noopener sponsored">Check Availability</a>` : ""}
-</div>
+${mobileBookingHtml(tour)}
 
 <footer class="site-footer">
   <div class="container">
@@ -410,21 +466,38 @@ ${jsonLd(tour)}
   </div>
 </footer>
 
-<script src="../js/main.js"></script>
+<script src="../js/main.js?v=${ASSET_V}"></script>
 <script>
   function switchDetailTab(targetId, clickedBtn, evt) {
     if (evt) { evt.preventDefault(); evt.stopPropagation(); }
-    document.querySelectorAll('.content-tab-panel').forEach(function (panel) {
-      panel.style.display = panel.id === targetId ? '' : 'none';
+    var panel = document.getElementById(targetId);
+    document.querySelectorAll('.content-tab-panel').forEach(function (p) {
+      p.style.display = p.id === targetId ? '' : 'none';
     });
     document.querySelectorAll('.content-tab').forEach(function (btn) {
       btn.classList.remove('active');
     });
-    if (clickedBtn) clickedBtn.classList.add('active');
+    if (clickedBtn) {
+      clickedBtn.classList.add('active');
+      // Slide the tab strip sideways so the chosen tab is fully visible (mobile).
+      var strip = clickedBtn.parentElement;
+      var left = clickedBtn.offsetLeft - (strip.clientWidth - clickedBtn.offsetWidth) / 2;
+      strip.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+    }
+    // Only scroll the page when the new panel would start hidden under the
+    // sticky header + tab strip; otherwise the page stays exactly where it is.
+    var tabsBar = document.querySelector('.content-tabs');
+    if (panel && tabsBar) {
+      var barBottom = tabsBar.getBoundingClientRect().bottom;
+      var panelTop = panel.getBoundingClientRect().top;
+      if (panelTop < barBottom) {
+        window.scrollTo({ top: window.scrollY + panelTop - barBottom - 8, behavior: 'smooth' });
+      }
+    }
     return false;
   }
 </script>
-<script src="../js/tour-static-hydrate.js"></script>
+<script src="../js/tour-static-hydrate.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }

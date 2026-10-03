@@ -63,7 +63,7 @@ function fmtDate(d) {
 
 function articleCard(p) {
   const grad = p.featuredImage ? null : (CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
-  const bg = p.featuredImage ? `url('${p.featuredImage}')` : grad;
+  const bg = p.featuredImage ? `url('${typeof resizedImg === "function" ? resizedImg(p.featuredImage, 800) : p.featuredImage}')` : grad;
   return `
     <a href="/blog/${p.slug}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>

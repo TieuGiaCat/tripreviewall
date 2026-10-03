@@ -1,5 +1,6 @@
 const { esc } = require("../utils");
-const { tourCardHtml } = require("./sharedHtml");
+const { ASSET_V } = require("./assetVersion");
+const { tourCardHtml, imgUrl } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
 const SITE_URL = process.env.SITE_URL || "https://tripreviewall.com";
@@ -102,10 +103,13 @@ function renderToursIndexHtml(tours) {
 <meta name="twitter:title" content="All Hawaii Tours — Tripreviewall">
 <meta name="twitter:description" content="${tours.length} Hawaii tours compared across FareHarbor, TripAdvisor and GetYourGuide.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/all-tours.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/all-tours.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -151,9 +155,9 @@ ${HEADER(0)}
   </div>
 </main>
 ${FOOTER(0)}
-<script src="js/data-loader.js"></script>
-<script src="js/main.js"></script>
-<script src="js/all-tours.js"></script>
+<script src="js/data-loader.js?v=${ASSET_V}"></script>
+<script src="js/main.js?v=${ASSET_V}"></script>
+<script src="js/all-tours.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
@@ -169,7 +173,7 @@ function blogCardHtml(p, prefix) {
     "Booking & Practical Info": "linear-gradient(135deg,#26313A,#B8592F)",
     "Planning & Comparisons": "linear-gradient(135deg,#5C8A72,#0B3B4F)",
   };
-  const bg = p.featuredImage ? `url('${esc(p.featuredImage)}')` : (gradients[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
+  const bg = p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : (gradients[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
   return `
     <a href="/blog/${esc(p.slug)}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
@@ -189,7 +193,7 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
   const pillarCards = pillarPosts
     .map((p) => `
       <a class="pillar-card" href="/blog/${esc(p.slug)}">
-        <div class="pillar-card-img" style="background-image:${p.featuredImage ? `url('${esc(p.featuredImage)}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};"></div>
+        <div class="pillar-card-img" style="background-image:${p.featuredImage ? `url('${esc(imgUrl(p.featuredImage, 800))}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};"></div>
         <div class="pillar-card-title">${esc(p.title)}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </div>
@@ -222,10 +226,13 @@ function renderBlogIndexHtml(posts, pillarPosts = []) {
 <meta name="twitter:title" content="All Articles — Tripreviewall">
 <meta name="twitter:description" content="Straight talk on Hawaii tours — what's actually worth booking, what to skip, and why.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/blog.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/blog.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -265,9 +272,9 @@ ${HEADER(0)}
   </div>
 </main>
 ${FOOTER(0)}
-<script src="js/data-loader.js"></script>
-<script src="js/main.js"></script>
-<script src="js/blog.js"></script>
+<script src="js/data-loader.js?v=${ASSET_V}"></script>
+<script src="js/main.js?v=${ASSET_V}"></script>
+<script src="js/blog.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
@@ -298,10 +305,13 @@ function renderDestinationsHubHtml(islandCounts, destinationsBySlug = {}) {
 <meta property="og:description" content="Browse honest, aggregated Hawaii tour reviews by island.">
 <meta property="og:url" content="${SITE_URL}/destinations">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/pages.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="css/pages.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -318,7 +328,7 @@ ${HEADER(0)}
     <div class="dest-grid" style="margin-bottom:96px;">
       ${ISLANDS.map((isl) => {
         const heroImage = destinationsBySlug[isl.slug] && destinationsBySlug[isl.slug].heroImage;
-        const bg = heroImage ? `url('${esc(heroImage)}')` : isl.gradient;
+        const bg = heroImage ? `url('${esc(imgUrl(heroImage, 800))}')` : isl.gradient;
         return `
       <a class="dest-card" href="/destinations/${isl.slug}" style="background-image:${bg}; background-size:cover; background-position:center;">
         <div class="dest-card-content"><h3 class="dest-card-name">${isl.name}</h3>
@@ -329,7 +339,7 @@ ${HEADER(0)}
   </div>
 </main>
 ${FOOTER(0)}
-<script src="js/main.js"></script>
+<script src="js/main.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
@@ -373,10 +383,13 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 ${heroImage ? `<meta property="og:image" content="${SITE_URL}${heroImage}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../css/pages.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="../css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="../css/pages.css?v=${ASSET_V}">
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
@@ -393,7 +406,7 @@ ${HEADER(1)}
       ${ISLANDS.map((i) => `<a class="dest-island-tab${i.slug === island.slug ? " active" : ""}" href="/destinations/${i.slug}">${i.name}</a>`).join("")}
     </div>
 
-    <div class="dest-hero" style="background-image:${heroImage ? `url('${esc(heroImage)}')` : island.gradient}; background-size:cover; background-position:center;">
+    <div class="dest-hero" style="background-image:${heroImage ? `url('${esc(imgUrl(heroImage, 1600))}')` : island.gradient}; background-size:cover; background-position:center;">
       <div class="dest-hero-content">
         <h1>${island.name}</h1>
         <p>${islandTours.length} tours tracked</p>
@@ -413,7 +426,7 @@ ${HEADER(1)}
   </div>
 </main>
 ${FOOTER(1)}
-<script src="../js/main.js"></script>
+<script src="../js/main.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }

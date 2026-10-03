@@ -13,33 +13,22 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initGalleryThumbs() {
-  const main = document.getElementById("gallery-main");
+  const mainImg = document.getElementById("gallery-main-img");
   document.querySelectorAll(".gallery-thumb").forEach((thumb) => {
     thumb.addEventListener("click", () => {
       document.querySelectorAll(".gallery-thumb").forEach((t) => t.classList.remove("active"));
       thumb.classList.add("active");
-      main.style.backgroundImage = `url('${thumb.dataset.url}')`;
+      if (!mainImg) return;
+      if (thumb.dataset.srcset) mainImg.srcset = thumb.dataset.srcset; else mainImg.removeAttribute("srcset");
+      mainImg.src = thumb.dataset.src || thumb.dataset.url;
     });
   });
 }
 
-function initTabScrollSpy() {
-  const tabs = document.querySelectorAll(".content-tab");
-  const sections = [...tabs].map((t) => document.getElementById(t.dataset.target));
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", (e) => {
-      e.preventDefault();
-      document.getElementById(tab.dataset.target).scrollIntoView({ behavior: "smooth" });
-    });
-  });
-  const onScroll = () => {
-    let current = sections[0];
-    sections.forEach((sec) => { if (sec && window.scrollY >= sec.offsetTop - 160) current = sec; });
-    tabs.forEach((t) => t.classList.toggle("active", t.dataset.target === current?.id));
-  };
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
-}
+/* Tabs are handled by switchDetailTab() inline in the page (show one panel,
+   no page jump). The old scroll-spy was removed: with hidden panels it
+   scrolled panels under the sticky header and highlighted the wrong tab. */
+function initTabScrollSpy() {}
 
 function initVariantSelector() {
   document.querySelectorAll(".variant-option").forEach((btn) => {

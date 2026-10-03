@@ -8,15 +8,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   initHeaderScroll();
   initMobileDrawer();
   initTourTabs();
-  if (document.getElementById("tour-grid")) {
-    window.ALL_TOURS = await loadAllTours();
-    renderFeaturedTours("top-rated");
-  }
-  if (document.getElementById("home-blog-grid")) {
+  // The home page arrives fully rendered from the server (tour grid + latest
+  // posts), so nothing is fetched on load. The full tour list is only
+  // downloaded the first time a visitor switches the Top Rated / Most
+  // Reviewed tab — this keeps the initial page light for PageSpeed.
+  const blogGrid = document.getElementById("home-blog-grid");
+  if (blogGrid && !blogGrid.querySelector("a, article")) {
     window.BLOG_POSTS = await loadAllPosts();
     renderHomeBlogPreview();
   }
 });
+
+/* Same rule as the server-side imgUrl(): local uploads can be fetched resized. */
+function resizedImg(url, w) {
+  if (!url || !/\/uploads\//.test(url) || /\.svg$/i.test(url) || url.indexOf("?") !== -1) return url;
+  return url + "?w=" + w;
+}
 
 const HOME_CAT_GRADIENTS = {
   "Comparison": "linear-gradient(135deg,#5C8A72,#0B3B4F)",
@@ -36,7 +43,7 @@ function renderHomeBlogPreview() {
     return;
   }
   grid.innerHTML = latest.map((p) => {
-    const bg = p.featuredImage ? `url('${p.featuredImage}')` : (HOME_CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
+    const bg = p.featuredImage ? `url('${resizedImg(p.featuredImage, 800)}')` : (HOME_CAT_GRADIENTS[p.category] || "linear-gradient(135deg,#0B3B4F,#5C8A72)");
     return `
     <a href="/blog/${p.slug}" class="blog-card">
       <div class="blog-card-image" style="background:${bg}; background-size:cover; background-position:center;"></div>
@@ -80,9 +87,12 @@ function initMobileDrawer() {
 function initTourTabs() {
   const tabs = document.querySelectorAll(".tab-btn");
   tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
+    tab.addEventListener("click", async () => {
       tabs.forEach((t) => t.classList.remove("active"));
       tab.classList.add("active");
+      if (typeof ALL_TOURS === "undefined" && typeof loadAllTours === "function") {
+        window.ALL_TOURS = await loadAllTours();
+      }
       renderFeaturedTours(tab.dataset.tab);
     });
   });
@@ -110,8 +120,8 @@ function tourCardTemplate(tour, basePath) {
   return `
     <article class="tour-card">
       <div class="tour-card-image-wrap" style="background:${imgSrc ? "var(--color-bg-alt, #eee)" : "linear-gradient(135deg,#0B3B4F,#5C8A72)"};">
-        ${imgSrc ? `<img class="tour-photo" src="${imgSrc}" alt="${tour.title} — ${tour.company}"
-             style="opacity:0;transition:opacity 0.35s ease;" onload="this.style.opacity='1';"
+        ${imgSrc ? `<img class="tour-photo" src="${resizedImg(imgSrc, 400)}"${resizedImg(imgSrc, 400) !== imgSrc ? ` srcset="${resizedImg(imgSrc, 400)} 400w, ${resizedImg(imgSrc, 800)} 800w" sizes="(min-width: 1024px) 300px, (min-width: 640px) 50vw, 100vw"` : ""}
+             width="400" height="300" loading="lazy" decoding="async" alt="${tour.title} — ${tour.company}"
              onerror="this.parentElement.style.background='linear-gradient(135deg,#0B3B4F,#5C8A72)'; this.remove();">` : ""}
         ${badge}
       </div>

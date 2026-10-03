@@ -53,7 +53,7 @@ function renderArticles(island) {
   empty.style.display = "none";
   grid.innerHTML = list.map((p) => `
     <a href="/blog/${p.slug}" class="blog-card">
-      <div class="blog-card-image" style="background:${p.featuredImage ? `url('${p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
+      <div class="blog-card-image" style="background:${p.featuredImage ? `url('${typeof resizedImg === "function" ? resizedImg(p.featuredImage, 800) : p.featuredImage}')` : "linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${p.category || ""}</div>
         <h3 class="blog-card-title">${p.title}</h3>

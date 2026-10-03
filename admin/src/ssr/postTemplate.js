@@ -1,4 +1,6 @@
 const { esc } = require("../utils");
+const { ASSET_V } = require("./assetVersion");
+const { imgUrl } = require("./sharedHtml");
 
 const SITE_URL = (process.env.SITE_URL || "https://tripreviewall.com").replace(/\/+$/, "");
 
@@ -14,7 +16,7 @@ function inlineTourCardHtml(tour) {
   const img = tour.gallery && tour.gallery[0];
   return `
     <div class="inline-tour-card">
-      <div class="inline-tour-img" style="${img ? `background-image:url('${esc(img)}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
+      <div class="inline-tour-img" style="${img ? `background-image:url('${esc(imgUrl(img, 400))}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
       <div style="flex:1;">
         <div class="inline-tour-eyebrow">Featured Tour</div>
         <h3 class="inline-tour-title">${esc(tour.title)}</h3>
@@ -36,7 +38,7 @@ function sidebarTourCardHtml(tour) {
     <aside class="article-sidebar-col">
       <div class="sidebar-affiliate-card">
         <div class="sidebar-affiliate-label">Featured Tour</div>
-        <div class="sidebar-affiliate-img" style="${img ? `background-image:url('${esc(img)}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
+        <div class="sidebar-affiliate-img" style="${img ? `background-image:url('${esc(imgUrl(img, 400))}')` : "background:linear-gradient(135deg,#5C8A72,#0B3B4F)"}; background-size:cover; background-position:center;"></div>
         <h4 class="sidebar-affiliate-title">${esc(tour.title)}</h4>
         <div style="font-size:var(--text-meta);">${(tour.aggregatedRating || 0).toFixed(1)}★ (${(tour.reviewCountTotal || 0).toLocaleString()})</div>
         <ul class="sidebar-affiliate-bullets">
@@ -55,7 +57,7 @@ function relatedArticlesHtml(related) {
   if (related.length === 0) return `<p style="color:var(--color-text-muted);">More articles coming soon.</p>`;
   return related.map((p) => `
     <a href="/blog/${esc(p.slug)}" class="blog-card">
-      <div class="blog-card-image" style="${p.featuredImage ? `background:url('${esc(p.featuredImage)}')` : "background:linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
+      <div class="blog-card-image" style="${p.featuredImage ? `background:url('${esc(imgUrl(p.featuredImage, 800))}')` : "background:linear-gradient(135deg,#0B3B4F,#5C8A72)"}; background-size:cover; background-position:center;"></div>
       <div class="blog-card-body">
         <div class="blog-card-cat">${esc(p.category || "")}</div>
         <h3 class="blog-card-title">${esc(p.title)}</h3>
@@ -186,10 +188,13 @@ ${post.author ? `<meta property="article:author" content="${esc(post.author)}">`
 ${post.featuredImage ? `<meta name="twitter:image" content="${SITE_URL}${post.featuredImage}">` : ""}
 ${jsonLd(post, relatedTour)}
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/tokens.css">
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../css/blog-detail.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../css/tokens.css?v=${ASSET_V}">
+<link rel="stylesheet" href="../css/style.css?v=${ASSET_V}">
+<link rel="stylesheet" href="../css/blog-detail.css?v=${ASSET_V}">
 </head>
 <body>
 
@@ -253,7 +258,7 @@ ${jsonLd(post, relatedTour)}
       <span>${esc(post.disclosureText)}</span>
     </div>` : ""}
 
-    ${post.featuredImage ? `<div class="article-hero-img" style="background-image:url('..${esc(post.featuredImage)}')"></div><p class="article-hero-caption">Photo: Operator</p>` : ""}
+    ${post.featuredImage ? `<div class="article-hero-img" style="background-image:url('..${esc(imgUrl(post.featuredImage, 1600))}')"></div><p class="article-hero-caption">Photo: Operator</p>` : ""}
 
     <div class="article-body-grid">
       <div class="article-body-main">
@@ -266,7 +271,7 @@ ${jsonLd(post, relatedTour)}
         <div class="author-box">
           ${author ? `
           <div class="author-card">
-            <div class="author-photo"${author.photoUrl ? ` style="background-image:url('..${esc(author.photoUrl)}');background-size:cover;background-position:center;"` : ""}></div>
+            <div class="author-photo"${author.photoUrl ? ` style="background-image:url('..${esc(imgUrl(author.photoUrl, 160))}');background-size:cover;background-position:center;"` : ""}></div>
             <div>
               <p class="author-name">${esc(author.name)}</p>
               ${author.roleTitle ? `<p class="author-role">${esc(author.roleTitle)}</p>` : ""}
@@ -316,7 +321,7 @@ ${jsonLd(post, relatedTour)}
   </div>
 </footer>
 
-<script src="../js/main.js"></script>
+<script src="../js/main.js?v=${ASSET_V}"></script>
 </body>
 </html>`;
 }
