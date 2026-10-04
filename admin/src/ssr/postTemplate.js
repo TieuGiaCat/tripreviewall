@@ -51,6 +51,27 @@ function sidebarTourCardInner(tour) {
         <p class="inline-tour-disclosure">Booking links on the tour page are affiliate links — Tripreviewall may earn a commission at no extra cost to you.</p>`;
 }
 
+/**
+ * Phones/tablets: the featured tour becomes a sticky bar at the bottom of the
+ * screen — the same bar as on a tour page, but the button opens the tour
+ * (with its reviews) instead of booking straight away.
+ */
+function mobileTourBarHtml(tour) {
+  if (!tour) return "";
+  const img = tour.gallery && tour.gallery[0];
+  return `
+<div class="article-tour-bar" role="complementary" aria-label="Featured tour">
+  <a class="article-tour-bar-info" href="/tours/${esc(tour.slug)}">
+    ${img ? `<img src="${esc(imgUrl(img, 160))}" width="48" height="48" alt="" loading="lazy" decoding="async">` : ""}
+    <span class="article-tour-bar-text">
+      <span class="article-tour-bar-title">${esc(tour.title)}</span>
+      <span class="article-tour-bar-meta">${tour.priceFrom != null ? `From <strong>$${esc(tour.priceFrom)}</strong>` : "Price on request"}${tour.aggregatedRating ? ` · ${Number(tour.aggregatedRating).toFixed(1)}★` : ""}</span>
+    </span>
+  </a>
+  <a href="/tours/${esc(tour.slug)}" class="btn btn-primary">View tour &amp; reviews</a>
+</div>`;
+}
+
 function sidebarTourCardHtml(tour) {
   if (!tour) return "";
   return `
@@ -159,8 +180,9 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
   const { processedBody, headings } = injectTOC(sanitizeHtml(unwrapEmptyLinks(post.body || "")));
 
   const tags = [];
-  if (post.category) tags.push(`<span class="tag-pill tag-category">${esc(post.category)}</span>`);
-  if (post.island) tags.push(`<span class="tag-pill tag-island">${esc(post.island)}</span>`);
+  if (post.category) tags.push(`<a class="tag-pill tag-category" href="/blog?category=${encodeURIComponent(post.category)}">${esc(post.category)}</a>`);
+  const topic = post.topic || post.island;
+  if (topic) tags.push(`<a class="tag-pill tag-island" href="/blog?topic=${encodeURIComponent(topic)}">${esc(topic)}</a>`);
 
   const metaParts = [];
   if (post.author) metaParts.push(`<span class="author-name">${esc(post.author)}</span>`);
@@ -171,7 +193,7 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
   if (post.readTime) metaParts.push(`<span>${post.readTime} min read</span>`);
 
   const internalLinks = [];
-  if (post.island) {
+  if (post.island && ["Oahu", "Maui", "Kauai", "Big Island"].includes(post.island)) {
     internalLinks.push(`<a href="/destinations/${post.island.toLowerCase().replace(" ", "-")}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
       More ${esc(post.island)} guides</a>`);
@@ -222,7 +244,7 @@ ${siteHeader()}
     <div class="article-header">
       <div class="article-tags">${tags.join("")}</div>
       <h1 class="article-headline">${esc(post.title)}</h1>
-      <div class="article-meta-row">${metaParts.join('<span>·</span>')}</div>
+      <div class="article-meta-row">${metaParts.join('<span class="meta-sep" aria-hidden="true">·</span>')}</div>
       <hr class="article-divider">
     </div>
 
@@ -278,6 +300,7 @@ ${siteHeader()}
 
 ${siteFooter()}
 
+${mobileTourBarHtml(relatedTour)}
 ${scriptTags(["main", "article"])}
 </body>
 </html>`;

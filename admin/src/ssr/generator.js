@@ -322,6 +322,14 @@ async function rebuildListingPages() {
       console.error("[ssr] regenerateListingPages: could not load categories (using defaults):", err.message);
     }
 
+    let blogTopics = null;
+    try {
+      const topicResult = await query(`SELECT name FROM topics WHERE status = 'active' ORDER BY name ASC`);
+      blogTopics = topicResult.rows.map((r) => r.name);
+    } catch (err) {
+      console.error("[ssr] regenerateListingPages: could not load topics (run npm run migrate):", err.message);
+    }
+
     const islandCounts = {};
     allTours.forEach((t) => { islandCounts[t.island] = (islandCounts[t.island] || 0) + 1; });
 
@@ -350,7 +358,7 @@ async function rebuildListingPages() {
         if (!(n >= 2 && n <= totalTourPages && f === `${n}.html`)) await removeFile(path.join(pagesDir, f), `old listing page ${f}`);
       }
     } catch (err) { /* no page folder yet */ }
-    await writePage(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts, allPosts.filter((p) => p.featuredPillar), blogCategories)));
+    await writePage(path.join(SITE_ROOT, "blog.html"), await injectTracking(renderBlogIndexHtml(allPosts, allPosts.filter((p) => p.featuredPillar), blogCategories, blogTopics)));
     await writePage(path.join(SITE_ROOT, "destinations.html"), await injectTracking(renderDestinationsHubHtml(islandCounts, destinationsBySlug)));
     await writePage(path.join(SITE_ROOT, "index.html"), await injectTracking(renderHomeHtml(allTours, allPosts, islandCounts, destinationsBySlug)));
     for (const isl of ISLANDS) {

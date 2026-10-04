@@ -182,6 +182,15 @@ CREATE TABLE IF NOT EXISTS categories (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Topic tags for blog posts (Admin → Topics). A post's topic is stored in
+-- posts.island_tag. Created/seeded by migration 004.
+CREATE TABLE IF NOT EXISTS topics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- ---------------------------------------------------------------
 -- admin_sessions  (DB-backed login sessions — survive `pm2 restart`
 -- and would work across multiple app processes, unlike the old

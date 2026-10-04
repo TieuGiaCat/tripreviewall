@@ -8,7 +8,14 @@ const { logAudit } = require("../auditLog");
 const { seoPanelHtml, seoPanelAssets, usedKeyphrases, scoreFor, scoreDots, SeoAnalysis } = require("../lib/seoPanel");
 const { docxToArticle } = require("../lib/docxToHtml");
 
-const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
+// A post's Topic (Admin → Topics) is stored in the posts.island_tag column.
+const { listActiveTopicNames } = require("./topicsRoutes");
+/** Topic from the form: any active topic, or the value the post already had. */
+function cleanTopic(value, topics, current = null) {
+  const v = String(value || "").trim();
+  if (!v) return null;
+  return topics.includes(v) || v === current ? v : null;
+}
 const FORMATS = ["listicle", "comparison", "deep_dive_review", "honest_take"];
 
 /* ============================================================
@@ -72,7 +79,7 @@ async function listPosts(req, res, user, urlObj) {
       return `<tr>
         <td><a href="/admin/posts/${p.id}/edit" style="color:var(--color-primary);font-weight:600;">${esc(title)}</a><br>
             <span style="color:var(--color-text-muted);font-size:12px;">${esc(p.slug)}</span></td>
-        <td>${esc(p.category || "—")}</td>
+        <td>${esc(p.category || "—")}${p.island_tag ? `<br><span style="color:var(--color-text-muted);font-size:11px;">Topic: ${esc(p.island_tag)}</span>` : ""}</td>
         <td>${(() => { const sc = (p.data && p.data.seo) || withSeoScores(p.data || {}, p.slug, {}).seo; return scoreDots(sc.seoScore, sc.readabilityScore, p.data && p.data.focusKeyphrase); })()}${p.data && p.data.focusKeyphrase ? `<br><span style="color:var(--color-text-muted);font-size:11px;">${esc(p.data.focusKeyphrase)}</span>` : ""}</td>
         <td>${esc(author || "—")}</td>
         <td><span class="badge ${p.status === "published" ? "badge-published" : "badge-draft"}">${esc(p.status)}</span></td>
@@ -106,6 +113,7 @@ async function listPosts(req, res, user, urlObj) {
       </form>
       <a href="/admin/posts/new" class="btn btn-primary">+ New Post</a>
       <a href="/admin/categories" class="btn btn-secondary">Manage Categories</a>
+      <a href="/admin/topics" class="btn btn-secondary">Manage Topics</a>
     </div>
 
     <table class="data-table">
@@ -400,16 +408,18 @@ function importReportHtml(report) {
     </div>`;
 }
 
-function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [], categoriesList = [], used = {}, importReport = null }) {
+function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [], categoriesList = [], topicsList = [], used = {}, importReport = null }) {
   const d = post.data || {};
   const bodyMode = d.bodyMode === "html" ? "html" : "visual";
 
   const categoryOptions = categoriesList.map(
     (c) => `<option value="${esc(c)}" ${post.category === c ? "selected" : ""}>${esc(c)}</option>`
   ).join("");
-  const islandOptions = ISLANDS.map(
-    (i) => `<option value="${esc(i)}" ${post.island_tag === i ? "selected" : ""}>${i || "— None —"}</option>`
-  ).join("");
+  // Active topics, plus the post's current one if it was deactivated since.
+  const topicChoices = [...new Set([...(topicsList || []), ...(post.island_tag ? [post.island_tag] : [])])];
+  const topicOptions = [`<option value="">— None —</option>`, ...topicChoices.map(
+    (t) => `<option value="${esc(t)}" ${post.island_tag === t ? "selected" : ""}>${esc(t)}${topicsList.includes(t) ? "" : " (inactive)"}</option>`
+  )].join("");
   const formatOptions = FORMATS.map(
     (f) => `<option value="${f}" ${post.content_format === f ? "selected" : ""}>${f.replace(/_/g, " ")}</option>`
   ).join("");
@@ -464,7 +474,7 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
         </div>
         <div class="form-row">
           <div class="form-field"><label>Category</label><select name="category"><option value="">— Select —</option>${categoryOptions}</select><div class="hint"><a href="/admin/categories" target="_blank">Manage categories →</a></div></div>
-          <div class="form-field"><label>Island Tag (optional)</label><select name="islandTag">${islandOptions}</select></div>
+          <div class="form-field"><label>Topic (optional)</label><select name="topic">${topicOptions}</select><div class="hint"><a href="/admin/topics" target="_blank">Manage topics →</a> · shown as a tag on the article and in the blog's Topic filter</div></div>
         </div>
         <div class="form-row">
           <div class="form-field"><label>Content Format</label><select name="contentFormat">${formatOptions}</select></div>
@@ -612,9 +622,10 @@ function withSeoScores(data, slug, used) {
 
 /** Renders the New/Edit form with everything it needs (authors, categories, editor, SEO panel). */
 async function sendPostForm(res, user, statusCode, { post = {}, errors = [], isEdit, importReport = null }) {
-  const [authorsList, categoriesList, used] = await Promise.all([
+  const [authorsList, categoriesList, topicsList, used] = await Promise.all([
     listActiveAuthorsForDropdown(),
     listActiveCategoryNames(),
+    listActiveTopicNames(),
     usedKeyphrases(isEdit && post.id ? `post:${post.id}` : ""),
   ]);
   const d = post.data || {};
@@ -625,7 +636,7 @@ async function sendPostForm(res, user, statusCode, { post = {}, errors = [], isE
     title: isEdit ? "Edit Post" : "New Post",
     activeNav: "blog",
     user,
-    body: renderPostForm({ post, errors, formAction, isEdit, authorsList, categoriesList, used, importReport }),
+    body: renderPostForm({ post, errors, formAction, isEdit, authorsList, categoriesList, topicsList, used, importReport }),
     extraHead: assets.head,
     extraScripts: assets.scripts + "\n" + seoPanelAssets(),
   }));
@@ -656,7 +667,7 @@ async function createPost(req, res, user) {
   const data = withSeoScores(bodyToPostData(body), slug, await usedKeyphrases(""));
   const status = body.status === "published" ? "published" : "draft";
   const category = (body.category || "").trim() || null;
-  const islandTag = ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null;
+  const islandTag = cleanTopic(body.topic, await listActiveTopicNames());
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
   const postForForm = { slug, status, category, island_tag: islandTag, content_format: contentFormat, data };
 
@@ -722,7 +733,7 @@ async function updatePost(req, res, user, id) {
 
   let existing;
   try {
-    const existingResult = await query("SELECT slug, status, published_at, data FROM posts WHERE id = $1", [id]);
+    const existingResult = await query("SELECT slug, status, published_at, island_tag, data FROM posts WHERE id = $1", [id]);
     existing = existingResult.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -744,7 +755,7 @@ async function updatePost(req, res, user, id) {
   const data = withSeoScores(bodyToPostData(body, existing.data || {}), slug, await usedKeyphrases(`post:${id}`));
   const status = body.status === "published" ? "published" : "draft";
   const category = (body.category || "").trim() || null;
-  const islandTag = ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null;
+  const islandTag = cleanTopic(body.topic, await listActiveTopicNames(), existing.island_tag);
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
   const postForForm = { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, published_at: existing.published_at, data };
 
@@ -856,7 +867,12 @@ async function importDocx(req, res, user, id = null) {
 
   const f = converted.fields;
   const categoriesList = await listActiveCategoryNames();
-  const guessIsland = ISLANDS.filter(Boolean).find((i) => SeoAnalysis.match(`${f.title || ""} ${f.island || ""}`, i) === "exact") || null;
+  // Topic: a "Topic:"/"Island:" line in the file, else the first topic named in the title.
+  const topicsList = await listActiveTopicNames();
+  const wanted = f.topic || f.island || "";
+  const guessIsland = (wanted && topicsList.find((t) => t.toLowerCase() === wanted.toLowerCase()))
+    || topicsList.find((t) => SeoAnalysis.match(f.title || "", t) === "exact") || null;
+  if (wanted && !topicsList.some((t) => t.toLowerCase() === wanted.toLowerCase())) converted.report.warnings.push(`Topic “${wanted}” doesn't exist in Admin → Topics — pick one below or add it there.`);
   const guessCategory = f.category ? categoriesList.find((c) => c.toLowerCase() === f.category.toLowerCase()) || null : null;
   if (f.focusKeyphraseGuessed) converted.report.warnings.push(`No “Focus keyphrase:” line in the file — suggested “${f.focusKeyphrase}” from the slug. Check it in the SEO panel.`);
   if (f.category && !guessCategory) converted.report.warnings.push(`Category “${f.category}” doesn't exist in Admin → Categories — pick one below.`);
@@ -912,7 +928,7 @@ async function previewPost(req, res, user) {
   const data = bodyToPostData(body);
   const row = {
     slug, category: (body.category || "").trim() || null,
-    island_tag: ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null,
+    island_tag: String(body.topic || "").trim() || null,
     content_format: body.contentFormat, published_at: new Date(), updated_at: new Date(), data,
   };
   let relatedTour = null, author = null;

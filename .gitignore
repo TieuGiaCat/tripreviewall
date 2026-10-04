@@ -20,3 +20,8 @@ admin/.env
 /privacy-policy.html
 /affiliate-disclosure.html
 /404.html
+
+# Uploaded images (and their resized copies) live only on the server
+/admin/public/uploads/**
+!/admin/public/uploads/*/
+!/admin/public/uploads/**/.gitkeep

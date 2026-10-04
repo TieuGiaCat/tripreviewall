@@ -22,6 +22,7 @@ const usersRoutes = require("./routes/usersRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const clickTrackingRoute = require("./routes/clickTrackingRoute");
 const categoriesRoutes = require("./routes/categoriesRoutes");
+const topicsRoutes = require("./routes/topicsRoutes");
 const rssRoute = require("./routes/rssRoute");
 const auditLogRoutes = require("./routes/auditLogRoutes");
 const pageSeoRoutes = require("./routes/pageSeoRoutes");
@@ -290,24 +291,14 @@ async function routeRequest(req, res) {
   }
 
   // ---- Categories (Blog Posts sub-page) ----
-  if (method === "GET" && pathname === "/admin/categories") {
-    return categoriesRoutes.listCategories(req, res, session);
+  // Categories and Topics (blog post taxonomies) — routes live in taxonomyRoutes.js.
+  if (pathname.startsWith("/admin/categories")) {
+    const handled = categoriesRoutes.route(method, pathname, req, res, session);
+    if (handled) return handled;
   }
-  if (method === "GET" && pathname === "/admin/categories/new") {
-    return categoriesRoutes.newCategoryForm(req, res, session);
-  }
-  if (method === "POST" && pathname === "/admin/categories/new") {
-    return categoriesRoutes.createCategory(req, res, session);
-  }
-  const catEditMatch = pathname.match(/^\/admin\/categories\/([^/]+)\/edit$/);
-  if (catEditMatch) {
-    const id = catEditMatch[1];
-    if (method === "GET") return categoriesRoutes.editCategoryForm(req, res, session, id);
-    if (method === "POST") return categoriesRoutes.updateCategory(req, res, session, id);
-  }
-  const catDeleteMatch = pathname.match(/^\/admin\/categories\/([^/]+)\/delete$/);
-  if (catDeleteMatch && method === "POST") {
-    return categoriesRoutes.deleteCategory(req, res, session, catDeleteMatch[1]);
+  if (pathname.startsWith("/admin/topics")) {
+    const handled = topicsRoutes.route(method, pathname, req, res, session);
+    if (handled) return handled;
   }
 
   // ---- Leads ----

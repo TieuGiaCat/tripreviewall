@@ -320,6 +320,7 @@ const META_LABELS = {
   excerpt: /^(excerpt|summary)$/i,
   category: /^(category)$/i,
   island: /^(island)$/i,
+  topic: /^(topic|tag|topic tag)$/i,
 };
 function parseMetaParagraph(block) {
   // Split on bold labels ("Slug:") — or plain "Label:" at line starts.
@@ -332,7 +333,7 @@ function parseMetaParagraph(block) {
     if (cur) cur.value += r.br ? " " : t;
   }
   if (!segs.length) {
-    const re = /(Slug|URL|Meta title|SEO title|Meta description|Focus keyphrase|Focus keyword|Keyword|Byline|Excerpt|Category|Island)\s*:\s*/gi;
+    const re = /(Slug|URL|Meta title|SEO title|Meta description|Focus keyphrase|Focus keyword|Keyword|Byline|Excerpt|Category|Island|Topic)\s*:\s*/gi;
     const parts = block.text.split(re);
     for (let i = 1; i < parts.length; i += 2) segs.push({ label: parts[i], value: parts[i + 1] || "" });
   }

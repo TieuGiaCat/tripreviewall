@@ -50,6 +50,14 @@ test("article page: JSON-LD has image, mainEntityOfPage and publisher logo (D7)"
   assert.equal(article.publisher.logo.url, "https://tripreviewall.com/icon-512.png");
 });
 
+test("article page: topic/category tags link to the filtered blog, mobile tour bar shown", () => {
+  const html = renderPostPageHtml(toPostPublicShape({ ...postRow(), island_tag: "Snorkeling" }), tour, [], null);
+  assert.match(html, /href="\/blog\?topic=Snorkeling"/);
+  assert.match(html, /href="\/blog\?category=Island%20Guides"/);
+  assert.match(html, /<div class="article-tour-bar"[\s\S]*View tour &amp; reviews/);
+  assert.doesNotMatch(html, /More Snorkeling guides/, "island link only for island topics");
+});
+
 test("article links are tracked: prose carries the slug and article.js is loaded (D8)", () => {
   const html = renderPostPageHtml(toPostPublicShape(postRow()), null, [], null);
   assert.match(html, /class="article-prose" data-post-slug="test-post"/);
@@ -77,9 +85,13 @@ test("every hand-written page in admin/pages renders without inline code", () =>
 
 test("All Articles tabs come from the categories passed in (Admin → Categories)", () => {
   const { renderBlogIndexHtml } = require("../src/ssr/listingTemplates");
-  const html = renderBlogIndexHtml([], [], ["Kauai", "Oahu"]);
+  const posts = [toPostPublicShape({ ...postRow(), slug: "a", category: "Kauai", island_tag: "Snorkeling" }), toPostPublicShape({ ...postRow(), slug: "b", category: "Oahu" })];
+  const html = renderBlogIndexHtml(posts, [], ["Kauai", "Oahu", "Empty one"], ["Snorkeling", "Unused"]);
   assert.match(html, /data-cat="All"[\s\S]*data-cat="Kauai"[\s\S]*data-cat="Oahu"/);
-  assert.doesNotMatch(html, /data-cat="Island Guides"/);
+  assert.doesNotMatch(html, /data-cat="Island Guides"|data-cat="Empty one"/, "default list ignored, empty categories hidden");
+  assert.match(html, /<option value="Snorkeling">Snorkeling<\/option>/, "topic filter lists used topics");
+  assert.doesNotMatch(html, /value="Unused"/);
+  assert.match(html, /data-topic="Snorkeling"/);
 });
 
 test("links left empty by the Word import render as plain text", () => {

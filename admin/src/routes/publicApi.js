@@ -108,7 +108,8 @@ function toPostPublicShape(row) {
     slug: row.slug,
     title: d.title || row.slug,
     category: row.category || "",
-    island: row.island_tag || null,
+    island: row.island_tag || null, // kept for the island pages; the same value is the post's topic
+    topic: row.island_tag || null,
     contentFormat: row.content_format || "listicle",
     author: d.authorName || "",
     authorSlug: d.authorSlug || null,
