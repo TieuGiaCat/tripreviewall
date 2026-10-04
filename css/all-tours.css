@@ -11,6 +11,8 @@
 .at-search { display: flex; align-items: center; gap: 10px; background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 12px 16px; max-width: 520px; }
 .at-search svg { width: 18px; height: 18px; color: var(--color-text-muted); flex-shrink: 0; }
 .at-search input { border: none; outline: none; background: transparent; font-family: var(--font-sans); font-size: var(--text-body); width: 100%; }
+/* The box itself shows keyboard focus (the input's own outline is off). */
+.at-search:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(11, 59, 79, 0.12); }
 
 .sort-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 0; border-bottom: 1px solid var(--color-border); margin-bottom: 32px; }
 .result-count { font-size: var(--text-meta); color: var(--color-text-muted); }

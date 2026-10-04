@@ -99,3 +99,24 @@ test("links left empty by the Word import render as plain text", () => {
   const html = renderPostPageHtml(post, null, [], null);
   assert.match(html, /See best beaches and <a href="\/tours">tours<\/a>/);
 });
+
+test("operator contact is hidden until a booking click (default 'after-click')", () => {
+  const siteInfo = require("../src/lib/siteInfo");
+  const t = toPublicShape(fakeTourRow({ contactPhone: "+1 808-555-0199", contactEmail: "ops@example.com" }));
+  const html = renderTourPageHtml(t, []);
+  assert.doesNotMatch(html, /808-555-0199|ops@example\.com/, "no plain-text phone/email in the page");
+  assert.match(html, /class="contact-gate" data-contact="[A-Za-z0-9+/=]+"/);
+  const payload = JSON.parse(Buffer.from(html.match(/data-contact="([^"]+)"/)[1], "base64").toString("utf8"));
+  assert.equal(payload.email, "ops@example.com");
+  assert.match(html, /contact-gate-links[\s\S]*\/api\/track-click/);
+  assert.deepEqual(findInlineCode(html), []);
+
+  const info = siteInfo.currentSiteInfo();
+  info.operatorContact = "always";
+  try {
+    assert.match(renderTourPageHtml(t, []), /href="tel:\+18085550199"/);
+    info.operatorContact = "never";
+    const none = renderTourPageHtml(t, []);
+    assert.doesNotMatch(none, /tabbtn-contact|tab-contact|808-555/);
+  } finally { info.operatorContact = "after-click"; }
+});

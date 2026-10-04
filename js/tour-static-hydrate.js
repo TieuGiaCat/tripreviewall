@@ -122,6 +122,69 @@
     switchDetailTab(next.getAttribute("data-target"), next);
   });
 
+  /* ---------- Operator contact: shown after a booking click ----------
+     The Contact tab (when Admin → Site Info → "Operator contact" is
+     "after-click") holds the phone/email base64-encoded in data-contact.
+     They're revealed once the visitor opens any booking link (FareHarbor,
+     TripAdvisor, GetYourGuide, Viator — they all go through
+     /api/track-click) or uses the FareHarbor calendar, and stay revealed
+     for that tour on this browser. */
+  var gate = document.querySelector(".contact-gate[data-contact]");
+  var contactKey = gate ? "trv-contact-" + gate.getAttribute("data-tour") : "";
+  function storageGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+  function storageSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* private mode */ } }
+  function decodeContact(b64) {
+    try {
+      var bin = atob(b64), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch (e) { return null; }
+  }
+  function revealContact() {
+    if (!gate || gate.classList.contains("is-unlocked")) return;
+    var c = decodeContact(gate.getAttribute("data-contact"));
+    if (!c) return;
+    var list = gate.querySelector("[data-contact-list]");
+    var icons = { company: "M3 4h18v18H3z", phone: "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z", email: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zM22 6l-10 7L2 6" };
+    function row(kind, text, href) {
+      var li = document.createElement("li");
+      li.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + icons[kind] + '"></path></svg>';
+      var el = document.createElement(href ? "a" : "span");
+      if (href) el.href = href;
+      el.textContent = text;
+      li.appendChild(el);
+      list.appendChild(li);
+    }
+    if (c.company) row("company", c.company);
+    if (c.phone) row("phone", c.phone, "tel:" + c.phone.replace(/[^\d+]/g, ""));
+    if (c.email) row("email", c.email, "mailto:" + c.email);
+    gate.querySelector(".contact-locked").hidden = true;
+    gate.querySelector(".contact-unlocked").hidden = false;
+    gate.classList.add("is-unlocked");
+  }
+  function markBookingClick() {
+    if (!gate) return;
+    storageSet(contactKey, "1");
+    revealContact();
+  }
+  if (gate) {
+    if (storageGet(contactKey) === "1") revealContact();
+    // Any booking link on the page (sidebar, mobile bar, bottom sheet, Contact tab).
+    ["click", "auxclick"].forEach(function (type) {
+      document.addEventListener(type, function (e) {
+        var a = e.target.closest && e.target.closest('a[href*="/api/track-click"], a[href*="fareharbor.com/"]');
+        if (a) markBookingClick();
+      }, true);
+    });
+    // Clicking inside the FareHarbor calendar iframe moves focus into it.
+    window.addEventListener("blur", function () {
+      setTimeout(function () {
+        var f = document.activeElement;
+        if (f && f.tagName === "IFRAME" && /fareharbor/i.test(f.src || "")) markBookingClick();
+      }, 0);
+    });
+  }
+
   /* ---------- Gallery thumbnails ---------- */
   function initGalleryThumbs() {
     var mainImg = document.getElementById("gallery-main-img");

@@ -6,6 +6,7 @@ const HERO_SIZES = "(min-width: 1280px) 1200px, 100vw";
 const HERO_WIDTHS = [400, 800, 1200, 1600];
 
 const { SITE_URL } = require("../siteConfig");
+const { currentSiteInfo } = require("../lib/siteInfo");
 
 /**
  * Platform cards for the "Review" tab — only the platforms ticked in admin
@@ -136,6 +137,63 @@ function ratingsSectionHtml(tour) {
       <p class="freshness-note">Ratings and review counts are checked periodically and may not reflect same-day changes on each platform.</p>
     </section>`;
 }
+
+const CONTACT_ICONS = {
+  company: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>`,
+  phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>`,
+  email: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
+  lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+};
+
+/**
+ * Contact tab. Admin → Settings → Site Info → "Operator contact on tour pages":
+ *   after-click  the phone/email are not written into the page as text; they
+ *                travel base64-encoded in data-contact and js/tour-static-hydrate.js
+ *                shows them once the visitor has opened a booking link
+ *                (remembered per tour in the browser). Until then the tab
+ *                offers the booking links.
+ *   always       shown right away (old behaviour)
+ *   never        tab not rendered
+ */
+function contactPanelHtml(tour) {
+  const mode = currentSiteInfo().operatorContact || "after-click";
+  if (mode === "never") return "";
+  const hasContact = !!(tour.contactPhone || tour.contactEmail);
+  const note = `<p class="contact-note">This is the tour operator's own contact info, shared for general questions — not for bookings. Book through the booking links for real-time availability and the best price.</p>`;
+  const contactList = `
+          <ul class="highlight-list contact-list">
+            ${tour.company ? `<li>${CONTACT_ICONS.company}${esc(tour.company)}</li>` : ""}
+            ${tour.contactPhone ? `<li>${CONTACT_ICONS.phone}<a href="tel:${esc(telDigits(tour.contactPhone))}">${esc(tour.contactPhone)}</a></li>` : ""}
+            ${tour.contactEmail ? `<li>${CONTACT_ICONS.email}<a href="mailto:${esc(tour.contactEmail)}">${esc(tour.contactEmail)}</a></li>` : ""}
+          </ul>`;
+  const none = `<p class="detail-body-text">No direct contact info on file for this operator yet. The fastest way to reach them is by starting a booking — you'll get their confirmation details and support contact right away.</p>`;
+
+  let body;
+  if (!hasContact) body = none;
+  else if (mode === "always") body = contactList + note;
+  else {
+    const options = bookingOptions(tour);
+    const payload = Buffer.from(JSON.stringify({ company: tour.company || "", phone: tour.contactPhone || "", email: tour.contactEmail || "" }), "utf8").toString("base64");
+    body = `
+          <div class="contact-gate" data-contact="${esc(payload)}" data-tour="${esc(tour.slug)}">
+            <div class="contact-locked">
+              <p class="contact-locked-lead">${CONTACT_ICONS.lock}<span>The operator's phone and email appear here after you check availability on one of their booking sites. Live prices and open dates are only shown there.</span></p>
+              ${options.length ? `<div class="contact-gate-links">${options.map((o) => `<a href="${esc(trackingUrl(tour.slug, o.key, o.url))}" class="btn ${o.key === "fareharbor" ? "btn-primary" : "btn-secondary"}" target="_blank" rel="noopener sponsored">${o.key === "fareharbor" ? "Check availability on FareHarbor" : "See it on " + esc(o.label)}</a>`).join("")}</div>` : ""}
+              <p class="contact-note">Already checked? The details appear automatically when you come back to this tab.</p>
+            </div>
+            <div class="contact-unlocked" hidden>
+              <ul class="highlight-list contact-list" data-contact-list></ul>
+              ${note}
+            </div>
+          </div>`;
+  }
+  return `
+        <section class="detail-section content-tab-panel" id="tab-contact" role="tabpanel" aria-labelledby="tabbtn-contact" tabindex="0" style="display:none;">
+          <h2 class="detail-section-title">Contact</h2>${body}
+        </section>`;
+}
+
+function telDigits(phone) { return String(phone || "").replace(/[^\d+]/g, ""); }
 
 function trackingUrl(tourSlug, platform, realUrl) {
   return `/api/track-click?tour=${encodeURIComponent(tourSlug)}&platform=${platform}&url=${encodeURIComponent(realUrl)}`;
@@ -341,7 +399,7 @@ ${siteHeader()}
       <button type="button" class="content-tab" role="tab" id="tabbtn-location" aria-controls="tab-location" aria-selected="false" tabindex="-1" data-target="tab-location">Location</button>
       <button type="button" class="content-tab" role="tab" id="tabbtn-review" aria-controls="tab-review" aria-selected="false" tabindex="-1" data-target="tab-review">Review</button>
       <button type="button" class="content-tab" role="tab" id="tabbtn-verdict" aria-controls="tab-verdict" aria-selected="false" tabindex="-1" data-target="tab-verdict">Our Verdict</button>
-      <button type="button" class="content-tab" role="tab" id="tabbtn-contact" aria-controls="tab-contact" aria-selected="false" tabindex="-1" data-target="tab-contact">Contact</button>
+      ${(currentSiteInfo().operatorContact || "after-click") === "never" ? "" : `<button type="button" class="content-tab" role="tab" id="tabbtn-contact" aria-controls="tab-contact" aria-selected="false" tabindex="-1" data-target="tab-contact">Contact</button>`}
     </div>
 
     <div class="detail-layout">
@@ -372,17 +430,7 @@ ${siteHeader()}
           ${verdictHtml(tour.verdict)}
         </div>
 
-        <section class="detail-section content-tab-panel" id="tab-contact" role="tabpanel" aria-labelledby="tabbtn-contact" tabindex="0" style="display:none;">
-          <h2 class="detail-section-title">Contact</h2>
-          ${tour.contactPhone || tour.contactEmail ? `
-          <ul class="highlight-list">
-            ${tour.company ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>${esc(tour.company)}</li>` : ""}
-            ${tour.contactPhone ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><a href="tel:${esc(tour.contactPhone)}">${esc(tour.contactPhone)}</a></li>` : ""}
-            ${tour.contactEmail ? `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><a href="mailto:${esc(tour.contactEmail)}">${esc(tour.contactEmail)}</a></li>` : ""}
-          </ul>
-          <p style="font-size:var(--text-meta); color:var(--color-text-muted); margin-top:12px;">This is the tour operator's own contact info, shared for general questions — not for bookings. Book directly through the "Check Availability" button for real-time availability.</p>
-          ` : `<p class="detail-body-text">No direct contact info on file for this operator yet. The fastest way to reach them is by starting a booking via FareHarbor — you'll get their confirmation details and support contact right away.</p>`}
-        </section>
+        ${contactPanelHtml(tour)}
       </div>
 
       ${bookingSidebarHtml(tour)}

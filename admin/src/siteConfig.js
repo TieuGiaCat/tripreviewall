@@ -24,6 +24,10 @@ const DEFAULT_SITE_INFO = {
   email: "contact@tripreviewall.com",
   hours: "Mon–Fri 8:30–20:00 · Sat–Sun 9:30–21:30 (HST)",
   address: "1948 Kealakai St Unit D, Honolulu, HI 96817",
+  // Operator phone/email on tour pages: "after-click" = shown only after the
+  // visitor has opened one of the booking links (FareHarbor, TripAdvisor,
+  // GetYourGuide, Viator); "always" = shown right away; "never" = hidden.
+  operatorContact: "after-click",
 };
 
 // Blog category → card gradient (used when a post has no featured image).

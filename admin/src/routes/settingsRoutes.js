@@ -327,6 +327,8 @@ const SITE_INFO_FIELDS = [
   { key: "hours", label: "Opening hours", hint: "e.g. Mon–Fri 8:30–20:00 · Sat–Sun 9:30–21:30 (HST)" },
   { key: "address", label: "Address", hint: "Shown on the Contact page." },
   { key: "operatorName", label: "Operated by", hint: "Company name in the footer copyright line." },
+  { key: "operatorContact", label: "Operator contact on tour pages", hint: "The tour operator's own phone/email (Contact tab). Showing it only after a booking click keeps visitors going through the affiliate links first.",
+    options: [["after-click", "Show only after the visitor clicks a booking link (recommended)"], ["always", "Always show"], ["never", "Never show"]] },
 ];
 
 function renderSiteInfoForm({ info = {}, errors = [], notice = null }) {
@@ -340,7 +342,9 @@ function renderSiteInfoForm({ info = {}, errors = [], notice = null }) {
       <div class="form-card">
         ${SITE_INFO_FIELDS.map((f) => `
         <div class="form-row full">
-          <div class="form-field"><label>${f.label}</label><input type="text" name="${f.key}" value="${esc(info[f.key] || "")}" maxlength="200"><div class="hint">${esc(f.hint)}</div></div>
+          <div class="form-field"><label>${f.label}</label>${f.options
+            ? `<select name="${f.key}">${f.options.map(([v, l]) => `<option value="${v}" ${(info[f.key] || "") === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`
+            : `<input type="text" name="${f.key}" value="${esc(info[f.key] || "")}" maxlength="200">`}<div class="hint">${esc(f.hint)}</div></div>
         </div>`).join("")}
       </div>
       <div class="form-actions"><button type="submit" class="btn btn-primary">Save &amp; rebuild pages</button></div>

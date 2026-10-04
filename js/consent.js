@@ -95,7 +95,7 @@
 
   function mount() {
     document.body.appendChild(banner);
-    if (document.getElementById("mobile-booking-bar")) document.body.classList.add("has-booking-bar");
+    if (document.getElementById("mobile-booking-bar") || document.querySelector(".article-tour-bar")) document.body.classList.add("has-booking-bar");
 
     // "Cookie settings" link in the footer so the choice can be changed later.
     var footerBottom = document.querySelector(".footer-bottom");

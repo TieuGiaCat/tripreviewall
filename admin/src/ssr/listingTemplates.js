@@ -337,7 +337,7 @@ function renderIslandPageHtml(islandSlug, tours, posts, destinationOverride) {
 ${heroImage ? `<meta property="og:image" content="${esc(absUrl(imgUrl(heroImage, 1200)))}">` : ""}
 <meta property="og:url" content="${SITE_URL}/destinations/${island.slug}">
 ${preloadImg(heroImage, { sizes: "(min-width: 1280px) 1200px, 100vw" })}
-${headBoilerplate(["pages"])}
+${headBoilerplate(["pages", "blog"])}
 </head>
 <body>
 ${siteHeader()}
