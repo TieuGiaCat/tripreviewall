@@ -11,7 +11,7 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 
 const ADMIN = path.join(__dirname, "..");
-const ROOTS = ["src", "scripts", "test", "../js"].map((d) => path.join(ADMIN, d));
+const ROOTS = ["src", "scripts", "test", "public", "../js"].map((d) => path.join(ADMIN, d));
 
 function walk(dir, ext) {
   if (!fs.existsSync(dir)) return [];

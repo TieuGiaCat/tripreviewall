@@ -80,22 +80,31 @@ function injectTOC(bodyHtml) {
     idx++;
     const id = `toc-${idx}`;
     const plainText = text.replace(/<[^>]+>/g, "").trim();
-    if (plainText) headings.push({ level: Number(level), id, text: plainText });
+    // FAQ questions get anchors but aren't listed in the table of contents.
+    if (plainText && !/class="[^"]*faq-q/.test(attrs || "")) headings.push({ level: Number(level), id, text: plainText });
     const cleanAttrs = (attrs || "").replace(/\sid="[^"]*"/i, "");
     return `<h${level}${cleanAttrs} id="${id}">${text}</h${level}>`;
   });
   return { processedBody, headings };
 }
 
+/** "In this guide" box. Long articles list only the H2 sections so the box stays short. */
 function tocHtml(headings) {
   if (headings.length < 2) return ""; // not worth a TOC box for 0-1 headings
+  const list = headings.length > 14 ? headings.filter((h) => h.level === 2) : headings;
+  if (list.length < 2) return "";
   return `
-    <div style="background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:8px;padding:20px 24px;margin:0 0 32px;">
-      <div style="font-weight:700;margin-bottom:10px;">In This Guide</div>
-      <ul style="margin:0;padding-left:20px;">
-        ${headings.map((h) => `<li style="margin-bottom:6px;${h.level === 3 ? "margin-left:16px;" : ""}"><a href="#${h.id}" style="color:var(--color-primary);text-decoration:none;">${esc(h.text)}</a></li>`).join("")}
-      </ul>
-    </div>`;
+    <details class="toc-guide"${list.length <= 10 ? " open" : ""}>
+      <summary>In this guide <span class="visually-hidden">(${list.length} sections)</span></summary>
+      <ol>
+        ${list.map((h) => `<li${h.level === 3 ? ' class="toc-sub"' : ""}><a href="#${h.id}">${esc(h.text)}</a></li>`).join("")}
+      </ol>
+    </details>`;
+}
+
+/** Links the writer left without an address (Word import: "#needs-link") show as plain text. */
+function unwrapEmptyLinks(html) {
+  return String(html || "").replace(/<a\b[^>]*\bhref\s*=\s*["'](?:#needs-link|about:blank|#|)["'][^>]*>([\s\S]*?)<\/a>/gi, "$1");
 }
 
 function jsonLd(post, relatedTour, canonicalUrl) {
@@ -147,7 +156,7 @@ function renderPostPageHtml(post, relatedTour, relatedPosts, author) {
   const metaDesc = (post.metaDescription || post.excerpt || post.title).slice(0, 155);
   // Body is editor HTML — rebuilt through an allow-list so no script/handler
   // pasted into the editor can ever reach the public page.
-  const { processedBody, headings } = injectTOC(sanitizeHtml(post.body || ""));
+  const { processedBody, headings } = injectTOC(sanitizeHtml(unwrapEmptyLinks(post.body || "")));
 
   const tags = [];
   if (post.category) tags.push(`<span class="tag-pill tag-category">${esc(post.category)}</span>`);

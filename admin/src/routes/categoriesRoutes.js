@@ -3,7 +3,29 @@ const { logAudit } = require("../auditLog");
 const { readFormBody, esc } = require("../utils");
 const { layout } = require("../render");
 
+/* The public All Articles page builds its tabs from this table, so every
+   change here rebuilds the listing pages (and, after a rename, the articles
+   that use the category). Errors are shown as a warning, never lost. */
+async function rebuildAfterChange(renamedPosts = []) {
+  const { regenerateListingPages, generatePostFile } = require("../ssr/generator");
+  const errors = [];
+  for (const row of renamedPosts) {
+    const r = await generatePostFile(row);
+    if (r && !r.ok) errors.push(r.error);
+  }
+  const listing = await regenerateListingPages();
+  errors.push(...(listing.errors || []));
+  return errors;
+}
+
+function redirectWithWarn(res, errors) {
+  const warn = errors.length ? "?warn=" + encodeURIComponent(errors.slice(0, 3).join(" · ")) : "";
+  res.writeHead(302, { Location: "/admin/categories" + warn });
+  res.end();
+}
+
 async function listCategories(req, res, user) {
+  const warn = new URL(req.url, "http://x").searchParams.get("warn") || "";
   let rows = [];
   let dbError = null;
   try {
@@ -39,8 +61,9 @@ async function listCategories(req, res, user) {
 
   const body = `
     <h1 class="page-title">Categories</h1>
-    <p class="page-sub">The list Blog Posts choose from. Renaming here does <strong>not</strong> update posts already using the old name — edit those posts individually if you rename a category.</p>
+    <p class="page-sub">The list Blog Posts choose from — and the tabs on the public <a href="/blog" target="_blank">All Articles</a> page (active categories only, A–Z). Changes here update the live page right away. Renaming a category also moves its posts to the new name.</p>
     ${dbError ? `<div class="alert alert-error">Database error: ${esc(dbError)}. Run <code>npm run migrate</code> if the "categories" table doesn't exist yet.</div>` : ""}
+    ${warn ? `<div class="alert alert-error">⚠ Saved, but the public page wasn't fully updated: ${esc(warn)}</div>` : ""}
 
     <div class="toolbar">
       <a href="/admin/posts" class="btn btn-secondary">← Back to Blog Posts</a>
@@ -110,8 +133,7 @@ async function createCategory(req, res, user) {
     return;
   }
 
-  res.writeHead(302, { Location: "/admin/categories" });
-  res.end();
+  redirectWithWarn(res, await rebuildAfterChange());
 }
 
 async function editCategoryForm(req, res, user, id) {
@@ -139,9 +161,23 @@ async function updateCategory(req, res, user, id) {
     return;
   }
 
+  let renamedPosts = [];
   try {
+    const before = await query(`SELECT name FROM categories WHERE id = $1`, [id]);
+    const oldName = before.rows[0] && before.rows[0].name;
     await query(`UPDATE categories SET name = $1, status = $2 WHERE id = $3`, [name, status, id]);
-    await logAudit(user, "update", "category", name, `Updated category "${name}" (${status})`);
+    let note = "";
+    if (oldName && oldName !== name) {
+      // Move the posts to the new name so they stay under the renamed tab.
+      const moved = await query(
+        `UPDATE posts SET category = $1, updated_at = now() WHERE category = $2
+         RETURNING slug, status, category, island_tag, content_format, published_at, updated_at, data`,
+        [name, oldName]
+      );
+      renamedPosts = moved.rows.filter((r) => r.status === "published");
+      note = ` — renamed from "${oldName}", ${moved.rowCount} post(s) moved`;
+    }
+    await logAudit(user, "update", "category", name, `Updated category "${name}" (${status})${note}`);
   } catch (err) {
     const dbErrors = err.code === "23505" ? ["Another category already uses this name."] : [`Database error: ${err.message}`];
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
@@ -149,15 +185,13 @@ async function updateCategory(req, res, user, id) {
     return;
   }
 
-  res.writeHead(302, { Location: "/admin/categories" });
-  res.end();
+  redirectWithWarn(res, await rebuildAfterChange(renamedPosts));
 }
 
 async function deleteCategory(req, res, user, id) {
   try { await query("DELETE FROM categories WHERE id = $1", [id]); await logAudit(user, "delete", "category", String(id), "Deleted a category"); }
   catch (err) { console.error("[categories] delete failed:", err.message); }
-  res.writeHead(302, { Location: "/admin/categories" });
-  res.end();
+  redirectWithWarn(res, await rebuildAfterChange());
 }
 
 /** Used by blogRoutes.js to populate the category dropdown on the Post form. */

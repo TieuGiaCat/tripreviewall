@@ -74,3 +74,16 @@ test("every hand-written page in admin/pages renders without inline code", () =>
     assert.doesNotMatch(html, /\{\{\w+/, `${path.basename(f)} has an unreplaced token`);
   }
 });
+
+test("All Articles tabs come from the categories passed in (Admin → Categories)", () => {
+  const { renderBlogIndexHtml } = require("../src/ssr/listingTemplates");
+  const html = renderBlogIndexHtml([], [], ["Kauai", "Oahu"]);
+  assert.match(html, /data-cat="All"[\s\S]*data-cat="Kauai"[\s\S]*data-cat="Oahu"/);
+  assert.doesNotMatch(html, /data-cat="Island Guides"/);
+});
+
+test("links left empty by the Word import render as plain text", () => {
+  const post = toPostPublicShape({ ...postRow(), data: { ...postRow().data, body: '<p>See <a href="#needs-link">best beaches</a> and <a href="/tours">tours</a>.</p>' } });
+  const html = renderPostPageHtml(post, null, [], null);
+  assert.match(html, /See best beaches and <a href="\/tours">tours<\/a>/);
+});

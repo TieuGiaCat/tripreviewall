@@ -232,6 +232,7 @@ CREATE TABLE IF NOT EXISTS page_seo (
   file_path TEXT NOT NULL,
   meta_title TEXT,
   meta_description TEXT,
+  focus_keyphrase TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

@@ -95,15 +95,15 @@ async function seedDestinations() {
 }
 
 /**
- * Categories used to be a hardcoded array in blogRoutes.js — now they're an
- * editable table. Seed the original 5 once so existing posts' category
- * values remain selectable, without wiping anything if already seeded.
+ * Categories are edited in Admin → Categories. The original 5 are seeded only
+ * into an EMPTY table (a brand-new database). Before, every `npm run migrate`
+ * re-added any default category the admin had deleted.
  */
 async function seedCategories() {
   const DEFAULT_CATEGORIES = ["Island Guides", "Tour Reviews by Type", "Planning & Comparisons", "Booking & Practical Info", "Real Traveler Reviews & Data"];
+  const count = await query("SELECT count(*)::int AS n FROM categories");
+  if (count.rows[0].n > 0) return;
   for (const name of DEFAULT_CATEGORIES) {
-    const existing = await query("SELECT id FROM categories WHERE name = $1", [name]);
-    if (existing.rows.length > 0) continue;
     await query(`INSERT INTO categories (name, status) VALUES ($1, 'active')`, [name]);
     console.log(`✓ Seeded category: ${name}`);
   }

@@ -114,4 +114,33 @@ async function applyAllPageSeoOverrides() {
   }
 }
 
-module.exports = { applyMetaTags, applyPageSeoOverride, applyAllPageSeoOverrides, safeHtmlPath };
+/**
+ * What the SEO panel needs to know about a generated page: its current
+ * <title>, meta description, H1 and the main content HTML. null if the file
+ * isn't there (yet).
+ */
+async function readPageForSeo(filePath) {
+  const full = safeHtmlPath(filePath);
+  if (!full) return null;
+  let html;
+  try { html = await fs.promises.readFile(full, "utf8"); } catch (err) { return null; }
+  const pick = (re) => { const m = html.match(re); return m ? m[1] : ""; };
+  const strip = (s) => s.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
+  const main = pick(/<main\b[^>]*>([\s\S]*?)<\/main>/i) || pick(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
+  return {
+    title: strip(pick(/<title[^>]*>([\s\S]*?)<\/title>/i)),
+    description: strip(pick(/<meta\b[^>]*\bname=["']description["'][^>]*\bcontent=["']([^"']*)["']/i)),
+    h1: strip(pick(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)),
+    // Visible content only: scripts/styles/inline SVG icons removed, the page H1 kept out (it's "title").
+    mainHtml: main.replace(/<(script|style|svg)\b[\s\S]*?<\/\1>/gi, "").replace(/<h1\b[\s\S]*?<\/h1>/i, ""),
+  };
+}
+
+/** "destinations/kauai.html" → "/destinations/kauai", "index.html" → "/" */
+function filePathToUrl(filePath) {
+  const p = String(filePath || "").replace(/^\/+/, "").replace(/\.html$/i, "");
+  if (p === "index") return "/";
+  return "/" + p.replace(/\/index$/, "");
+}
+
+module.exports = { applyMetaTags, applyPageSeoOverride, applyAllPageSeoOverrides, safeHtmlPath, readPageForSeo, filePathToUrl };

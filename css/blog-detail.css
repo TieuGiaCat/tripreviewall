@@ -101,8 +101,92 @@
 .sidebar-affiliate-bullets svg { width: 14px; height: 14px; color: var(--color-primary); }
 .sidebar-affiliate-price { font-weight: 700; font-size: var(--text-h4); margin: 8px 0 12px; }
 
-/* Comparison table (inserted via the "Insert Comparison Table" Quill button) */
-.article-prose .comparison-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: var(--text-meta); }
-.article-prose .comparison-table th, .article-prose .comparison-table td { border: 1px solid var(--color-border); padding: 10px 14px; text-align: left; }
-.article-prose .comparison-table th { background: var(--color-bg-alt); font-weight: 700; }
-.article-prose .comparison-table tbody tr:nth-child(even) { background: var(--color-bg-alt); }
+/* ============================================================
+   Article body — the look every post gets, whether written in the
+   editor or imported from Word (admin/src/lib/docxToHtml.js).
+   ============================================================ */
+.article-prose > :first-child { margin-top: 0; }
+.article-prose a { color: var(--color-primary); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.article-prose a:hover { color: var(--color-cta); }
+.article-prose h2 { padding-top: 28px; border-top: 1px solid var(--color-border); line-height: 1.25; }
+.article-prose h3 { line-height: 1.3; color: var(--color-primary); scroll-margin-top: 100px; }
+.article-prose h4 { font-size: var(--text-h4); margin: 28px 0 10px; }
+.article-prose ul, .article-prose ol { margin: 0 0 24px; padding-left: 1.4em; }
+.article-prose ul { list-style: disc; }
+.article-prose ol { list-style: decimal; }
+.article-prose ul ul { list-style: circle; margin: 8px 0 0; }
+.article-prose li { margin-bottom: 10px; padding-left: 4px; }
+.article-prose li::marker { color: var(--color-cta); font-weight: 700; }
+.article-prose li > strong:first-child { color: var(--color-primary); }
+.article-prose blockquote { margin: 32px 0; padding: 6px 0 6px 24px; border-left: 3px solid var(--color-primary); font-family: var(--font-serif); font-style: italic; font-size: 1.3rem; }
+.article-prose blockquote p { margin: 0; }
+.article-prose img { max-width: 100%; height: auto; border-radius: var(--radius-md); display: block; }
+.article-prose figure { margin: 32px 0; }
+.article-prose figcaption { font-size: var(--text-meta); color: var(--color-text-muted); font-style: italic; margin-top: 8px; }
+.article-prose hr { border: none; border-top: 1px solid var(--color-border); margin: 40px 0; }
+
+/* Image notes from the writer ("[IMAGE 3 — …]") are for the editor only. */
+.article-prose .image-slot, .article-prose .image-slot-inline { display: none; }
+
+/* Quick answer — the snippet-style summary near the top */
+.article-prose .answer-box { background: rgba(11, 59, 79, 0.06); border-left: 4px solid var(--color-primary); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 20px 24px; margin: 28px 0 32px; }
+.article-prose .answer-box p { margin: 0; font-weight: 500; }
+.article-prose .answer-box .answer-box-label { font-size: var(--text-caption); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-primary); margin-bottom: 8px; }
+
+/* Callouts: "Our stance:", "Tip:", "Warning:", "Note:" */
+.article-prose .callout { border-radius: var(--radius-md); padding: 18px 22px; margin: 28px 0; border: 1px solid var(--color-border); background: var(--color-bg-alt); }
+.article-prose .callout p { margin: 0; }
+.article-prose .callout p + p { margin-top: 10px; }
+.article-prose .callout > p:first-child > strong:first-child { display: block; font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.article-prose .callout-verdict { border-color: rgba(184, 89, 47, 0.35); background: rgba(217, 123, 79, 0.08); }
+.article-prose .callout-verdict > p:first-child > strong:first-child { color: var(--color-cta); }
+.article-prose .callout-tip { border-color: rgba(92, 138, 114, 0.4); background: rgba(92, 138, 114, 0.08); }
+.article-prose .callout-tip > p:first-child > strong:first-child { color: var(--color-positive-text); }
+.article-prose .callout-warning { border-color: rgba(184, 92, 74, 0.45); background: rgba(184, 92, 74, 0.07); }
+.article-prose .callout-warning > p:first-child > strong:first-child { color: var(--color-negative-text); }
+.article-prose .callout-note > p:first-child > strong:first-child { color: var(--color-primary); }
+
+/* Tables — scroll sideways on phones instead of squashing */
+.article-prose .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 24px 0 32px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg-alt); }
+.article-prose .table-scroll .comparison-table { margin: 0; border: none; }
+.article-prose .comparison-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: var(--text-meta); line-height: 1.45; }
+.article-prose .comparison-table th, .article-prose .comparison-table td { border-bottom: 1px solid var(--color-border); padding: 11px 14px; text-align: left; vertical-align: top; }
+.article-prose .comparison-table thead th { background: var(--color-primary); color: #fff; font-weight: 600; font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.article-prose .comparison-table tbody tr:nth-child(even) { background: rgba(11, 59, 79, 0.035); }
+.article-prose .comparison-table tbody tr:hover { background: rgba(217, 123, 79, 0.08); }
+.article-prose .comparison-table tbody th { font-weight: 600; color: var(--color-primary); background: rgba(11, 59, 79, 0.05); }
+.article-prose .comparison-table.is-wide { min-width: 900px; }
+.article-prose .comparison-table.is-wide td:first-child, .article-prose .comparison-table.is-wide th:first-child { font-variant-numeric: tabular-nums; color: var(--color-text-muted); width: 1%; }
+.article-prose .comparison-table.is-wide td:nth-child(2) { font-weight: 600; }
+.article-prose .table-scroll .comparison-table tr:last-child td, .article-prose .table-scroll .comparison-table tr:last-child th { border-bottom: none; }
+
+/* FAQ */
+.article-prose .faq-block { border-bottom: 1px solid var(--color-border); padding: 4px 0 8px; }
+.article-prose .faq-block:last-of-type { border-bottom: none; }
+.article-prose .faq-block .faq-q { font-family: var(--font-sans); font-size: var(--text-body-lg); font-weight: 700; color: var(--color-text); margin: 20px 0 8px; }
+.article-prose .faq-block p { margin-bottom: 12px; color: var(--color-text); }
+
+/* Read next */
+.article-prose .read-next { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 22px 26px; margin: 32px 0; }
+.article-prose .read-next-title { font-family: var(--font-serif); font-weight: 600; font-size: var(--text-h4); margin: 0 0 12px; }
+.article-prose .read-next ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.article-prose .read-next li { padding: 0; margin: 0; }
+.article-prose .read-next li a { font-weight: 600; text-decoration: none; }
+.article-prose .read-next li a:hover { text-decoration: underline; }
+
+/* Table of contents ("In this guide") */
+.toc-guide { background: var(--color-bg-alt); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0; margin: 0 0 36px; }
+.toc-guide > summary { cursor: pointer; padding: 16px 22px; font-weight: 700; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.toc-guide > summary::-webkit-details-marker { display: none; }
+.toc-guide > summary::after { content: "+"; font-size: 1.25rem; color: var(--color-primary); }
+.toc-guide[open] > summary::after { content: "–"; }
+.toc-guide ol { margin: 0; padding: 0 22px 18px 44px; display: grid; gap: 8px; }
+.toc-guide li { font-size: var(--text-meta); }
+.toc-guide li.toc-sub { margin-left: 16px; list-style: circle; }
+.toc-guide a { color: var(--color-primary); text-decoration: none; }
+.toc-guide a:hover { text-decoration: underline; }
+.article-prose .comparison-table.is-wide td:nth-child(2) { min-width: 170px; }
+.article-prose .comparison-table td { min-width: 90px; }
+/* Grid children must be allowed to shrink, or a wide table pushes the page sideways on phones. */
+.article-body-grid > * { min-width: 0; }
+.article-prose { overflow-wrap: break-word; }

@@ -5,6 +5,8 @@ const { generatePostFile, removePostFile, isReservedSlug, regenerateListingPages
 const { listActiveAuthorsForDropdown } = require("./authorsRoutes");
 const { listActiveCategoryNames } = require("./categoriesRoutes");
 const { logAudit } = require("../auditLog");
+const { seoPanelHtml, seoPanelAssets, usedKeyphrases, scoreFor, scoreDots, SeoAnalysis } = require("../lib/seoPanel");
+const { docxToArticle } = require("../lib/docxToHtml");
 
 const ISLANDS = ["", "Oahu", "Maui", "Kauai", "Big Island"];
 const FORMATS = ["listicle", "comparison", "deep_dive_review", "honest_take"];
@@ -71,6 +73,7 @@ async function listPosts(req, res, user, urlObj) {
         <td><a href="/admin/posts/${p.id}/edit" style="color:var(--color-primary);font-weight:600;">${esc(title)}</a><br>
             <span style="color:var(--color-text-muted);font-size:12px;">${esc(p.slug)}</span></td>
         <td>${esc(p.category || "—")}</td>
+        <td>${(() => { const sc = (p.data && p.data.seo) || withSeoScores(p.data || {}, p.slug, {}).seo; return scoreDots(sc.seoScore, sc.readabilityScore, p.data && p.data.focusKeyphrase); })()}${p.data && p.data.focusKeyphrase ? `<br><span style="color:var(--color-text-muted);font-size:11px;">${esc(p.data.focusKeyphrase)}</span>` : ""}</td>
         <td>${esc(author || "—")}</td>
         <td><span class="badge ${p.status === "published" ? "badge-published" : "badge-draft"}">${esc(p.status)}</span></td>
         <td>${new Date(p.updated_at).toLocaleDateString()}</td>
@@ -106,8 +109,8 @@ async function listPosts(req, res, user, urlObj) {
     </div>
 
     <table class="data-table">
-      <thead><tr><th>Title</th><th>Category</th><th>Author</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
-      <tbody>${tableRows || `<tr><td colspan="6" style="text-align:center;color:var(--color-text-muted);padding:32px;">No posts yet — click "+ New Post" to write your first one.</td></tr>`}</tbody>
+      <thead><tr><th>Title</th><th>Category</th><th title="SEO · Readability (saved when the post is saved)">SEO</th><th>Author</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+      <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:32px;">No posts yet — click "+ New Post" to write your first one.</td></tr>`}</tbody>
     </table>
     ${paginationHtml(page, totalPages, "/admin/posts", { q: search, status: statusFilter })}
   `;
@@ -135,11 +138,16 @@ function quillJsSrc() {
 }
 
 /**
- * Builds the <head> link + end-of-body <script> needed for the Quill
- * rich-text editor on a post form. `postId` is null on the New Post form
- * (image insertion is disabled there — a post needs an id to upload to).
+ * Editor scripts for the post form.
+ *
+ * Two editing modes for the body:
+ *   • Visual  — the Quill editor (simple posts written in the admin)
+ *   • Formatted HTML — the article HTML as-is, with a live preview of the real
+ *     page. Imported Word files use this mode, because Quill would strip their
+ *     tables, quick-answer box, callouts and FAQ blocks.
+ * The current mode is saved with the post (data.bodyMode).
  */
-function quillAssets(postId, initialBodyHtml) {
+function editorAssets(postId, initialBodyHtml, bodyMode) {
   const b64 = Buffer.from(initialBodyHtml || "", "utf8").toString("base64");
   const head = quillCss();
   const scripts = `
@@ -152,17 +160,16 @@ function quillAssets(postId, initialBodyHtml) {
     }).join(''));
   }
 
-  // Quill has no native table support — register a simple custom embed
-  // block that stores the table's data as JSON on the node and renders it
-  // as plain HTML. Not editable cell-by-cell inside Quill (re-open the
-  // insert dialog to change it) — but the saved body HTML (read directly
-  // via quill.root.innerHTML on submit, never through Quill's own
-  // HTML export) contains a completely normal <table>, so it displays
-  // and reads correctly on the live article regardless of this limitation.
-  var BlockEmbed = Quill.import('blots/block/embed');
   function escHtml(s) {
-    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  // If the Quill script couldn't load, the form still works in Formatted HTML mode.
+  var hasQuill = typeof window.Quill !== 'undefined';
+  var quill = null;
+  if (hasQuill) {
+  // Quill has no native table support — a custom block stores the table as
+  // JSON and renders plain HTML (the saved body contains a normal <table>).
+  var BlockEmbed = Quill.import('blots/block/embed');
   function buildComparisonTableHtml(value) {
     var headHtml = '<tr>' + value.headers.map(function (h) { return '<th>' + escHtml(h) + '</th>'; }).join('') + '</tr>';
     var bodyHtml = value.rows.map(function (row) {
@@ -188,7 +195,7 @@ function quillAssets(postId, initialBodyHtml) {
   Quill.register(ComparisonTableBlot);
   Quill.import('ui/icons').comparisonTable = '&#9638;';
 
-  var quill = new Quill('#quill-editor', {
+  quill = new Quill('#quill-editor', {
     theme: 'snow',
     modules: {
       toolbar: [
@@ -202,15 +209,50 @@ function quillAssets(postId, initialBodyHtml) {
       ]
     }
   });
+  }
+
+  var htmlArea = document.getElementById('body-html-editor');
+  var modeInput = document.getElementById('body-mode-input');
+  var mode = hasQuill ? ${JSON.stringify(bodyMode === "html" ? "html" : "visual")} : 'html';
+  if (!hasQuill) {
+    var vBtn = document.querySelector('[data-body-mode="visual"]');
+    if (vBtn) { vBtn.disabled = true; vBtn.title = 'The visual editor could not be loaded'; }
+  }
   var initialHtml = "${b64}" ? b64DecodeUnicode("${b64}") : "";
-  if (initialHtml) quill.root.innerHTML = initialHtml;
+  if (mode === 'html') htmlArea.value = initialHtml;
+  else if (initialHtml && quill) quill.root.innerHTML = initialHtml;
+
+  var RICH = /class="[^"]*(answer-box|callout|table-scroll|faq-block|read-next|image-slot)/;
+  function showMode(m) {
+    mode = m;
+    modeInput.value = m;
+    document.getElementById('visual-editor-wrap').hidden = m !== 'visual';
+    document.getElementById('html-editor-wrap').hidden = m !== 'html';
+    document.querySelectorAll('[data-body-mode]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-body-mode') === m ? 'true' : 'false'); });
+    if (window.SeoPanel) window.SeoPanel.refresh();
+  }
+  document.querySelectorAll('[data-body-mode]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = btn.getAttribute('data-body-mode');
+      if (target === mode || (target === 'visual' && !quill)) return;
+      if (target === 'visual') {
+        if (RICH.test(htmlArea.value) && !confirm('The visual editor removes tables, the quick-answer box, callouts, FAQ blocks and image notes.\\n\\nKeep editing as formatted HTML instead?\\n(OK = switch anyway, Cancel = stay)')) return;
+        quill.root.innerHTML = htmlArea.value;
+      } else {
+        htmlArea.value = quill.root.innerHTML;
+      }
+      showMode(target);
+    });
+  });
+  showMode(mode);
+
+  function currentHtml() { return mode === 'html' || !quill ? htmlArea.value : quill.root.innerHTML; }
+  window.SeoPanelContent = currentHtml;
+  if (quill) quill.on('text-change', function () { if (window.SeoPanel) window.SeoPanel.refresh(); });
 
   var postId = ${postId ? `"${postId}"` : "null"};
-  quill.getModule('toolbar').addHandler('image', function () {
-    if (!postId) {
-      alert('Save this post first, then come back to insert images.');
-      return;
-    }
+  function uploadImage(done) {
+    if (!postId) { alert('Save this post first, then come back to insert images.'); return; }
     var input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', '.jpg,.jpeg,.png,.webp');
@@ -222,26 +264,26 @@ function quillAssets(postId, initialBodyHtml) {
       formData.append('images', file);
       fetch('/admin/posts/' + postId + '/upload-inline-image', { method: 'POST', body: formData })
         .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.url) {
-            var range = quill.getSelection(true) || { index: quill.getLength() };
-            quill.insertEmbed(range.index, 'image', data.url);
-            quill.setSelection(range.index + 1);
-            var altText = prompt('Alt text for this image (describe it for SEO and screen readers):', '');
-            if (altText) {
-              var imgs = quill.root.querySelectorAll('img[src="' + data.url + '"]');
-              var justInserted = imgs[imgs.length - 1];
-              if (justInserted) justInserted.setAttribute('alt', altText);
-            }
-          } else {
-            alert('Upload failed: ' + (data.error || 'unknown error'));
-          }
-        })
+        .then(function (data) { if (data.url) done(data.url); else alert('Upload failed: ' + (data.error || 'unknown error')); })
         .catch(function () { alert('Upload failed — check your connection and try again.'); });
     };
+  }
+
+  if (quill) quill.getModule('toolbar').addHandler('image', function () {
+    uploadImage(function (url) {
+      var range = quill.getSelection(true) || { index: quill.getLength() };
+      quill.insertEmbed(range.index, 'image', url);
+      quill.setSelection(range.index + 1);
+      var altText = prompt('Alt text for this image (describe it for SEO and screen readers):', '');
+      if (altText) {
+        var imgs = quill.root.querySelectorAll('img[src="' + url + '"]');
+        var justInserted = imgs[imgs.length - 1];
+        if (justInserted) justInserted.setAttribute('alt', altText);
+      }
+    });
   });
 
-  quill.getModule('toolbar').addHandler('comparisonTable', function () {
+  if (quill) quill.getModule('toolbar').addHandler('comparisonTable', function () {
     var input = prompt(
       'Enter table data.\\n\\nFirst line = column headers. Then one row per line.\\nSeparate columns with a | character.\\n\\nExample:\\nFeature | Option A | Option B\\nPrice | $50 | $75\\nDuration | 2 hours | 4 hours',
       'Feature | Option A | Option B\\n | | '
@@ -260,17 +302,107 @@ function quillAssets(postId, initialBodyHtml) {
     quill.setSelection(range.index + 1);
   });
 
-  var form = document.getElementById('quill-editor').closest('form');
-  form.addEventListener('submit', function () {
-    document.getElementById('body-hidden-input').value = quill.root.innerHTML;
+  // Formatted-HTML mode: "Insert image" fills the image note under (or after)
+  // the cursor — reusing the writer's alt text — or inserts at the cursor.
+  var insertBtn = document.getElementById('html-insert-image');
+  if (insertBtn) insertBtn.addEventListener('click', function () {
+    uploadImage(function (url) {
+      var v = htmlArea.value, pos = htmlArea.selectionStart || 0;
+      var re = /<div class="image-slot"[^>]*?data-alt="([^"]*)"[^>]*>[\\s\\S]*?<\\/div>/g, m, slot = null, first = null;
+      while ((m = re.exec(v))) {
+        if (!first) first = m;
+        if (m.index + m[0].length >= pos) { slot = m; break; }
+      }
+      slot = slot || first;
+      var alt = prompt('Alt text for this image:', slot ? slot[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : '');
+      if (alt === null) return;
+      var fig = '<figure><img src="' + url + '" alt="' + escHtml(alt) + '"></figure>';
+      if (slot) htmlArea.value = v.slice(0, slot.index) + fig + v.slice(slot.index + slot[0].length);
+      else htmlArea.value = v.slice(0, pos) + fig + v.slice(pos);
+      if (window.SeoPanel) window.SeoPanel.refresh();
+      refreshPreview();
+    });
   });
+
+  // Import report: paste a URL for a link the writer left empty.
+  document.querySelectorAll('[data-fix-link]').forEach(function (row) {
+    row.querySelector('button').addEventListener('click', function () {
+      var text = row.getAttribute('data-fix-link');
+      var url = row.querySelector('input').value.trim();
+      if (!url) return;
+      var target = '<a href="#needs-link">';
+      var v = currentHtml();
+      var i = v.indexOf(target + escHtml(text).replace(/&quot;/g, '"') + '</a>');
+      if (i === -1) i = v.indexOf(target);
+      if (i === -1) { alert('That link is no longer in the text.'); return; }
+      v = v.slice(0, i) + '<a href="' + escHtml(url) + '">' + v.slice(i + target.length);
+      if (mode === 'html' || !quill) htmlArea.value = v; else quill.root.innerHTML = v;
+      row.classList.add('is-fixed');
+      row.querySelector('button').textContent = 'Added ✓';
+      if (window.SeoPanel) window.SeoPanel.refresh();
+    });
+  });
+
+  var form = document.getElementById('post-form');
+  form.addEventListener('submit', function () {
+    document.getElementById('body-hidden-input').value = currentHtml();
+    modeInput.value = mode;
+  });
+
+  // Live preview of the real article page (HTML mode).
+  var previewTimer = null;
+  function refreshPreview() {
+    var frame = document.getElementById('post-preview-frame');
+    if (!frame || mode !== 'html' || frame.closest('[hidden]')) return;
+    document.getElementById('body-hidden-input').value = currentHtml();
+    modeInput.value = mode;
+    // Submit the unsaved form to the preview page, shown in the frame.
+    var oldAction = form.getAttribute('action'), oldTarget = form.getAttribute('target');
+    form.setAttribute('action', '/admin/posts/preview');
+    form.setAttribute('target', 'post-preview');
+    form.submit(); // (doesn't fire "submit", so the real Save is never triggered)
+    form.setAttribute('action', oldAction);
+    if (oldTarget) form.setAttribute('target', oldTarget); else form.removeAttribute('target');
+  }
+  var refreshBtn = document.getElementById('preview-refresh');
+  if (refreshBtn) refreshBtn.addEventListener('click', refreshPreview);
+  if (mode === 'html') setTimeout(refreshPreview, 300);
+  document.querySelectorAll('[data-body-mode="html"]').forEach(function (b) { b.addEventListener('click', function () { setTimeout(refreshPreview, 100); }); });
+  htmlArea.addEventListener('input', function () { clearTimeout(previewTimer); previewTimer = setTimeout(refreshPreview, 1500); });
 })();
 </script>`;
   return { head, scripts };
 }
 
-function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [], categoriesList = [] }) {
+function importReportHtml(report) {
+  if (!report) return "";
+  const chips = [
+    [report.words, "words"], [report.headings, "headings"], [report.tables, "tables"], [report.lists, "lists"],
+    [report.callouts, "boxes & callouts"], [report.faq, "FAQ answers"], [report.imageSlots.length, "image notes"],
+  ].filter(([n]) => n).map(([n, l]) => `<span class="import-chip"><strong>${Number(n).toLocaleString("en-US")}</strong> ${l}</span>`).join("");
+  const slots = report.imageSlots.map((s) => `<tr><td>${s.n}</td><td>${esc(s.description)}${s.caption ? `<br><small>Caption: ${esc(s.caption)}</small>` : ""}</td><td>${s.alt ? `<code>${esc(s.alt)}</code>` : "—"}</td></tr>`).join("");
+  const matched = report.linksMatched.map((l) => `<li>“${esc(l.text)}” → <code>${esc(l.href)}</code></li>`).join("");
+  const missing = [...new Set(report.linksMissing)].map((t) => `
+      <div class="fix-link-row" data-fix-link="${esc(t)}"><span>“${esc(t)}”</span><input type="text" placeholder="/blog/… or https://…"><button type="button" class="btn btn-secondary btn-sm">Add link</button></div>`).join("");
+  return `
+    <div class="form-card import-report">
+      <h2>Imported from Word — not saved yet</h2>
+      <p class="hint" style="margin-top:-8px;">Check the fields below, then click <strong>Create Post</strong> / <strong>Save Changes</strong>. Formatting was converted to the site's article style.</p>
+      <div class="import-chips">${chips}</div>
+      ${report.warnings.length ? `<div class="alert alert-error" style="margin:12px 0 0;">${report.warnings.map(esc).join("<br>")}</div>` : ""}
+      ${slots ? `<h3>Photos to add (${report.imageSlots.length})</h3>
+      <p class="hint">The writer's image notes are kept in the text but hidden on the live page. ${"Save the post, then use “Insert image” above the HTML editor — it fills the nearest note and reuses its alt text."} Image 1 is usually the hero: upload it as the Featured Image.</p>
+      <table class="data-table import-table"><thead><tr><th>#</th><th>What the photo should show</th><th>Alt text</th></tr></thead><tbody>${slots}</tbody></table>` : ""}
+      ${missing ? `<h3>Links without an address (${new Set(report.linksMissing).size})</h3>
+      <p class="hint">The Word file had these as empty links. Until you add a URL they show as plain text on the live page.</p>
+      <div class="fix-links">${missing}</div>` : ""}
+      ${matched ? `<details><summary>${report.linksMatched.length} link(s) matched to our own pages automatically</summary><ul class="import-matched">${matched}</ul></details>` : ""}
+    </div>`;
+}
+
+function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsList = [], categoriesList = [], used = {}, importReport = null }) {
   const d = post.data || {};
+  const bodyMode = d.bodyMode === "html" ? "html" : "visual";
 
   const categoryOptions = categoriesList.map(
     (c) => `<option value="${esc(c)}" ${post.category === c ? "selected" : ""}>${esc(c)}</option>`
@@ -282,13 +414,48 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
     (f) => `<option value="${f}" ${post.content_format === f ? "selected" : ""}>${f.replace(/_/g, " ")}</option>`
   ).join("");
 
+  const seoPanel = seoPanelHtml({
+    type: "post",
+    keyphrase: d.focusKeyphrase || "",
+    metaTitle: d.metaTitle || "",
+    metaDescription: d.metaDescription || "",
+    titleField: 'input[name="title"]',
+    slugField: 'input[name="slug"]',
+    urlPrefix: "/blog/",
+    titleSuffix: " | Tripreviewall",
+    descFallback: d.excerpt || "",
+    descFallbackField: 'textarea[name="excerpt"]',
+    image: d.featuredImage || "",
+    date: post.published_at ? new Date(post.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "",
+    used,
+    extraHtml: `
+        <label class="seo-label" for="seo-canonical">Canonical URL (optional)</label>
+        <input type="text" id="seo-canonical" name="canonicalUrl" value="${esc(d.canonicalUrl || "")}" placeholder="https://tripreviewall.com/blog/...">
+        <p class="hint">Leave blank unless this content is duplicated elsewhere.</p>
+        <label style="display:flex;align-items:center;gap:8px;font-weight:600;margin-top:14px;font-size:13px;">
+          <input type="checkbox" name="featuredPillar" value="1" ${d.featuredPillar ? "checked" : ""} style="width:auto;">
+          Featured Pillar (show in the "Start Here" band on the Blog page)
+        </label>`,
+  });
+
   return `
     <h1 class="page-title">${isEdit ? "Edit Post" : "New Post"}</h1>
-    <p class="page-sub">${isEdit ? esc(post.slug) : "Body is plain text for now — paragraphs render as-is on the public page."}</p>
+    <p class="page-sub">${isEdit ? esc(post.slug) : "Write in the editor, or import a finished draft from Word."}</p>
 
     ${errors.length ? `<div class="alert alert-error">${errors.map(esc).join("<br>")}</div>` : ""}
 
-    <form method="POST" action="${formAction}">
+    <form method="POST" action="${isEdit ? `/admin/posts/${post.id}/import-docx` : "/admin/posts/import-docx"}" enctype="multipart/form-data" class="form-card docx-import">
+      <h2>${isEdit ? "Replace the article from a Word file" : "Import from Word (.docx)"}</h2>
+      <p class="hint" style="margin:-8px 0 12px;">Headings, lists, tables, links and bold/italic come across; fonts and colours are replaced by the site's style. A first line like <code>Slug: … Meta description: … Focus keyphrase: …</code> fills the SEO fields. ${isEdit ? "Only the body (and any empty SEO fields) is replaced — nothing is saved until you click Save Changes." : "Nothing is saved until you click Create Post."}</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <input type="file" name="docxFile" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+        <button type="submit" class="btn btn-secondary">Import</button>
+      </div>
+    </form>
+
+    ${importReportHtml(importReport)}
+
+    <form method="POST" action="${formAction}" id="post-form">
       <div class="form-card">
         <h2>General</h2>
         <div class="form-row">
@@ -324,22 +491,7 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
         </div>
       </div>
 
-      <div class="form-card">
-        <h2>SEO</h2>
-        <div class="form-row">
-          <div class="form-field"><label>Meta Title (optional — falls back to Title above)</label><input type="text" name="metaTitle" value="${esc(d.metaTitle || "")}" maxlength="70"></div>
-          <div class="form-field"><label>Meta Description (optional — falls back to Excerpt below)</label><input type="text" name="metaDescription" value="${esc(d.metaDescription || "")}" maxlength="160"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-field"><label>Canonical URL Override (optional — leave blank unless this content is duplicated elsewhere)</label><input type="text" name="canonicalUrl" value="${esc(d.canonicalUrl || "")}" placeholder="https://tripreviewall.com/blog/..."></div>
-          <div class="form-field">
-            <label style="display:flex;align-items:center;gap:8px;font-weight:600;">
-              <input type="checkbox" name="featuredPillar" value="1" ${d.featuredPillar ? "checked" : ""} style="width:auto;">
-              Featured Pillar (show in the "Start Here" band on the Blog page)
-            </label>
-          </div>
-        </div>
-      </div>
+      ${seoPanel}
 
       <div class="form-card">
         <h2>Content</h2>
@@ -348,10 +500,30 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
         </div>
         <div class="form-row full">
           <div class="form-field">
-            <label>Body</label>
-            <div id="quill-editor" style="background:#fff;height:400px;margin-bottom:42px;"></div>
+            <div class="body-toolbar">
+              <label style="margin:0;">Body</label>
+              <span class="gp-toggle" role="group" aria-label="Editor">
+                <button type="button" data-body-mode="visual" aria-pressed="${bodyMode === "visual"}">Visual editor</button>
+                <button type="button" data-body-mode="html" aria-pressed="${bodyMode === "html"}">Formatted HTML</button>
+              </span>
+            </div>
+            <input type="hidden" name="bodyMode" id="body-mode-input" value="${bodyMode}">
+            <div id="visual-editor-wrap"${bodyMode === "html" ? " hidden" : ""}>
+              <div id="quill-editor" style="background:#fff;height:400px;margin-bottom:42px;"></div>
+              <div class="hint">${isEdit ? "Use the toolbar to insert images anywhere in the article." : "Image insertion is available after you save this post the first time."}</div>
+            </div>
+            <div id="html-editor-wrap"${bodyMode === "visual" ? " hidden" : ""}>
+              <div class="html-editor-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="html-insert-image">Insert image${isEdit ? "" : " (after first save)"}</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="preview-refresh">Refresh preview</button>
+                <span class="hint">Blocks: <code>answer-box</code> · <code>callout callout-verdict / -tip / -warning / -note</code> · <code>table-scroll</code> · <code>faq-block</code> · <code>read-next</code></span>
+              </div>
+              <div class="html-editor-split">
+                <textarea id="body-html-editor" spellcheck="false" aria-label="Article HTML"></textarea>
+                <iframe name="post-preview" id="post-preview-frame" title="Article preview" src="about:blank"></iframe>
+              </div>
+            </div>
             <textarea name="body" id="body-hidden-input" style="display:none;"></textarea>
-            <div class="hint">${isEdit ? "Use the toolbar to insert images anywhere in the article." : "Image insertion is available after you save this post the first time."}</div>
           </div>
         </div>
         <div class="form-row full">
@@ -371,6 +543,7 @@ function renderPostForm({ post = {}, errors = [], formAction, isEdit, authorsLis
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">${isEdit ? "Save Changes" : "Create Post"}</button>
+        <button type="submit" class="btn btn-secondary" formaction="/admin/posts/preview" formtarget="_blank" formnovalidate>Preview article ↗</button>
         <a href="/admin/posts" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
@@ -405,11 +578,13 @@ function bodyToPostData(body, existingData = {}) {
     excerpt: (body.excerpt || "").trim(),
     authorSlug: (body.authorSlug || "").trim() || null,
     authorName: (body.authorName || "").trim(),
-    readTimeMinutes: body.readTimeMinutes !== "" ? Number(body.readTimeMinutes) : null,
+    readTimeMinutes: body.readTimeMinutes !== "" && body.readTimeMinutes != null ? Number(body.readTimeMinutes) : null,
     body: (body.body || "").trim(),
+    bodyMode: body.bodyMode === "html" ? "html" : "visual",
     tags: (body.tags || "").split(",").map((t) => t.trim()).filter(Boolean),
     disclosureText: (body.disclosureText || "").trim(),
     relatedTourSlug: (body.relatedTourSlug || "").trim(),
+    focusKeyphrase: (body.focusKeyphrase || "").trim() || null,
     metaTitle: (body.metaTitle || "").trim() || null,
     metaDescription: (body.metaDescription || "").trim() || null,
     canonicalUrl: /^https:\/\/[^\s"'<>]+$/.test((body.canonicalUrl || "").trim()) ? body.canonicalUrl.trim() : null,
@@ -420,27 +595,55 @@ function bodyToPostData(body, existingData = {}) {
   };
 }
 
+/** Saves the SEO / readability traffic lights with the post (same analysis as the panel). */
+function withSeoScores(data, slug, used) {
+  const scores = scoreFor({
+    type: "post",
+    keyphrase: data.focusKeyphrase || "",
+    title: data.title,
+    seoTitle: `${data.metaTitle || data.title} | Tripreviewall`,
+    metaDescription: (data.metaDescription || data.excerpt || "").slice(0, 155), // same fallback as the article template
+    slug,
+    html: data.body,
+    used,
+  });
+  return { ...data, seo: scores };
+}
+
+/** Renders the New/Edit form with everything it needs (authors, categories, editor, SEO panel). */
+async function sendPostForm(res, user, statusCode, { post = {}, errors = [], isEdit, importReport = null }) {
+  const [authorsList, categoriesList, used] = await Promise.all([
+    listActiveAuthorsForDropdown(),
+    listActiveCategoryNames(),
+    usedKeyphrases(isEdit && post.id ? `post:${post.id}` : ""),
+  ]);
+  const d = post.data || {};
+  const assets = editorAssets(isEdit ? post.id : null, d.body || "", d.bodyMode);
+  const formAction = isEdit ? `/admin/posts/${post.id}/edit` : "/admin/posts/new";
+  res.writeHead(statusCode, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(layout({
+    title: isEdit ? "Edit Post" : "New Post",
+    activeNav: "blog",
+    user,
+    body: renderPostForm({ post, errors, formAction, isEdit, authorsList, categoriesList, used, importReport }),
+    extraHead: assets.head,
+    extraScripts: assets.scripts + "\n" + seoPanelAssets(),
+  }));
+}
+
 /* ============================================================
    New
    ============================================================ */
 async function newPostForm(req, res, user) {
-  const authorsList = await listActiveAuthorsForDropdown();
-  const categoriesList = await listActiveCategoryNames();
-  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  const qa = quillAssets(null, "");
-  res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, authorsList, categoriesList }), extraHead: qa.head, extraScripts: qa.scripts }));
+  await sendPostForm(res, user, 200, { isEdit: false });
 }
 
 async function createPost(req, res, user) {
-  const authorsList = await listActiveAuthorsForDropdown();
-  const categoriesList = await listActiveCategoryNames();
   let body;
   try {
     body = await readFormBody(req);
   } catch (err) {
-    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    const qa0 = quillAssets(null, "");
-    res.end(layout({ title: "New Post", activeNav: "blog", user, body: renderPostForm({ formAction: "/admin/posts/new", isEdit: false, errors: ["Malformed request."], authorsList, categoriesList }), extraHead: qa0.head, extraScripts: qa0.scripts }));
+    await sendPostForm(res, user, 400, { isEdit: false, errors: ["Malformed request (or the article is larger than 2 MB)."] });
     return;
   }
 
@@ -450,25 +653,15 @@ async function createPost(req, res, user) {
   if (!slug) errors.push("Could not generate a valid slug — please set one manually.");
   if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
-  const data = bodyToPostData(body);
+  const data = withSeoScores(bodyToPostData(body), slug, await usedKeyphrases(""));
   const status = body.status === "published" ? "published" : "draft";
   const category = (body.category || "").trim() || null;
   const islandTag = ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null;
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
+  const postForForm = { slug, status, category, island_tag: islandTag, content_format: contentFormat, data };
 
   if (errors.length) {
-    const qa1 = quillAssets(null, data.body);
-    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(
-      layout({
-        title: "New Post",
-        activeNav: "blog",
-        user,
-        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: "/admin/posts/new", isEdit: false, authorsList, categoriesList }),
-        extraHead: qa1.head,
-        extraScripts: qa1.scripts,
-      })
-    );
+    await sendPostForm(res, user, 400, { isEdit: false, post: postForForm, errors });
     return;
   }
 
@@ -486,18 +679,7 @@ async function createPost(req, res, user) {
   } catch (err) {
     console.error("[posts] create failed:", err.message);
     const dbErrors = err.code === "23505" ? ["A post with this slug already exists."] : [`Database error: ${err.message}`];
-    const qa2 = quillAssets(null, data.body);
-    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(
-      layout({
-        title: "New Post",
-        activeNav: "blog",
-        user,
-        body: renderPostForm({ post: { slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: "/admin/posts/new", isEdit: false, authorsList, categoriesList }),
-        extraHead: qa2.head,
-        extraScripts: qa2.scripts,
-      })
-    );
+    await sendPostForm(res, user, 400, { isEdit: false, post: postForForm, errors: dbErrors });
     return;
   }
 
@@ -525,28 +707,22 @@ async function editPostForm(req, res, user, id) {
     res.end(layout({ title: "Not found", activeNav: "blog", user, body: `<div class="alert alert-error">Post not found.</div><a href="/admin/posts" class="btn btn-secondary">Back to Posts</a>` }));
     return;
   }
-  const authorsList = await listActiveAuthorsForDropdown();
-  const categoriesList = await listActiveCategoryNames();
-  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  const qa3 = quillAssets(id, (post.data && post.data.body) || "");
-  res.end(layout({ title: "Edit Post", activeNav: "blog", user, body: renderPostForm({ post, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList, categoriesList }), extraHead: qa3.head, extraScripts: qa3.scripts }));
+  await sendPostForm(res, user, 200, { isEdit: true, post });
 }
 
 async function updatePost(req, res, user, id) {
-  const authorsList = await listActiveAuthorsForDropdown();
-  const categoriesList = await listActiveCategoryNames();
   let body;
   try {
     body = await readFormBody(req);
   } catch (err) {
     res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    res.end("Malformed request.");
+    res.end("Malformed request (or the article is larger than 2 MB).");
     return;
   }
 
   let existing;
   try {
-    const existingResult = await query("SELECT slug, status, data FROM posts WHERE id = $1", [id]);
+    const existingResult = await query("SELECT slug, status, published_at, data FROM posts WHERE id = $1", [id]);
     existing = existingResult.rows[0];
   } catch (err) {
     res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
@@ -565,25 +741,15 @@ async function updatePost(req, res, user, id) {
   if (!slug) errors.push("Could not generate a valid slug.");
   if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
-  const data = bodyToPostData(body, existing.data || {});
+  const data = withSeoScores(bodyToPostData(body, existing.data || {}), slug, await usedKeyphrases(`post:${id}`));
   const status = body.status === "published" ? "published" : "draft";
   const category = (body.category || "").trim() || null;
   const islandTag = ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null;
   const contentFormat = FORMATS.includes(body.contentFormat) ? body.contentFormat : "listicle";
+  const postForForm = { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, published_at: existing.published_at, data };
 
   if (errors.length) {
-    const qa4 = quillAssets(id, data.body);
-    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(
-      layout({
-        title: "Edit Post",
-        activeNav: "blog",
-        user,
-        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList, categoriesList }),
-        extraHead: qa4.head,
-        extraScripts: qa4.scripts,
-      })
-    );
+    await sendPostForm(res, user, 400, { isEdit: true, post: postForForm, errors });
     return;
   }
 
@@ -608,18 +774,7 @@ async function updatePost(req, res, user, id) {
   } catch (err) {
     console.error("[posts] update failed:", err.message);
     const dbErrors = err.code === "23505" ? ["Another post already uses this slug."] : [`Database error: ${err.message}`];
-    const qa5 = quillAssets(id, data.body);
-    res.writeHead(400, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(
-      layout({
-        title: "Edit Post",
-        activeNav: "blog",
-        user,
-        body: renderPostForm({ post: { id, slug, status, category, island_tag: islandTag, content_format: contentFormat, data }, errors: dbErrors, formAction: `/admin/posts/${id}/edit`, isEdit: true, authorsList, categoriesList }),
-        extraHead: qa5.head,
-        extraScripts: qa5.scripts,
-      })
-    );
+    await sendPostForm(res, user, 400, { isEdit: true, post: postForForm, errors: dbErrors });
     return;
   }
 
@@ -627,6 +782,158 @@ async function updatePost(req, res, user, id) {
 
   res.writeHead(302, { Location: postsRedirect(genErrors) });
   res.end();
+}
+
+/* ============================================================
+   Word import + preview
+   ============================================================ */
+/** Our own pages the converter can link to when the Word file left a link empty. */
+async function buildLinkTargets() {
+  const targets = [];
+  const n = (s) => SeoAnalysis.norm(s);
+  [["Oahu", "oahu"], ["Maui", "maui"], ["Kauai", "kauai"], ["Big Island", "big-island"]].forEach(([name, slug]) => {
+    const k = n(name);
+    targets.push({ label: `${name} destination page`, href: `/destinations/${slug}`, keys: [k, `${k} tours`, `${k} tours page`, `${k} tour page`, `${k} destination page`, `${k} destination`, `${k} guide`, `${k} island guide`] });
+  });
+  try {
+    const posts = await query(`SELECT slug, data->>'title' AS title, data->>'focusKeyphrase' AS kp FROM posts WHERE status = 'published'`);
+    posts.rows.forEach((r) => {
+      const keys = [n(r.title), n(String(r.title || "").split(/[:—–|]/)[0]), n(r.slug.replace(/-/g, " "))];
+      if (r.kp) keys.push(n(r.kp), n(`${r.kp} guide`));
+      targets.push({ label: `Article “${r.title}”`, href: `/blog/${r.slug}`, keys: keys.filter(Boolean), priority: 5 });
+    });
+  } catch (err) { /* no posts table */ }
+  try {
+    const tours = await query(`SELECT slug, data->>'name' AS name FROM tours WHERE status = 'published'`);
+    tours.rows.forEach((r) => targets.push({ label: `Tour “${r.name}”`, href: `/tours/${r.slug}`, keys: [n(r.name)].filter(Boolean) }));
+  } catch (err) { /* no tours table */ }
+  return targets;
+}
+
+/** Saves a picture embedded in the Word file into /uploads/posts and returns its URL. */
+function saveDocxImage(slugHint) {
+  const fs = require("fs");
+  const path = require("path");
+  const crypto = require("crypto");
+  const { UPLOAD_ROOT } = require("../upload");
+  return (buffer, name) => {
+    const ext = path.extname(name).toLowerCase();
+    if (![".jpg", ".jpeg", ".png", ".webp", ".gif"].includes(ext)) throw new Error(`${ext || "this"} images aren't supported — re-insert it as JPG or PNG`);
+    if (buffer.length > 8 * 1024 * 1024) throw new Error("image is larger than 8 MB");
+    const dir = path.join(UPLOAD_ROOT, "posts");
+    fs.mkdirSync(dir, { recursive: true });
+    const file = `${String(slugHint || "article").replace(/[^a-z0-9-]/gi, "").slice(0, 50)}-${Date.now()}-${crypto.randomBytes(3).toString("hex")}${ext}`;
+    fs.writeFileSync(path.join(dir, file), buffer);
+    return `/uploads/posts/${file}`;
+  };
+}
+
+async function importDocx(req, res, user, id = null) {
+  const { parseDocxUpload } = require("../upload");
+  let existing = null;
+  if (id) {
+    try {
+      const r = await query("SELECT * FROM posts WHERE id = $1", [id]);
+      existing = r.rows[0];
+    } catch (err) { /* handled below */ }
+    if (!existing) {
+      res.writeHead(404, { "Content-Type": "text/html; charset=utf-8" });
+      res.end(layout({ title: "Not found", activeNav: "blog", user, body: `<div class="alert alert-error">Post not found.</div>` }));
+      return;
+    }
+  }
+
+  let converted;
+  try {
+    const buffer = await parseDocxUpload(req);
+    if (!buffer) throw new Error("Choose a .docx file first.");
+    converted = docxToArticle(buffer, { linkTargets: await buildLinkTargets(), saveImage: saveDocxImage(existing ? existing.slug : "article") });
+  } catch (err) {
+    console.error("[posts] docx import failed:", err.message);
+    await sendPostForm(res, user, 400, { isEdit: !!existing, post: existing || {}, errors: [`Word import failed: ${err.message}`] });
+    return;
+  }
+
+  const f = converted.fields;
+  const categoriesList = await listActiveCategoryNames();
+  const guessIsland = ISLANDS.filter(Boolean).find((i) => SeoAnalysis.match(`${f.title || ""} ${f.island || ""}`, i) === "exact") || null;
+  const guessCategory = f.category ? categoriesList.find((c) => c.toLowerCase() === f.category.toLowerCase()) || null : null;
+  if (f.focusKeyphraseGuessed) converted.report.warnings.push(`No “Focus keyphrase:” line in the file — suggested “${f.focusKeyphrase}” from the slug. Check it in the SEO panel.`);
+  if (f.category && !guessCategory) converted.report.warnings.push(`Category “${f.category}” doesn't exist in Admin → Categories — pick one below.`);
+
+  let post;
+  if (existing) {
+    const d = existing.data || {};
+    post = {
+      ...existing,
+      data: {
+        ...d,
+        body: converted.html,
+        bodyMode: "html",
+        title: d.title || f.title || "",
+        focusKeyphrase: d.focusKeyphrase || f.focusKeyphrase || null,
+        metaTitle: d.metaTitle || f.metaTitle || null,
+        metaDescription: d.metaDescription || f.metaDescription || null,
+        excerpt: d.excerpt || f.excerpt || "",
+        readTimeMinutes: f.readTimeMinutes || d.readTimeMinutes,
+      },
+    };
+  } else {
+    post = {
+      slug: f.slug || "",
+      status: "draft",
+      category: guessCategory,
+      island_tag: guessIsland,
+      content_format: /\bvs\b|versus|compar/i.test(f.title || "") ? "comparison" : "listicle",
+      data: {
+        title: f.title || "",
+        excerpt: f.excerpt || "",
+        authorName: f.authorName || "",
+        readTimeMinutes: f.readTimeMinutes,
+        body: converted.html,
+        bodyMode: "html",
+        focusKeyphrase: f.focusKeyphrase || null,
+        metaTitle: f.metaTitle || null,
+        metaDescription: f.metaDescription || null,
+        tags: [],
+      },
+    };
+  }
+  await sendPostForm(res, user, 200, { isEdit: !!existing, post, importReport: converted.report });
+}
+
+/** POST /admin/posts/preview — the real article page, rendered from the unsaved form. */
+async function previewPost(req, res, user) {
+  const { renderPostPageHtml } = require("../ssr/postTemplate");
+  const { toPublicShape, toPostPublicShape } = require("./publicApi");
+  let body;
+  try { body = await readFormBody(req); } catch (err) { res.writeHead(400); res.end("Malformed request."); return; }
+  const slug = slugify(body.slug || body.title) || "preview";
+  const data = bodyToPostData(body);
+  const row = {
+    slug, category: (body.category || "").trim() || null,
+    island_tag: ISLANDS.includes(body.islandTag) && body.islandTag ? body.islandTag : null,
+    content_format: body.contentFormat, published_at: new Date(), updated_at: new Date(), data,
+  };
+  let relatedTour = null, author = null;
+  try {
+    if (data.relatedTourSlug) {
+      const t = await query(`SELECT slug, island, price_from, data FROM tours WHERE slug = $1 LIMIT 1`, [data.relatedTourSlug]);
+      if (t.rows[0]) relatedTour = toPublicShape(t.rows[0]);
+    }
+    if (data.authorSlug) {
+      const a = await query(`SELECT slug, data FROM authors WHERE slug = $1 LIMIT 1`, [data.authorSlug]);
+      if (a.rows[0]) author = { slug: a.rows[0].slug, ...(a.rows[0].data || {}) };
+    }
+  } catch (err) { /* preview without extras */ }
+  let html = renderPostPageHtml(toPostPublicShape(row), relatedTour, [], author);
+  html = html.replace("<head>", '<head>\n<meta name="robots" content="noindex, nofollow">')
+    .replace("<body>", '<body>\n<div style="position:sticky;top:0;z-index:999;background:#B8592F;color:#fff;font:600 13px/1 Inter,sans-serif;padding:8px 16px;text-align:center;">Preview — not published</div>');
+  // This page is shown inside the admin's preview frame.
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Content-Security-Policy", "frame-ancestors 'self'");
+  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+  res.end(html);
 }
 
 async function deletePost(req, res, user, id) {
@@ -735,4 +1042,4 @@ async function uploadInlineImage(req, res, user, id) {
   res.end(JSON.stringify({ url: uploadResult.urls[0] }));
 }
 
-module.exports = { listPosts, newPostForm, createPost, editPostForm, updatePost, deletePost, uploadPostImage, uploadInlineImage };
+module.exports = { listPosts, newPostForm, createPost, editPostForm, updatePost, deletePost, uploadPostImage, uploadInlineImage, importDocx, previewPost };

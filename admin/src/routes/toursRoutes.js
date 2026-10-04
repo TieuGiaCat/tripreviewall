@@ -3,6 +3,7 @@ const { readFormBody, slugify, esc, linesToArray, httpUrlOrEmpty } = require("..
 const { layout, paginationHtml } = require("../render");
 const { generateTourFile, removeTourFile, isReservedSlug, regenerateListingPages } = require("../ssr/generator");
 const { logAudit } = require("../auditLog");
+const { seoPanelHtml, seoPanelAssets, scoreFor, scoreDots, usedKeyphrases, SeoAnalysis } = require("../lib/seoPanel");
 const { LEGACY_EDITORS_PICK_SLUGS } = require("../siteConfig");
 const { tourAffiliateIssues, SQL_HAS_AFFILIATE_ISSUE, clientRulesJson } = require("../lib/affiliateLinks");
 
@@ -96,6 +97,7 @@ async function listTours(req, res, user, urlObj) {
         <td><span class="badge ${t.status === "published" ? "badge-published" : "badge-draft"}">${esc(t.status)}</span></td>
         <td>${t.price_from != null ? "$" + esc(t.price_from) : "—"}</td>
         <td>${rating != null ? esc(rating) + "★" : "—"}</td>
+        <td>${(() => { const sc = tourSeoScores(t.data || {}, t.slug); return scoreDots(sc.seoScore, sc.readabilityScore, t.data && t.data.focusKeyphrase); })()}</td>
         <td>${new Date(t.updated_at).toLocaleDateString()}</td>
         <td>
           <a href="/admin/tours/${t.id}/edit" class="btn btn-secondary btn-sm">Edit</a>
@@ -141,8 +143,8 @@ async function listTours(req, res, user, urlObj) {
     </div>
 
     <table class="data-table">
-      <thead><tr><th>${sortLink("Name", sort === "name_asc" ? "name_desc" : "name_asc", sort.startsWith("name_") ? (sort === "name_asc" ? " ▲" : " ▼") : "")}</th><th>Island</th><th>Status</th><th>Price</th><th>Rating</th><th>${sortLink("Updated", sort === "updated_desc" ? "updated_asc" : "updated_desc", sort.startsWith("updated_") ? (sort === "updated_desc" ? " ▼" : " ▲") : "")}</th><th>Actions</th></tr></thead>
-      <tbody>${tableRows || `<tr><td colspan="7" style="text-align:center;color:var(--color-text-muted);padding:32px;">No tours match this search yet.</td></tr>`}</tbody>
+      <thead><tr><th>${sortLink("Name", sort === "name_asc" ? "name_desc" : "name_asc", sort.startsWith("name_") ? (sort === "name_asc" ? " ▲" : " ▼") : "")}</th><th>Island</th><th>Status</th><th>Price</th><th>Rating</th><th title="SEO · Readability">SEO</th><th>${sortLink("Updated", sort === "updated_desc" ? "updated_asc" : "updated_desc", sort.startsWith("updated_") ? (sort === "updated_desc" ? " ▼" : " ▲") : "")}</th><th>Actions</th></tr></thead>
+      <tbody>${tableRows || `<tr><td colspan="8" style="text-align:center;color:var(--color-text-muted);padding:32px;">No tours match this search yet.</td></tr>`}</tbody>
     </table>
     ${paginationHtml(page, totalPages, "/admin/tours", { q: search, status: statusFilter, island: islandFilter, links: linksFilter, sort })}
   `;
@@ -287,11 +289,25 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         <div class="form-row full">
           <div class="form-field"><label>Full Description</label><textarea name="fullDescription" style="min-height:140px;">${esc(d.fullDescription || "")}</textarea></div>
         </div>
-        <div class="form-row">
-          <div class="form-field"><label>Meta Title (optional — falls back to Tour Name + Company)</label><input type="text" name="metaTitle" value="${esc(d.metaTitle || "")}" maxlength="70"></div>
-          <div class="form-field"><label>Meta Description (optional — falls back to Full Description)</label><input type="text" name="metaDescription" value="${esc(d.metaDescription || "")}" maxlength="160"></div>
-        </div>
       </div>
+
+      ${seoPanelHtml({
+        type: "tour",
+        keyphrase: d.focusKeyphrase || "",
+        metaTitle: d.metaTitle || "",
+        metaDescription: d.metaDescription || "",
+        titleField: 'input[name="name"]',
+        slugField: 'input[name="slug"]',
+        urlPrefix: "/tours/",
+        titleSuffix: " | Tripreviewall",
+        fallbackFields: ["name", "company"],
+        descFallback: String(d.fullDescription || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 155),
+        image: gallery[0] || "",
+        usedUrl: `/admin/seo/used-keyphrases?self=${isEdit && tour.id ? `tour:${encodeURIComponent(tour.id)}` : ""}`,
+        descFallbackField: 'textarea[name="fullDescription"]',
+        contentBuilder: "tour",
+        galleryCount: gallery.length,
+      })}
 
       <div class="form-card">
         <h2>Our Verdict</h2>
@@ -477,6 +493,7 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
       `
       }
     </div>
+    ${seoPanelAssets()}
   `;
 }
 
@@ -527,6 +544,19 @@ function ratingsFromBody(body, existingData) {
   };
 }
 
+/** SEO / readability traffic lights for a tour's data (same analysis as the admin panel). */
+function tourSeoScores(d, slug) {
+  return scoreFor({
+    type: "tour",
+    keyphrase: d.focusKeyphrase || "",
+    title: d.name,
+    seoTitle: `${d.metaTitle || [d.name, d.company].filter(Boolean).join(" — ")} | Tripreviewall`,
+    metaDescription: (d.metaDescription || String(d.fullDescription || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()).slice(0, 155),
+    slug,
+    html: SeoAnalysis.tourHtml(d),
+  });
+}
+
 function bodyToTourData(body, existingData = {}) {
   return {
     // Keep every existing field the form doesn't edit (anything imported or
@@ -545,6 +575,7 @@ function bodyToTourData(body, existingData = {}) {
     editorsPick: body.editorsPick === "1",
     highlights: linesToArray(body.highlights),
     fullDescription: (body.fullDescription || "").trim(),
+    focusKeyphrase: (body.focusKeyphrase || "").trim() || null,
     metaTitle: (body.metaTitle || "").trim() || null,
     metaDescription: (body.metaDescription || "").trim() || null,
     verdict: {
@@ -646,6 +677,7 @@ async function createTour(req, res, user) {
   }
 
   const data = bodyToTourData(body);
+  data.seo = tourSeoScores(data, slug);
   const status = body.status === "published" ? "published" : "draft";
   const island = ISLANDS.includes(body.island) ? body.island : null;
   const priceFrom = body.priceFrom !== "" ? Number(body.priceFrom) : null;
@@ -738,6 +770,7 @@ async function updateTour(req, res, user, id) {
   if (isReservedSlug(slug)) errors.push(`"${slug}" is a reserved page name — please choose a different slug.`);
 
   const data = bodyToTourData(body, existing.data || {});
+  data.seo = tourSeoScores(data, slug);
   const status = body.status === "published" ? "published" : "draft";
   const island = ISLANDS.includes(body.island) ? body.island : null;
   const priceFrom = body.priceFrom !== "" ? Number(body.priceFrom) : null;
@@ -989,7 +1022,7 @@ const EXPORT_COLUMNS = [
   "priceFrom",
   "location_lat", "location_lng",
   "fareharborItemId",
-  "metaTitle", "metaDescription",
+  "focusKeyphrase", "metaTitle", "metaDescription",
   "fareharborRegularLink", "fareharborCalendarScript", "showFareharbor",
   "tripadvisorUrl", "showTripadvisor",
   "getyourguideUrl", "showGetyourguide",
@@ -1041,6 +1074,7 @@ async function exportToursCsv(req, res, user) {
       ])),
       location_lat: loc.lat != null ? loc.lat : "", location_lng: loc.lng != null ? loc.lng : "",
       fareharborItemId: d.fareharborItemId || "",
+      focusKeyphrase: d.focusKeyphrase || "",
       metaTitle: d.metaTitle || "",
       metaDescription: d.metaDescription || "",
       fareharborRegularLink: d.fareharborRegularLink || "",
@@ -1106,7 +1140,7 @@ function renderImportForm({ report = null, backfillReport = null } = {}) {
 
     <div class="form-card">
       <h2>Columns this tool updates</h2>
-      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, metaTitle, metaDescription, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, google/tripadvisor/getyourguide/viator _rating, _count and _show (TRUE/FALSE = show that platform's card on the live page). When platform ratings are present, the overall rating and total count are recalculated from the shown platforms.
+      <p style="color:var(--color-text-muted);">priceFrom, location_lat, location_lng, focusKeyphrase, metaTitle, metaDescription, fareharborRegularLink, fareharborCalendarScript, showFareharbor, tripadvisorUrl, showTripadvisor, getyourguideUrl, showGetyourguide, viatorUrl, showViator, aggregatedRating, reviewCountTotal, star5–star1, google/tripadvisor/getyourguide/viator _rating, _count and _show (TRUE/FALSE = show that platform's card on the live page). When platform ratings are present, the overall rating and total count are recalculated from the shown platforms.
       The slug/name/island/status columns are shown for reference only — editing them in the spreadsheet has no effect. <strong>fareharborItemId is the match key</strong> — it must be present and correct for a row to update anything.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Meta Title / Meta Description:</strong> aim for ≤ 60 characters (title) and ≤ 160 characters (description). Longer values are still saved but Google will cut them off in search results. A blank cell keeps the current value.</p>
       <p style="color:var(--color-text-muted);margin-top:8px;"><strong>Important:</strong> all rating fields (including "fareharbor_rating") must be on a <strong>0–5 scale</strong> to match the star display — not FareHarbor's own internal 0–100 "quality score."</p>
@@ -1289,7 +1323,7 @@ async function importToursCsv(req, res, user) {
     // SEO meta — blank cell = keep current value. Whitespace/newlines collapsed
     // because a title/description must be a single line in <head>.
     const metaWarnings = [];
-    [["metaTitle", 60], ["metaDescription", 160]].forEach(([key, limit]) => {
+    [["focusKeyphrase", 80], ["metaTitle", 60], ["metaDescription", 160]].forEach(([key, limit]) => {
       const v = String(csvRow[key] || "").replace(/\s+/g, " ").trim();
       if (!v) return;
       if (v.length > limit) metaWarnings.push(`${key} is ${v.length} chars (recommended ≤ ${limit})`);

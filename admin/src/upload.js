@@ -91,7 +91,35 @@ function parseCsvUpload(req) {
   });
 }
 
-module.exports = { parseImageUpload, parseCsvUpload, fetchAndConvertToWebp, UPLOAD_ROOT };
+/**
+ * Reads an uploaded Word file (field "docxFile", max 20 MB) into memory for
+ * the blog importer. Returns a Buffer, or null if no file was sent.
+ */
+function parseDocxUpload(req) {
+  return new Promise((resolve, reject) => {
+    const form = formidable({ multiples: false, maxFileSize: 20 * 1024 * 1024 });
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        reject(new Error(/maxFileSize/i.test(err.message) ? "The Word file is larger than 20 MB." : err.message));
+        return;
+      }
+      const file = Array.isArray(files.docxFile) ? files.docxFile[0] : files.docxFile;
+      if (!file || !file.filepath) { resolve(null); return; }
+      const ext = path.extname(file.originalFilename || "").toLowerCase();
+      if (ext !== ".docx") {
+        fs.unlink(file.filepath, () => {});
+        reject(new Error(ext === ".doc" ? "Old .doc files aren't supported — in Word use File → Save As → .docx." : "Please upload a .docx file."));
+        return;
+      }
+      fs.readFile(file.filepath, (readErr, buf) => {
+        fs.unlink(file.filepath, () => {});
+        if (readErr) reject(readErr); else resolve(buf);
+      });
+    });
+  });
+}
+
+module.exports = { parseImageUpload, parseCsvUpload, parseDocxUpload, fetchAndConvertToWebp, UPLOAD_ROOT };
 
 /* ============================================================
    Fetch-from-URL → convert to WebP (Media Library "paste a link" feature).

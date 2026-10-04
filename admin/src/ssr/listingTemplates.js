@@ -3,7 +3,7 @@ const { headBoilerplate, scriptTags, siteHeader, siteFooter } = require("./layou
 const { tourCardHtml, imgUrl, coverImg, preloadImg, absUrl } = require("./sharedHtml");
 const { ISLANDS } = require("./islands");
 
-const { SITE_URL, CATEGORY_GRADIENTS, DEFAULT_GRADIENT, BLOG_CATEGORIES: CATEGORY_LIST } = require("../siteConfig");
+const { SITE_URL, CATEGORY_GRADIENTS, DEFAULT_GRADIENT, BLOG_CATEGORIES: DEFAULT_CATEGORY_LIST } = require("../siteConfig");
 
 
 /* ============================================================
@@ -120,7 +120,6 @@ function fmtPostDate(d) {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
 }
 
-const BLOG_CATEGORIES = ["All", ...CATEGORY_LIST];
 const BLOG_INITIAL_VISIBLE = 6;
 
 function blogCardHtml(p, prefix, hidden) {
@@ -138,8 +137,14 @@ function blogCardHtml(p, prefix, hidden) {
     </a>`;
 }
 
-function renderBlogIndexHtml(posts, pillarPosts = []) {
+/**
+ * `categories` = active category names from Admin → Blog Posts → Categories
+ * (passed in by the generator). Falls back to the old fixed list only if the
+ * categories table can't be read.
+ */
+function renderBlogIndexHtml(posts, pillarPosts = [], categories = null) {
   const sorted = [...posts].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const tabs = ["All", ...(Array.isArray(categories) ? categories : DEFAULT_CATEGORY_LIST)];
   const pillarCards = pillarPosts
     .map((p) => `
       <a class="pillar-card" href="/blog/${esc(p.slug)}">
@@ -189,7 +194,7 @@ ${siteHeader()}
   </div>
 
   <div class="container">
-    <div class="layer1-tabs" id="layer1-tabs" role="group" aria-label="Filter articles by category">${BLOG_CATEGORIES.map((c, i) => `<button type="button" class="layer1-tab${i === 0 ? " active" : ""}" data-cat="${esc(c)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(c)}</button>`).join("")}</div>
+    <div class="layer1-tabs" id="layer1-tabs" role="group" aria-label="Filter articles by category">${tabs.map((c, i) => `<button type="button" class="layer1-tab${i === 0 ? " active" : ""}" data-cat="${esc(c)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(c)}</button>`).join("")}</div>
     <div class="layer2-row">
       <label for="island-select" style="font-size:var(--text-meta);color:var(--color-text-muted);">Filter by:</label>
       <select class="layer2-select" id="island-select">${["All", ...new Set(sorted.map((p) => p.island).filter(Boolean))].map((i) => `<option value="${esc(i)}">${i === "All" ? "Island: All" : esc(i)}</option>`).join("")}</select>

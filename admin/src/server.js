@@ -259,6 +259,17 @@ async function routeRequest(req, res) {
   if (method === "POST" && pathname === "/admin/posts/new") {
     return blogRoutes.createPost(req, res, session);
   }
+  // Word import (new post / replace the body of an existing one) and live preview.
+  if (method === "POST" && pathname === "/admin/posts/import-docx") {
+    return blogRoutes.importDocx(req, res, session);
+  }
+  if (method === "POST" && pathname === "/admin/posts/preview") {
+    return blogRoutes.previewPost(req, res, session);
+  }
+  const postImportMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/import-docx$/);
+  if (postImportMatch && method === "POST") {
+    return blogRoutes.importDocx(req, res, session, postImportMatch[1]);
+  }
   const postEditMatch = pathname.match(/^\/admin\/posts\/([^/]+)\/edit$/);
   if (postEditMatch) {
     const id = postEditMatch[1];
@@ -434,6 +445,11 @@ async function routeRequest(req, res) {
   // ---- Audit Log ----
   if (method === "GET" && pathname === "/admin/audit-log") {
     return auditLogRoutes.showAuditLog(req, res, session, urlObj);
+  }
+
+  // ---- SEO panel helper: focus keyphrases already used elsewhere ----
+  if (method === "GET" && pathname === "/admin/seo/used-keyphrases") {
+    return require("./lib/seoPanel").usedKeyphrasesJson(req, res, urlObj);
   }
 
   // ---- Page SEO ----
