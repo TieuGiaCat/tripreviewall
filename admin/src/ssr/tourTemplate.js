@@ -7,6 +7,7 @@ const HERO_WIDTHS = [400, 800, 1200, 1600];
 
 const { SITE_URL } = require("../siteConfig");
 const { currentSiteInfo } = require("../lib/siteInfo");
+const tc = require("./tourContent");
 
 /**
  * Platform cards for the "Review" tab — only the platforms ticked in admin
@@ -22,13 +23,19 @@ const RATING_PLATFORMS = [
 ];
 function ratingsBySourceForDisplay(tour) {
   const rbs = tour.ratingsBySource || {};
-  return RATING_PLATFORMS
+  const fromAdmin = RATING_PLATFORMS
     .filter((p) => {
       const r = rbs[p.key];
       if (!r || r.avg == null) return false;
       return typeof r.show === "boolean" ? r.show : p.key !== "google";
     })
     .map((p) => ({ name: p.name, avg: Number(rbs[p.key].avg), count: Number(rbs[p.key].count) || 0 }));
+  if (fromAdmin.length) return fromAdmin;
+  // Nothing entered in Admin tab 2 → fall back to the researched public scores
+  // in tour.content.review.ratings (imported content / Admin tab 4).
+  const c = tour.content && tour.content.review && Array.isArray(tour.content.review.ratings) ? tour.content.review.ratings : [];
+  return c.filter((r) => r && r.platform && r.rating != null && !isNaN(Number(r.rating)))
+    .map((r) => ({ name: r.platform, avg: Number(r.rating), count: Number(r.count) || 0, asOf: r.asOf || "" }));
 }
 
 function quickFactsHtml(tour) {
@@ -125,7 +132,7 @@ function ratingsSectionHtml(tour) {
             <div class="source-card-name">${esc(s.name)}</div>
             ${starsRowHtml(s.avg)}
             <div class="source-card-score tabular">${s.avg.toFixed(1)}</div>
-            <div class="source-card-count tabular">${s.count.toLocaleString()} reviews</div>
+            <div class="source-card-count tabular">${s.count ? `${s.count.toLocaleString()} reviews` : "review count not shown"}</div>
           </div>`).join("")}
       </div>` : `<p class="detail-body-text">We haven't collected platform ratings for this tour yet.</p>`}
       ${gs.summaryText ? `
@@ -158,14 +165,16 @@ const CONTACT_ICONS = {
 function contactPanelHtml(tour) {
   const mode = currentSiteInfo().operatorContact || "after-click";
   if (mode === "never") return "";
-  const hasContact = !!(tour.contactPhone || tour.contactEmail);
+  const k0 = (tour.content && tour.content.contact) || {};
+  const hasContact = !!(tour.contactPhone || tour.contactEmail || k0.website || k0.address);
   const note = `<p class="contact-note">This is the tour operator's own contact info, shared for general questions — not for bookings. Book through the booking links for real-time availability and the best price.</p>`;
+  const extra = tc.contactExtraHtml(tour.content);
   const contactList = `
           <ul class="highlight-list contact-list">
             ${tour.company ? `<li>${CONTACT_ICONS.company}${esc(tour.company)}</li>` : ""}
             ${tour.contactPhone ? `<li>${CONTACT_ICONS.phone}<a href="tel:${esc(telDigits(tour.contactPhone))}">${esc(tour.contactPhone)}</a></li>` : ""}
             ${tour.contactEmail ? `<li>${CONTACT_ICONS.email}<a href="mailto:${esc(tour.contactEmail)}">${esc(tour.contactEmail)}</a></li>` : ""}
-          </ul>`;
+          </ul>${extra}`;
   const none = `<p class="detail-body-text">No direct contact info on file for this operator yet. The fastest way to reach them is by starting a booking — you'll get their confirmation details and support contact right away.</p>`;
 
   let body;
@@ -173,7 +182,8 @@ function contactPanelHtml(tour) {
   else if (mode === "always") body = contactList + note;
   else {
     const options = bookingOptions(tour);
-    const payload = Buffer.from(JSON.stringify({ company: tour.company || "", phone: tour.contactPhone || "", email: tour.contactEmail || "" }), "utf8").toString("base64");
+    const k = (tour.content && tour.content.contact) || {};
+    const payload = Buffer.from(JSON.stringify({ company: tour.company || "", phone: tour.contactPhone || "", email: tour.contactEmail || "", website: k.website || "", address: k.address || "", hours: k.hours || "" }), "utf8").toString("base64");
     body = `
           <div class="contact-gate" data-contact="${esc(payload)}" data-tour="${esc(tour.slug)}">
             <div class="contact-locked">
@@ -183,7 +193,9 @@ function contactPanelHtml(tour) {
             </div>
             <div class="contact-unlocked" hidden>
               <ul class="highlight-list contact-list" data-contact-list></ul>
+              <ul class="contact-extra" data-contact-extra hidden></ul>
               ${note}
+              <p class="contact-note">TripReviewAll is an independent review site and does not operate this tour. For changes to an existing booking, contact ${esc(tour.company || "the operator")} directly.</p>
             </div>
           </div>`;
   }
@@ -194,6 +206,12 @@ function contactPanelHtml(tour) {
 }
 
 function telDigits(phone) { return String(phone || "").replace(/[^\d+]/g, ""); }
+
+/** Where the Verdict's text CTA goes: the first booking option (FareHarbor if it exists). */
+function verdictCtaHref(tour) {
+  const o = bookingOptions(tour)[0];
+  return o ? trackingUrl(tour.slug, o.key, o.url) : "";
+}
 
 function trackingUrl(tourSlug, platform, realUrl) {
   return `/api/track-click?tour=${encodeURIComponent(tourSlug)}&platform=${platform}&url=${encodeURIComponent(realUrl)}`;
@@ -303,7 +321,7 @@ function jsonLd(tour) {
     "@type": "TouristTrip",
     name: tour.title,
     url: `${SITE_URL}/tours/${tour.slug}`,
-    description: (tour.fullDescription || "").slice(0, 300),
+    description: ((tour.content && tour.content.overview && tour.content.overview.verdictSnippet) || tour.fullDescription || "").slice(0, 300).replace(/\s+\S*$/, ""),
     image: tour.gallery && tour.gallery[0] ? absUrl(tour.gallery[0]) : undefined,
     touristType: tour.tourType || undefined,
     provider: tour.company ? { "@type": "Organization", name: tour.company } : undefined,
@@ -318,7 +336,8 @@ function jsonLd(tour) {
       { "@type": "ListItem", position: 3, name: tour.title },
     ],
   };
-  return `${jsonLdScript(data)}\n${jsonLdScript(breadcrumb)}`;
+  const faq = tc.faqJsonLd(tour.content);
+  return `${jsonLdScript(data)}\n${jsonLdScript(breadcrumb)}${faq ? "\n" + jsonLdScript(faq) : ""}`;
 }
 
 /**
@@ -329,6 +348,10 @@ function jsonLd(tour) {
 function renderTourPageHtml(tour, similarTours) {
   const canonical = `${SITE_URL}/tours/${tour.slug}`;
   const pageTitle = tour.metaTitle || `${tour.title} — ${tour.company}`;
+  // A meta title that already ends with the brand ("… | TripReviewAll") is used as-is.
+  const hasBrand = /tripreviewall\s*$/i.test(pageTitle);
+  const fullTitle = hasBrand ? pageTitle : `${pageTitle} | Tripreviewall`;
+  const socialTitle = hasBrand ? pageTitle : `${pageTitle} — Tripreviewall`;
   const metaDesc = (tour.metaDescription || tour.fullDescription || `Honest review of ${tour.title}.`).slice(0, 155);
   const heroImg = tour.gallery && tour.gallery[0];
 
@@ -337,17 +360,17 @@ function renderTourPageHtml(tour, similarTours) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(pageTitle)} | Tripreviewall</title>
+<title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(metaDesc)}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="${esc(pageTitle)} — Tripreviewall">
+<meta property="og:title" content="${esc(socialTitle)}">
 <meta property="og:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta property="og:image" content="${esc(absUrl(imgUrl(heroImg, 1200)))}">` : ""}
 <meta property="og:url" content="${canonical}">
 <meta property="og:site_name" content="Tripreviewall">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(pageTitle)} — Tripreviewall">
+<meta name="twitter:title" content="${esc(socialTitle)}">
 <meta name="twitter:description" content="${esc(metaDesc)}">
 ${heroImg ? `<meta name="twitter:image" content="${esc(absUrl(imgUrl(heroImg, 1200)))}">` : ""}
 ${jsonLd(tour)}
@@ -399,6 +422,7 @@ ${siteHeader()}
       <button type="button" class="content-tab" role="tab" id="tabbtn-location" aria-controls="tab-location" aria-selected="false" tabindex="-1" data-target="tab-location">Location</button>
       <button type="button" class="content-tab" role="tab" id="tabbtn-review" aria-controls="tab-review" aria-selected="false" tabindex="-1" data-target="tab-review">Review</button>
       <button type="button" class="content-tab" role="tab" id="tabbtn-verdict" aria-controls="tab-verdict" aria-selected="false" tabindex="-1" data-target="tab-verdict">Our Verdict</button>
+      ${tc.faqHtml(tour.content) ? `<button type="button" class="content-tab" role="tab" id="tabbtn-faq" aria-controls="tab-faq" aria-selected="false" tabindex="-1" data-target="tab-faq">FAQ</button>` : ""}
       ${(currentSiteInfo().operatorContact || "after-click") === "never" ? "" : `<button type="button" class="content-tab" role="tab" id="tabbtn-contact" aria-controls="tab-contact" aria-selected="false" tabindex="-1" data-target="tab-contact">Contact</button>`}
     </div>
 
@@ -407,8 +431,9 @@ ${siteHeader()}
         <section class="detail-section content-tab-panel" id="tab-overview" role="tabpanel" aria-labelledby="tabbtn-overview" tabindex="0">
           ${packagesHtml(tour.packages)}
           <h2 class="detail-section-title">Overview</h2>
+          ${tc.overviewHtml(tour.content, tour) || `
           <ul class="highlight-list">${(tour.highlights || []).map((h) => `<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(h)}</li>`).join("")}</ul>
-          <p class="detail-body-text">${esc(tour.fullDescription || "")}</p>
+          <p class="detail-body-text">${esc(tour.fullDescription || "")}</p>`}
           ${variantSelectorHtml(tour.variants)}
         </section>
 
@@ -419,16 +444,22 @@ ${siteHeader()}
                <p style="margin-top:10px;"><a href="https://www.google.com/maps?q=${tour.location.lat},${tour.location.lng}" target="_blank" rel="noopener">Open in Google Maps →</a></p>`
             : ""}
           <p class="detail-body-text">${esc(tour.city ? tour.city + ", " : "")}${esc(tour.island)}, Hawaii</p>
-          <p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>
+          ${tc.locationHtml(tour.content) || `<p style="font-size:var(--text-meta); color:var(--color-text-muted);">Exact meeting point and pickup details are confirmed at booking via FareHarbor.</p>`}
         </section>
 
         <div class="content-tab-panel" id="tab-review" role="tabpanel" aria-labelledby="tabbtn-review" tabindex="0" style="display:none;">
           ${ratingsSectionHtml(tour)}
+          ${tc.reviewHtml(tour.content, { skipRatings: true }) ? `<section class="detail-section"><h2 class="detail-section-title">What the Reviews Say</h2>${tc.reviewHtml(tour.content, { skipRatings: true })}</section>` : ""}
         </div>
 
         <div class="content-tab-panel" id="tab-verdict" role="tabpanel" aria-labelledby="tabbtn-verdict" tabindex="0" style="display:none;">
-          ${verdictHtml(tour.verdict)}
+          ${tc.verdictHtml(tour.content, verdictCtaHref(tour)) ? `<section class="detail-section"><h2 class="visually-hidden">Our Verdict</h2>${tc.verdictHtml(tour.content, verdictCtaHref(tour))}</section>` : verdictHtml(tour.verdict)}
         </div>
+
+        ${tc.faqHtml(tour.content) ? `<section class="detail-section content-tab-panel" id="tab-faq" role="tabpanel" aria-labelledby="tabbtn-faq" tabindex="0" style="display:none;">
+          <h2 class="detail-section-title">Frequently Asked Questions</h2>
+          ${tc.faqHtml(tour.content)}
+        </section>` : ""}
 
         ${contactPanelHtml(tour)}
       </div>

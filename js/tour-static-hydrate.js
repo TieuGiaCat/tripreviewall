@@ -158,6 +158,15 @@
     if (c.company) row("company", c.company);
     if (c.phone) row("phone", c.phone, "tel:" + c.phone.replace(/[^\d+]/g, ""));
     if (c.email) row("email", c.email, "mailto:" + c.email);
+    var extra = gate.querySelector("[data-contact-extra]");
+    if (extra) {
+      var items = [];
+      if (c.website && /^https?:\/\//.test(c.website)) { var a = document.createElement("a"); a.href = c.website; a.target = "_blank"; a.rel = "noopener nofollow"; a.textContent = c.website.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, ""); items.push(["Website:", a]); }
+      if (c.address) items.push(["Address:", document.createTextNode(c.address)]);
+      if (c.hours) items.push(["Hours:", document.createTextNode(c.hours)]);
+      items.forEach(function (it) { var li = document.createElement("li"); var s = document.createElement("span"); s.textContent = it[0]; li.appendChild(s); li.appendChild(document.createTextNode(" ")); li.appendChild(it[1]); extra.appendChild(li); });
+      extra.hidden = !items.length;
+    }
     gate.querySelector(".contact-locked").hidden = true;
     gate.querySelector(".contact-unlocked").hidden = false;
     gate.classList.add("is-unlocked");

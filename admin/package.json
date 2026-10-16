@@ -12,6 +12,7 @@
     "bulk-import-images": "node src/bulk-import-images.js",
     "bulk-import-locations": "node src/bulk-import-locations.js",
     "regenerate-all": "node src/regenerate-all.js",
+    "import-tour-content": "node src/import-tour-content.js",
     "test": "node --test",
     "check": "node scripts/check.js"
   },

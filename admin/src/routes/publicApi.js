@@ -29,6 +29,7 @@ function toPublicShape(row) {
     variants: d.variants || [],
     editorsPick: typeof d.editorsPick === "boolean" ? d.editorsPick : LEGACY_EDITORS_PICK_SLUGS.includes(row.slug),
     packages: d.packages || { show: false, items: [] },
+    content: d.content || null, // structured page content (see ssr/tourContent.js)
     fareharborItemId: d.fareharborItemId || "",
     fareharborRegularLink: d.fareharborRegularLink || "",
     fareharborCalendarScript: d.fareharborCalendarScript || "",
@@ -37,10 +38,28 @@ function toPublicShape(row) {
     location: d.location || null,
     bookingLinks: d.bookingLinks || {},
     priceFrom: row.price_from != null ? Number(row.price_from) : null,
-    aggregatedRating: d.aggregatedRating != null ? Number(d.aggregatedRating) : null,
-    reviewCountTotal: d.reviewCountTotal != null ? Number(d.reviewCountTotal) : null,
+    aggregatedRating: d.aggregatedRating ? Number(d.aggregatedRating) : researchedAggregate(d).rating,
+    reviewCountTotal: d.reviewCountTotal ? Number(d.reviewCountTotal) : researchedAggregate(d).count,
     ratingDistribution: d.ratingDistribution || { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 },
   };
+}
+
+/**
+ * When Admin tab 2 holds no ratings, fall back to the researched public scores
+ * in data.content.review.ratings: count-weighted average over platforms that
+ * show a review count; platforms without a count don't affect the average.
+ */
+function researchedAggregate(d) {
+  const list = d && d.content && d.content.review && Array.isArray(d.content.review.ratings) ? d.content.review.ratings : [];
+  let sum = 0, n = 0, plain = [];
+  for (const r of list) {
+    const rating = Number(r && r.rating), count = Number(r && r.count);
+    if (!(rating > 0)) continue;
+    if (count > 0) { sum += rating * count; n += count; } else plain.push(rating);
+  }
+  if (n > 0) return { rating: Math.round((sum / n) * 10) / 10, count: n };
+  if (plain.length) return { rating: Math.round((plain.reduce((a, b) => a + b, 0) / plain.length) * 10) / 10, count: null };
+  return { rating: null, count: null };
 }
 
 /** Only what a tour card needs (C8) — ~10× smaller than the full shape. */

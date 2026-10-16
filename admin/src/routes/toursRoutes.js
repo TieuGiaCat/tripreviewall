@@ -6,6 +6,7 @@ const { logAudit } = require("../auditLog");
 const { seoPanelHtml, seoPanelAssets, scoreFor, scoreDots, usedKeyphrases, SeoAnalysis } = require("../lib/seoPanel");
 const { LEGACY_EDITORS_PICK_SLUGS } = require("../siteConfig");
 const { tourAffiliateIssues, SQL_HAS_AFFILIATE_ISSUE, clientRulesJson } = require("../lib/affiliateLinks");
+const { bodyToContent, contentToFields } = require("../lib/tourContentFields");
 
 const ISLANDS = require("../ssr/islands").ISLANDS.map((i) => i.name); // single source: ssr/islands.js
 
@@ -197,6 +198,7 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="basics" onclick="switchTourTab('basics')" style="background:var(--color-primary,#c1440e);color:#fff;">1. Basics</button>
         <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="content" onclick="switchTourTab('content')">2. Content &amp; Reviews</button>
         <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="packages" onclick="switchTourTab('packages')">3. Packages</button>
+        <button type="button" class="btn btn-secondary tour-tab-btn" data-tab="pagecontent" onclick="switchTourTab('pagecontent')">4. Page content</button>
       </div>
 
       <div class="tour-tab-panel" data-tab-panel="basics">
@@ -367,6 +369,10 @@ function renderTourForm({ tour = {}, errors = [], formAction, isEdit }) {
         </div>
         <div id="packageFields"></div>
       </div>
+      </div>
+
+      <div class="tour-tab-panel" data-tab-panel="pagecontent" style="display:none;">
+        ${pageContentPanelHtml(d.content)}
       </div>
 
       <div class="form-actions">
@@ -557,6 +563,82 @@ function tourSeoScores(d, slug) {
   });
 }
 
+/** Admin tab "4. Page content": textareas for the structured tour-page content. */
+function pageContentPanelHtml(content) {
+  const f = contentToFields(content);
+  const ta = (name, label, hint, rows = 4) => `
+    <div class="form-field">
+      <label>${esc(label)}</label>
+      <textarea name="${name}" rows="${rows}">${esc(f[name] || "")}</textarea>
+      ${hint ? `<div class="hint">${hint}</div>` : ""}
+    </div>`;
+  const inp = (name, label, hint, type = "text") => `
+    <div class="form-field">
+      <label>${esc(label)}</label>
+      <input type="${type}" name="${name}" value="${esc(f[name] || "")}">
+      ${hint ? `<div class="hint">${hint}</div>` : ""}
+    </div>`;
+  return `
+      <div class="form-card">
+        <h2>Overview tab</h2>
+        <p class="hint" style="margin:-8px 0 16px;">These fields replace the plain "Full description" on the live page when filled in. Lists: one item per line. Text: blank line between paragraphs. <code>**bold**</code> is allowed. Leave a field empty to hide its section. Content imported by <code>npm run import-tour-content</code> lands here.</p>
+        ${ta("c_verdictSnippet", "Verdict snippet (first paragraph, ≤ 60 words)", "Direct answer to “is this tour worth it?” — shown first and used as the page's structured-data description.", 3)}
+        ${ta("c_highlights", "Highlights (override)", "One per line. Leave empty to use the Highlights from tab 2.")}
+        ${ta("c_whatToExpect", "What to expect (steps, in order)", "One step per line — rendered as a numbered list.", 6)}
+        <div class="form-row">
+          ${ta("c_included", "What's included", "One per line.")}
+          ${ta("c_notIncluded", "What's not included", "One per line.")}
+        </div>
+        <div class="form-row">
+          ${ta("c_whatToBring", "What to bring", "One per line.")}
+          ${ta("c_restrictions", "Restrictions and requirements", "One per line (age, weight, pregnancy, mobility…).")}
+        </div>
+        ${ta("c_cancellationPolicy", "Cancellation policy", "", 2)}
+      </div>
+
+      <div class="form-card">
+        <h2>Location tab</h2>
+        ${ta("c_meetingPoint", "Meeting point", "Exact place and what to look for (dock, hotel lobby, which harbor slip…).", 3)}
+        ${ta("c_checkIn", "Check-in", "How early to arrive, what to bring to check-in (ID, voucher, waiver).", 2)}
+        ${ta("c_parking", "Parking and getting there", "Parking cost, lot location, shuttle / pickup zones, rideshare notes.", 3)}
+      </div>
+
+      <div class="form-card">
+        <h2>Review tab — "What the Reviews Say"</h2>
+        ${ta("c_methodology", "Methodology", "How many reviews were read, on which platforms, when. Be honest if only star counts were available.", 2)}
+        ${ta("c_ratings", "Public ratings by platform", "One per line: <code>Platform | rating | review count | checked (Month YYYY)</code> — e.g. <code>TripAdvisor | 4.8 | 312 | October 2026</code>.", 4)}
+        ${ta("c_praise", "What reviewers praise (themes)", "Blocks separated by a blank line. Line 1: <code>Theme title — 4 of 11 reviews we read</code>. Then summary sentence(s). Optional example line starting with <code>— Platform, 5★, Month YYYY: paraphrase</code>.", 10)}
+        ${ta("c_complaints", "What reviewers complain about (themes)", "Same format. Optional second line in brackets: <code>[operator issue · most recent: May 2026]</code>. Optional last line: <code>Operator response: …</code>.", 10)}
+        ${ta("c_operatorWide", "About the operator in general", "Company-wide reputation (other tours, years in business, safety record) — only what you can source.", 3)}
+      </div>
+
+      <div class="form-card">
+        <h2>Our Verdict tab</h2>
+        <p class="hint" style="margin:-8px 0 16px;">When "Verdict intro" or "Book if" is filled in, this replaces the older Verdict fields from tab 2.</p>
+        ${ta("c_verdictIntro", "Verdict intro", "1–2 short paragraphs: who it's for, main caveat.", 4)}
+        <div class="form-row">
+          ${ta("c_bookIf", "Book this tour if…", "One per line.")}
+          ${ta("c_skipIf", "Skip this tour if…", "One per line.")}
+        </div>
+        ${ta("c_tips", "Tips from reviewers and operator notes", "One per line.", 5)}
+        ${inp("c_cta", "Call-to-action text", "Shown as a link to the first booking option, e.g. <code>Check availability on FareHarbor</code>.")}
+      </div>
+
+      <div class="form-card">
+        <h2>FAQ tab</h2>
+        ${ta("c_faq", "Questions and answers", "Blocks separated by a blank line: a <code>Q:</code> line followed by an <code>A:</code> line. The tab only appears when at least one Q/A exists; also emitted as FAQ structured data.", 12)}
+      </div>
+
+      <div class="form-card">
+        <h2>Contact tab extras</h2>
+        <p class="hint" style="margin:-8px 0 16px;">Phone and email are on tab 1. These follow the same "Operator contact" visibility rule from Site Info.</p>
+        ${inp("c_website", "Operator website", "Full URL, https://…", "url")}
+        ${inp("c_address", "Address", "")}
+        ${inp("c_hours", "Office hours", "e.g. Daily 7:00 AM – 7:00 PM HST")}
+        ${inp("c_updatedOn", "Content last reviewed", "Shown in the verdict byline, e.g. <code>October 2026</code>.")}
+      </div>`;
+}
+
 function bodyToTourData(body, existingData = {}) {
   return {
     // Keep every existing field the form doesn't edit (anything imported or
@@ -590,6 +672,9 @@ function bodyToTourData(body, existingData = {}) {
       lastCheckedDate: body.googleLastChecked || null,
     },
     ...ratingsFromBody(body, existingData),
+    // "4. Page content" tab — only touched when the form actually posted it
+    // (the field is always present when the tab is rendered).
+    content: body.c_verdictSnippet !== undefined ? bodyToContent(body, existingData.content || {}) : (existingData.content || null),
     // No longer edited in the form — kept so tour cards' bar still has data.
     ratingDistribution: existingData.ratingDistribution || { star5: 0, star4: 0, star3: 0, star2: 0, star1: 0 },
     bookingLinks: {
