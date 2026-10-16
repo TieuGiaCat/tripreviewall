@@ -66,12 +66,16 @@ function toContent(t, updatedOn) {
 }
 
 /** Walk every public text field and flag leaks / banned marketing words. */
-function lint(slug, content, seo) {
+function lint(slug, content, seo, companyName) {
   const problems = [];
+  // Words that are part of the operator's name ("Sea Paradise") are not marketing copy.
+  const nameWords = new Set(String(companyName || "").toLowerCase().split(/[^a-z-]+/).filter(Boolean));
   const visit = (val, where) => {
     if (typeof val === "string") {
       if (LEAK.test(val)) problems.push(`${slug}: internal note leaked in ${where}`);
-      if (BANNED.test(val)) problems.push(`${slug}: banned word "${val.match(BANNED)[0]}" in ${where}`);
+      const hit = val.match(BANNED);
+      const properNoun = hit && /^[A-Z]/.test(hit[0]) && new RegExp(hit[0] + "\\s+[A-Z]").test(val); // "Paradise Pinnacle" (a dive site)
+      if (hit && !nameWords.has(hit[0].toLowerCase()) && !properNoun) problems.push(`${slug}: banned word "${hit[0]}" in ${where}`);
     } else if (Array.isArray(val)) val.forEach((x, i) => visit(x, `${where}[${i}]`));
     else if (val && typeof val === "object") Object.keys(val).forEach((k) => { if (k !== "sources" && k !== "needsData" && !/url$/i.test(k)) visit(val[k], `${where}.${k}`); });
   };
@@ -114,7 +118,7 @@ async function main() {
     const d = { ...row.data };
     const content = toContent(t, s(t.updatedOn) || updatedOn);
     const seo = t.seo || {};
-    warnings.push(...lint(slug, content, { metaTitle: s(seo.metaTitle), metaDescription: s(seo.metaDescription) }));
+    warnings.push(...lint(slug, content, { metaTitle: s(seo.metaTitle), metaDescription: s(seo.metaDescription) }, d.company));
     if (s(seo.metaTitle)) { const prev = seenTitles.get(s(seo.metaTitle).toLowerCase()); if (prev) warnings.push(`${slug}: metaTitle duplicates ${prev}`); seenTitles.set(s(seo.metaTitle).toLowerCase(), slug); }
     (content.needsData || []).forEach((n) => needs.push(`${slug}: ${n}`));
 

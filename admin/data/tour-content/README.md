@@ -19,5 +19,6 @@ The import is repeatable: running it again re-applies the files (later edits
 made in Admin → Tours → "4. Page content" are overwritten for those tours, so
 edit the JSON instead, or remove a tour from the file to keep the admin version).
 
-Coverage: 227 of 265 tours. The 38 tours not yet researched are listed in
-`NOT-DONE.txt`; their pages keep the old description until content is added.
+Coverage: all 265 tours. 47 of them are marked `confidence: "low"` (thin
+sources) and listed in `LOW-CONFIDENCE.txt` — review those first. Each tour's
+`needsData` array says exactly which facts could not be verified online.
